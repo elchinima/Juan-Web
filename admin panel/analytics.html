@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Juan Admin - Analytics</title>
+    <link rel="shortcut icon" href="assets/img/logo.png" type="image/png" />
+    <link rel="stylesheet" href="assets/css/admin.css" />
+  </head>
+  <body data-page="analytics">
+    <div class="admin-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html" data-transition>
+          <img src="assets/img/logo.png" alt="Juan" />
+          <span>Admin</span>
+        </a>
+        <nav class="side-nav" aria-label="Admin navigation">
+          <a href="index.html" data-transition>Dashboard</a>
+          <a href="products.html" data-transition>Products</a>
+          <a href="orders.html" data-transition>Orders</a>
+          <a href="customers.html" data-transition>Customers</a>
+          <a class="active" href="analytics.html" data-transition>Analytics</a>
+          <a href="settings.html" data-transition>Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <span>Performance</span>
+          <strong>+12.8%</strong>
+          <p>Revenue increased compared with last month.</p>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <p class="eyebrow">Reports</p>
+            <h1>Analytics</h1>
+          </div>
+          <div class="topbar-actions">
+            <a class="ghost-button" href="products.html" data-transition>Products</a>
+            <button class="primary-button" type="button" data-pulse>Download</button>
+          </div>
+        </header>
+
+        <section class="hero-panel reveal">
+          <div>
+            <p class="eyebrow">Growth</p>
+            <h2>Revenue and customer interest are trending upward.</h2>
+            <p>Use this overview to see which categories and days are driving the store.</p>
+          </div>
+          <div class="hero-metric">
+            <span>Monthly Sales</span>
+            <strong data-count="58240">$0</strong>
+            <small>Target: $64,000</small>
+          </div>
+        </section>
+
+        <section class="content-grid wide-left">
+          <article class="panel reveal">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Trend</p>
+                <h3>Sales by Category</h3>
+              </div>
+            </div>
+            <div class="bar-chart large" aria-label="Category sales chart">
+              <span style="--value: 84%" data-label="Sport"></span>
+              <span style="--value: 68%" data-label="Boots"></span>
+              <span style="--value: 78%" data-label="Casual"></span>
+              <span style="--value: 52%" data-label="Formal"></span>
+              <span style="--value: 91%" data-label="Limited"></span>
+            </div>
+          </article>
+
+          <article class="panel reveal">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Goals</p>
+                <h3>Monthly Targets</h3>
+              </div>
+            </div>
+            <div class="target-list">
+              <div>
+                <span>Revenue</span>
+                <strong>91%</strong>
+              </div>
+              <div>
+                <span>Orders</span>
+                <strong>84%</strong>
+              </div>
+              <div>
+                <span>Reviews</span>
+                <strong>67%</strong>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="assets/js/admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Juan Admin - Orders</title>
+    <link rel="shortcut icon" href="assets/img/logo.png" type="image/png" />
+    <link rel="stylesheet" href="assets/css/admin.css" />
+  </head>
+  <body data-page="orders">
+    <div class="admin-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html" data-transition>
+          <img src="assets/img/logo.png" alt="Juan" />
+          <span>Admin</span>
+        </a>
+        <nav class="side-nav" aria-label="Admin navigation">
+          <a href="index.html" data-transition>Dashboard</a>
+          <a href="products.html" data-transition>Products</a>
+          <a class="active" href="orders.html" data-transition>Orders</a>
+          <a href="customers.html" data-transition>Customers</a>
+          <a href="analytics.html" data-transition>Analytics</a>
+          <a href="settings.html" data-transition>Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <span>Orders</span>
+          <strong>248 Today</strong>
+          <p>32 orders are waiting for shipment.</p>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <p class="eyebrow">Sales</p>
+            <h1>Orders</h1>
+          </div>
+          <div class="topbar-actions">
+            <a class="ghost-button" href="customers.html" data-transition>Customers</a>
+            <button class="primary-button" type="button" data-pulse>Export</button>
+          </div>
+        </header>
+
+        <section class="stats-grid compact">
+          <article class="stat-card reveal">
+            <span>Processing</span>
+            <strong data-count="32">0</strong>
+            <p>Ready for packing</p>
+          </article>
+          <article class="stat-card reveal">
+            <span>Shipped</span>
+            <strong data-count="184">0</strong>
+            <p>In delivery flow</p>
+          </article>
+          <article class="stat-card reveal">
+            <span>Returned</span>
+            <strong data-count="6">0</strong>
+            <p>Needs support</p>
+          </article>
+        </section>
+
+        <section class="panel reveal">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Queue</p>
+              <h3>Latest Orders</h3>
+            </div>
+            <button class="filter-button" type="button" data-pulse>Sort</button>
+          </div>
+          <div class="admin-table">
+            <div class="admin-table-head">
+              <span>Order</span>
+              <span>Customer</span>
+              <span>Total</span>
+              <span>Status</span>
+            </div>
+            <div class="admin-table-row">
+              <span>#JN-2048</span>
+              <strong>Emma Wilson</strong>
+              <span>$176.00</span>
+              <em class="status warn">Processing</em>
+            </div>
+            <div class="admin-table-row">
+              <span>#JN-2047</span>
+              <strong>Liam Carter</strong>
+              <span>$142.00</span>
+              <em class="status good">Shipped</em>
+            </div>
+            <div class="admin-table-row">
+              <span>#JN-2046</span>
+              <strong>Olivia Reed</strong>
+              <span>$74.00</span>
+              <em class="status good">Paid</em>
+            </div>
+            <div class="admin-table-row">
+              <span>#JN-2045</span>
+              <strong>Noah Evans</strong>
+              <span>$69.00</span>
+              <em class="status off">Returned</em>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="assets/js/admin.js"></script>
+  </body>
+</html>

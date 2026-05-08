@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Juan Admin - Products</title>
+    <link rel="shortcut icon" href="assets/img/logo.png" type="image/png" />
+    <link rel="stylesheet" href="assets/css/admin.css" />
+  </head>
+  <body data-page="products">
+    <div class="admin-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html" data-transition>
+          <img src="assets/img/logo.png" alt="Juan" />
+          <span>Admin</span>
+        </a>
+        <nav class="side-nav" aria-label="Admin navigation">
+          <a href="index.html" data-transition>Dashboard</a>
+          <a class="active" href="products.html" data-transition>Products</a>
+          <a href="orders.html" data-transition>Orders</a>
+          <a href="customers.html" data-transition>Customers</a>
+          <a href="analytics.html" data-transition>Analytics</a>
+          <a href="settings.html" data-transition>Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <span>Catalog</span>
+          <strong>126 Items</strong>
+          <p>18 products need a stock review.</p>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <p class="eyebrow">Catalog</p>
+            <h1>Products</h1>
+          </div>
+          <div class="topbar-actions">
+            <a class="ghost-button" href="index.html" data-transition>Dashboard</a>
+            <button class="primary-button" type="button" data-pulse>Add Product</button>
+          </div>
+        </header>
+
+        <section class="hero-panel reveal">
+          <div>
+            <p class="eyebrow">Inventory</p>
+            <h2>Keep product cards, prices, and stock levels organized.</h2>
+            <p>This mockup keeps the storefront style while making admin work faster to scan.</p>
+          </div>
+          <div class="hero-metric">
+            <span>Low Stock</span>
+            <strong data-count="18">0</strong>
+            <small>Review needed</small>
+          </div>
+        </section>
+
+        <section class="content-grid wide-left">
+          <article class="panel reveal">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Products</p>
+                <h3>Catalog List</h3>
+              </div>
+              <button class="filter-button" type="button" data-pulse>Filter</button>
+            </div>
+            <div class="product-list">
+              <div class="product-row">
+                <div class="product-thumb">RS</div>
+                <div>
+                  <strong>Running Sneakers</strong>
+                  <span>Sport Shoes</span>
+                </div>
+                <em>$88.00</em>
+                <small class="status good">In Stock</small>
+              </div>
+              <div class="product-row">
+                <div class="product-thumb">LB</div>
+                <div>
+                  <strong>Leather Boots</strong>
+                  <span>Boots</span>
+                </div>
+                <em>$142.00</em>
+                <small class="status warn">Low Stock</small>
+              </div>
+              <div class="product-row">
+                <div class="product-thumb">CT</div>
+                <div>
+                  <strong>Classic Trainers</strong>
+                  <span>Lifestyle</span>
+                </div>
+                <em>$74.00</em>
+                <small class="status good">In Stock</small>
+              </div>
+              <div class="product-row">
+                <div class="product-thumb">SS</div>
+                <div>
+                  <strong>Suede Slip Ons</strong>
+                  <span>Casual</span>
+                </div>
+                <em>$69.00</em>
+                <small class="status off">Draft</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel reveal">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Quick Edit</p>
+                <h3>Product Form</h3>
+              </div>
+            </div>
+            <form class="admin-form">
+              <label>
+                Product Name
+                <input type="text" value="Running Sneakers" />
+              </label>
+              <label>
+                Category
+                <select>
+                  <option>Sport Shoes</option>
+                  <option>Boots</option>
+                  <option>Lifestyle</option>
+                </select>
+              </label>
+              <label>
+                Price
+                <input type="text" value="$88.00" />
+              </label>
+              <button class="primary-button full" type="button" data-pulse>Save Product</button>
+            </form>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="assets/js/admin.js"></script>
+  </body>
+</html>
