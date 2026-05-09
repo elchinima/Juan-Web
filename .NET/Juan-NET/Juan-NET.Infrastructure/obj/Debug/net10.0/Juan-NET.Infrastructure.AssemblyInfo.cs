@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Juan-NET.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+32dc167750df0c4ae541b7001b1c6296407c9721")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31bafc82e0ac856b7e87386e0cacd5655ce94488")]
 [assembly: System.Reflection.AssemblyProductAttribute("Juan-NET.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Juan-NET.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

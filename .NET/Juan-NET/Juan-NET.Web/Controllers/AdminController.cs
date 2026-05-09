@@ -3,6 +3,7 @@ using Juan_NET.Persistence.Context;
 using Juan_NET.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Juan_NET.Web.Controllers
 {
@@ -10,11 +11,13 @@ namespace Juan_NET.Web.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ImageStorageService _imageStorage;
+        private readonly EmailService _emailService;
 
-        public AdminController(AppDbContext context, ImageStorageService imageStorage)
+        public AdminController(AppDbContext context, ImageStorageService imageStorage, EmailService emailService)
         {
             _context = context;
             _imageStorage = imageStorage;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Index()
@@ -50,7 +53,12 @@ namespace Juan_NET.Web.Controllers
             ModelState.Remove($"{nameof(AdminProductsViewModel.Product)}.{nameof(Product.CategoryName)}");
             ModelState.Remove($"{nameof(AdminProductsViewModel.Product)}.{nameof(Product.ProductCategories)}");
 
-            viewModel.SelectedCategoryIds = viewModel.SelectedCategoryIds.Distinct().ToList();
+            viewModel.SelectedCategoryIds = (viewModel.SelectedCategoryIds ?? new List<int>()).Distinct().ToList();
+
+            if (viewModel.Product is null)
+            {
+                ModelState.AddModelError(nameof(AdminProductsViewModel.Product), "Product details are required.");
+            }
 
             if (viewModel.SelectedCategoryIds.Count < 1 || viewModel.SelectedCategoryIds.Count > 3)
             {
@@ -146,7 +154,12 @@ namespace Juan_NET.Web.Controllers
             ModelState.Remove(nameof(AdminCategoriesViewModel.Categories));
             ModelState.Remove($"{nameof(AdminCategoriesViewModel.Category)}.{nameof(Category.ProductCategories)}");
 
-            var name = viewModel.Category.Name.Trim();
+            var name = viewModel.Category?.Name?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ModelState.AddModelError($"{nameof(AdminCategoriesViewModel.Category)}.{nameof(Category.Name)}", "Category name is required.");
+            }
 
             if (await _context.Categories.AnyAsync(category => category.Name == name))
             {
@@ -204,6 +217,11 @@ namespace Juan_NET.Web.Controllers
         {
             ModelState.Remove(nameof(AdminSlidersViewModel.Sliders));
 
+            if (viewModel.Slider is null)
+            {
+                ModelState.AddModelError(nameof(AdminSlidersViewModel.Slider), "Slider details are required.");
+            }
+
             if (!ModelState.IsValid)
             {
                 viewModel.Sliders = await _context.Sliders.OrderBy(slider => slider.DisplayOrder).ToListAsync();
@@ -229,6 +247,11 @@ namespace Juan_NET.Web.Controllers
         public async Task<IActionResult> EditSlider(AdminSlidersViewModel viewModel)
         {
             ModelState.Remove(nameof(AdminSlidersViewModel.Sliders));
+
+            if (viewModel.Slider is null)
+            {
+                return RedirectToAction(nameof(Sliders));
+            }
 
             var slider = await _context.Sliders.FindAsync(viewModel.Slider.Id);
 
@@ -311,7 +334,14 @@ namespace Juan_NET.Web.Controllers
                 ? await GetSubscribeRecipientsQuery().ToListAsync()
                 : viewModel.SelectedEmails.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-            TempData["SubscribeMessage"] = $"Message simulated for {recipients.Count} recipient(s).";
+            var body = WebUtility.HtmlEncode(viewModel.Message).Replace("\n", "<br />");
+
+            foreach (var recipient in recipients)
+            {
+                await _emailService.SendAsync(recipient, viewModel.Subject, $"<p>{body}</p>");
+            }
+
+            TempData["SubscribeMessage"] = $"Message sent to {recipients.Count} recipient(s).";
 
             return RedirectToAction(nameof(Subscribe));
         }

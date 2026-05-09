@@ -14,7 +14,7 @@
 @section SidebarCard {
     <span>Email</span>
     <strong>@recipients.Count Recipients</strong>
-    <p>Newsletter message simulation for users and subscribers.</p>
+    <p>Newsletter delivery for users and subscribers.</p>
 }
 
 <header class="topbar">
@@ -26,6 +26,7 @@
         <h1>Subscribe</h1>
     </div>
     <div class="topbar-actions">
+        <button class="primary-button" type="button" data-open-subscribe-modal>Send Message</button>
         <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
     </div>
 </header>
@@ -75,18 +76,33 @@
         </div>
     </article>
 
-    <article class="panel reveal">
+    <article class="panel reveal subscribe-action-panel">
         <div class="panel-head">
             <div>
-                <p class="eyebrow">Simulation</p>
-                <h3>Send Message</h3>
+                <p class="eyebrow">Delivery</p>
+                <h3>Send real email</h3>
             </div>
         </div>
-        <form id="subscribe-send-form" class="admin-form" asp-controller="Admin" asp-action="SendSubscribe" method="post" data-confirm="Simulate sending this message?">
+        <p class="muted-text">Select recipients from the audience list, then compose the email in a modal window.</p>
+        <button class="primary-button full" type="button" data-open-subscribe-modal>Send Message</button>
+    </article>
+</section>
+
+<div class="admin-modal @(ViewData.ModelState.IsValid ? "" : "is-open")" data-subscribe-modal>
+    <div class="admin-modal-backdrop" data-close-subscribe-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="subscribe-modal-title">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Delivery</p>
+                <h3 id="subscribe-modal-title">Send Message</h3>
+            </div>
+            <button class="modal-close" type="button" aria-label="Close modal" data-close-subscribe-modal>&times;</button>
+        </div>
+        <form id="subscribe-send-form" class="admin-form" asp-controller="Admin" asp-action="SendSubscribe" method="post" data-confirm="Send this message to selected recipients?">
             <div asp-validation-summary="ModelOnly" class="status off"></div>
             <label class="inline-check">
                 <input asp-for="SendToAll" />
-                Send to all users
+                Send to all users and subscribers
             </label>
             <span asp-validation-for="SelectedEmails" class="status off"></span>
             <label>
@@ -96,10 +112,10 @@
             </label>
             <label>
                 Message
-                <textarea asp-for="Message" rows="6" placeholder="Write message text"></textarea>
+                <textarea asp-for="Message" rows="7" placeholder="Write message text"></textarea>
                 <span asp-validation-for="Message" class="status off"></span>
             </label>
-            <button class="primary-button full" type="submit">Send Simulation</button>
+            <button class="primary-button full" type="submit">Send Message</button>
         </form>
-    </article>
-</section>
+    </section>
+</div>

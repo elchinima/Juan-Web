@@ -1,32 +1,5 @@
 ﻿<header class="header-area">
     <div class="main-header d-none d-lg-block">
-        <div class="header-top theme-bg">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <div class="welcome-message">
-                            <p>Welcome to Juan online store</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 text-right">
-                        <div class="header-top-settings">
-                            <ul class="nav align-items-center justify-content-end">
-                                <li><a asp-controller="Admin" asp-action="Index">Admin Panel</a></li>
-                                @if (User.Identity?.IsAuthenticated == true)
-                                {
-                                    <li><a asp-controller="Account" asp-action="Profile">@User.Identity.Name</a></li>
-                                }
-                                else
-                                {
-                                    <li><a asp-controller="Account" asp-action="Login">Login</a></li>
-                                    <li><a asp-controller="Account" asp-action="Register">Register</a></li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="header-main-area sticky">
             <div class="container">
                 <div class="row align-items-center position-relative">

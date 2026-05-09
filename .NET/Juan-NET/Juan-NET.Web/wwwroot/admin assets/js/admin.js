@@ -11,6 +11,9 @@
   var sliderModal = document.querySelector("[data-slider-modal]");
   var openSliderModal = document.querySelector("[data-open-slider-modal]");
   var closeSliderModal = document.querySelectorAll("[data-close-slider-modal]");
+  var subscribeModal = document.querySelector("[data-subscribe-modal]");
+  var openSubscribeModal = document.querySelectorAll("[data-open-subscribe-modal]");
+  var closeSubscribeModal = document.querySelectorAll("[data-close-subscribe-modal]");
   var imageInput = document.querySelector("[data-image-input]");
   var imageName = document.querySelector("[data-image-name]");
   var sliderImageInput = document.querySelector("[data-slider-image-input]");
@@ -63,6 +66,10 @@
     body.classList.add("modal-open");
   }
 
+  if (subscribeModal && subscribeModal.classList.contains("is-open")) {
+    body.classList.add("modal-open");
+  }
+
   if (openProductModal && productModal) {
     openProductModal.addEventListener("click", function () {
       productModal.classList.add("is-open");
@@ -87,6 +94,20 @@
   closeSliderModal.forEach(function (item) {
     item.addEventListener("click", function () {
       sliderModal.classList.remove("is-open");
+      body.classList.remove("modal-open");
+    });
+  });
+
+  openSubscribeModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      subscribeModal.classList.add("is-open");
+      body.classList.add("modal-open");
+    });
+  });
+
+  closeSubscribeModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      subscribeModal.classList.remove("is-open");
       body.classList.remove("modal-open");
     });
   });

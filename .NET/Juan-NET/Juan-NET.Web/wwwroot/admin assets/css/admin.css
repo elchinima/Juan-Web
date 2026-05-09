@@ -591,24 +591,40 @@ button {
   margin-bottom: 18px;
 }
 
+.muted-text {
+  margin: 0 0 22px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.subscribe-action-panel {
+  align-self: start;
+}
+
 .admin-modal {
   position: fixed;
   z-index: 50;
   inset: 0;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
 }
 
 .admin-modal.is-open {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .admin-modal-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(34, 34, 34, 0.58);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .admin-modal-panel {
@@ -621,6 +637,21 @@ button {
   border-radius: 8px;
   background: #ffffff;
   box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(18px) scale(0.92);
+  transform-origin: top center;
+  clip-path: inset(18% 18% 18% 18% round 24px);
+  transition: opacity 0.28s ease, transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1), clip-path 0.34s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.admin-modal.is-open .admin-modal-backdrop {
+  opacity: 1;
+}
+
+.admin-modal.is-open .admin-modal-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  clip-path: inset(0 0 0 0 round 8px);
 }
 
 .confirm-modal-panel {

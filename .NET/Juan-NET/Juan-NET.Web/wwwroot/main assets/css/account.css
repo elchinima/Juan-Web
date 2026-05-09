@@ -238,6 +238,107 @@
   font-size: 24px;
 }
 
+.image-dropzone-field {
+  display: grid;
+  gap: 10px;
+}
+
+.image-dropzone-label {
+  color: #222222;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.image-dropzone {
+  position: relative;
+  min-height: 120px;
+  padding: 16px;
+  border: 1px dashed #d8ccb7;
+  border-radius: 8px;
+  background: #fbfaf7;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.image-dropzone:focus-within {
+  border-color: #e3a51e;
+  box-shadow: 0 0 0 4px rgba(227, 165, 30, 0.12);
+}
+
+.image-dropzone-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.image-dropzone-text {
+  color: #555555;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: none;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-dropzone-hint {
+  color: #999999;
+  font-size: 12px;
+  text-transform: none;
+}
+
+.image-dropzone.is-dragover {
+  border-color: #e3a51e;
+  background: rgba(227, 165, 30, 0.08);
+  box-shadow: 0 0 0 4px rgba(227, 165, 30, 0.12);
+}
+
+.image-dropzone.has-image .image-dropzone-text {
+  color: #222222;
+}
+
+.image-dropzone-preview {
+  position: absolute;
+  inset: 8px;
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.98);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  background: #f7f3ea;
+  box-shadow: 0 18px 45px rgba(34, 34, 34, 0.18);
+}
+
+.image-dropzone-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.image-dropzone.has-image:hover .image-dropzone-preview {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
 .profile-inline-form {
   margin-top: 12px;
 }

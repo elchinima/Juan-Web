@@ -1751,6 +1751,52 @@ fieldset {
   .product-content .product-name {
     padding-bottom: 12px; }
 
+.our-product .product-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  min-height: 504px; }
+
+.our-product .product-thumb {
+  height: 264px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center; }
+
+.our-product .product-thumb img {
+  max-height: 100%;
+  width: auto; }
+
+.our-product .product-content {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-bottom: 84px; }
+
+.our-product .product-content p {
+  margin-top: 16px;
+  margin-bottom: 9px; }
+
+.our-product .product-action-link a {
+  bottom: 16px; }
+
 .product-name {
   font-size: 18px;
   font-weight: 400;
