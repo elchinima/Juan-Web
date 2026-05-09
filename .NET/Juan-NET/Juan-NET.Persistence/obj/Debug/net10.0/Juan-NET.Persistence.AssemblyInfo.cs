@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Juan-NET.Persistence")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8d7fc4324172a2aef8e135255416e8ef84b81da1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0d0ba2e825d850190335361041003c0f9aae75c4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Juan-NET.Persistence")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Juan-NET.Persistence")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

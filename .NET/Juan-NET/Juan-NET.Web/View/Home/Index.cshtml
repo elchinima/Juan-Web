@@ -1,4 +1,5 @@
-﻿@{
+﻿@model HomeViewModel
+@{
     ViewData["Title"] = "Home";
 }
 
@@ -78,9 +79,9 @@
                                     <li class="user-hover">
                                         <a href="#"><i class="ion-ios-gear-outline"></i></a>
                                         <ul class="dropdown-list">
-                                            <li><a href="#">login</a></li>
-                                            <li><a href="#">register</a></li>
-                                            <li><a href="#">my account</a></li>
+                                            <li><a asp-controller="Account" asp-action="Register">register</a></li>
+                                            <li><a asp-controller="Account" asp-action="Register">register</a></li>
+                                            <li><a asp-controller="Admin" asp-action="Index">admin</a></li>
                                         </ul>
                                     </li>
                                     <li>
@@ -169,26 +170,19 @@
         <div class="row">
             <div class="col-12">
                 <div class="hero-slider-active slick-arrow-style slick-arrow-style_hero slick-dot-style">
-                    <div class="hero-single-slide">
-                        <div class="hero-slider-item bg-img" data-bg="~/main assets/img/slider/slider-1.jpg">
-                            <div class="hero-slider-content slide-1">
-                                <h5 class="slide-subtitle">Top Selling!</h5>
-                                <h2 class="slide-title">New Collection</h2>
-                                <p class="slide-desc">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                                <a asp-controller="Products" asp-action="Index" class="btn btn-hero">SHOP NOW</a>
+                    @foreach (var slider in Model.Sliders)
+                    {
+                        <div class="hero-single-slide">
+                            <div class="hero-slider-item bg-img" data-bg="@slider.ImageUrl">
+                                <div class="hero-slider-content slide-1">
+                                    <h5 class="slide-subtitle">@slider.Subtitle</h5>
+                                    <h2 class="slide-title">@slider.Title</h2>
+                                    <p class="slide-desc">@slider.Description</p>
+                                    <a href="@slider.ButtonUrl" class="btn btn-hero">@slider.ButtonText</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="hero-single-slide">
-                        <div class="hero-slider-item bg-img" data-bg="~/main assets/img/slider/slider-2.jpg">
-                            <div class="hero-slider-content slide-1">
-                                <h5 class="slide-subtitle">Best Selling!</h5>
-                                <h2 class="slide-title">Top Collection</h2>
-                                <p class="slide-desc">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                                <a asp-controller="Products" asp-action="Index" class="btn btn-hero">SHOP NOW</a>
-                            </div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
@@ -242,24 +236,26 @@
         <div class="row">
             <div class="col-12">
                 <div class="product-carousel-4 mbn-50 slick-row-15 slick-arrow-style">
-                    @* TODO: заменить на @foreach (var product in Model.FeaturedProducts) *@
-                    <div class="product-item mb-50">
-                        <div class="product-thumb">
-                            <a href="#"><img src="~/main assets/img/product/product-1.jpg" alt="" /></a>
-                        </div>
-                        <div class="product-content">
-                            <h5 class="product-name"><a href="#">Leather Mens Slipper</a></h5>
-                            <div class="price-box">
-                                <span class="price-regular">$80.00</span>
-                                <span class="price-old"><del>$70.00</del></span>
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="product-item mb-50">
+                            <div class="product-thumb">
+                                <a href="#"><img src="@(string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/main assets/img/product/product-1.jpg") : product.ImageUrl)" alt="@product.Name" /></a>
                             </div>
-                            <div class="product-action-link">
-                                <a href="#" data-toggle="tooltip" title="Wishlist"><i class="ion-android-favorite-outline"></i></a>
-                                <a href="#" data-toggle="tooltip" title="Add To Cart"><i class="ion-bag"></i></a>
-                                <a href="#" data-toggle="modal" data-target="#quick_view"><span data-toggle="tooltip" title="Quick View"><i class="ion-ios-eye-outline"></i></span></a>
+                            <div class="product-content">
+                                <h5 class="product-name"><a href="#">@product.Name</a></h5>
+                                <div class="price-box">
+                                    <span class="price-regular">@product.Price.ToString("C")</span>
+                                </div>
+                                <p>@string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name))</p>
+                                <div class="product-action-link">
+                                    <a href="#" data-toggle="tooltip" title="Wishlist"><i class="ion-android-favorite-outline"></i></a>
+                                    <a href="#" data-toggle="tooltip" title="Add To Cart"><i class="ion-bag"></i></a>
+                                    <a href="#" data-toggle="modal" data-target="#quick_view"><span data-toggle="tooltip" title="Quick View"><i class="ion-ios-eye-outline"></i></span></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>

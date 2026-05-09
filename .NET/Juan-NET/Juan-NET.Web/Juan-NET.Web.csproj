@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Juan-NET.Domain\Juan-NET.Domain.csproj" />
+    <ProjectReference Include="..\Juan-NET.Persistence\Juan-NET.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="View\View Model\" />
     <Folder Include="View\Admin\" />
     <Folder Include="wwwroot\" />

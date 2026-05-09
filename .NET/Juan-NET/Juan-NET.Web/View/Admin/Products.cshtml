@@ -1,0 +1,142 @@
+@model AdminProductsViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Products";
+    ViewData["PageName"] = "products";
+    ViewData["ActivePage"] = "Products";
+    var lowStock = Model.Products.Count(product => product.StockCount <= 5);
+    var selectedCategoryIds = Model.SelectedCategoryIds;
+}
+
+@section SidebarCard {
+    <span>Catalog</span>
+    <strong>@Model.Products.Count Items</strong>
+    <p>@lowStock products need a stock review.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Catalog</p>
+        <h1>Products</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <button class="primary-button" type="button" data-open-product-modal>Add Product</button>
+    </div>
+</header>
+
+<section class="hero-panel reveal">
+    <div>
+        <p class="eyebrow">Inventory</p>
+        <h2>Add products to the database and publish them to the storefront.</h2>
+        <p>New items saved here are stored in the Products table and shown on the shop page.</p>
+    </div>
+    <div class="hero-metric">
+        <span>Low Stock</span>
+        <strong data-count="@lowStock">0</strong>
+        <small>Review needed</small>
+    </div>
+</section>
+
+@if (TempData["ProductMessage"] is string message)
+{
+    <div class="status good admin-message">@message</div>
+}
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Products</p>
+            <h3>Catalog List</h3>
+        </div>
+    </div>
+    <div class="product-list">
+        @if (Model.Products.Any())
+        {
+            @foreach (var product in Model.Products)
+            {
+                    <div class="product-row">
+                        <div class="product-thumb">@product.Name[..Math.Min(product.Name.Length, 2)].ToUpper()</div>
+                    <div><strong>@product.Name</strong><span>@string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name))</span></div>
+                    <em>@product.Price.ToString("C")</em>
+                    <small class="status @(product.IsActive ? (product.StockCount <= 5 ? "warn" : "good") : "off")">@(product.IsActive ? (product.StockCount <= 5 ? "Low Stock" : "In Stock") : "Draft")</small>
+                    <form asp-controller="Admin" asp-action="DeleteProduct" method="post">
+                        <input type="hidden" name="id" value="@product.Id" />
+                        <button class="danger-button" type="submit">Delete</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="product-row">
+                <div class="product-thumb">JN</div>
+                <div><strong>No products yet</strong><span>Create the first item using the Add Product button.</span></div>
+                <em>$0.00</em>
+                <small class="status off">Empty</small>
+            </div>
+        }
+    </div>
+</section>
+
+<div class="admin-modal @(ViewData.ModelState.IsValid ? "" : "is-open")" data-product-modal>
+    <div class="admin-modal-backdrop" data-close-product-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Create</p>
+                <h3 id="product-modal-title">Add Product</h3>
+            </div>
+            <button class="modal-close" type="button" aria-label="Close modal" data-close-product-modal>&times;</button>
+        </div>
+
+        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddProduct" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
+            <label>
+                Product Name
+                <input asp-for="Product.Name" placeholder="Running Sneakers" />
+                <span asp-validation-for="Product.Name" class="status off"></span>
+            </label>
+            <label>
+                Price
+                <input asp-for="Product.Price" type="number" step="0.01" placeholder="88.00" />
+                <span asp-validation-for="Product.Price" class="status off"></span>
+            </label>
+            <label>
+                Stock Count
+                <input asp-for="Product.StockCount" type="number" min="0" placeholder="25" />
+                <span asp-validation-for="Product.StockCount" class="status off"></span>
+            </label>
+            <label class="image-picker">
+                Image
+                <input asp-for="ImageFile" type="file" accept="image/*" data-image-input />
+                <span data-image-name>Choose product image</span>
+            </label>
+            <div class="category-picker form-wide">
+                <span>Category</span>
+                <div>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <label>
+                            <input type="checkbox" name="SelectedCategoryIds" value="@category.Id" checked="@selectedCategoryIds.Contains(category.Id)" data-category-choice />
+                            @category.Name
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="SelectedCategoryIds" class="status off"></span>
+            </div>
+            <label class="form-wide">
+                Description
+                <textarea asp-for="Product.Description" rows="4" placeholder="Short product description"></textarea>
+            </label>
+            <label class="inline-check form-wide">
+                <input asp-for="Product.IsActive" checked />
+                Publish product
+            </label>
+            <button class="primary-button full form-wide" type="submit" data-pulse>Save Product</button>
+        </form>
+    </section>
+</div>

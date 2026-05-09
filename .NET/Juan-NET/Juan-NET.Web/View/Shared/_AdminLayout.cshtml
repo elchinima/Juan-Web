@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Juan Admin</title>
+    <link rel="shortcut icon" href="~/admin assets/img/logo.png" type="image/png" />
+    <link rel="stylesheet" href="~/admin assets/css/admin.css" />
+</head>
+<body data-page="@ViewData["PageName"]">
+    <div class="admin-shell">
+        <aside class="sidebar">
+            <a class="brand" asp-controller="Admin" asp-action="Index">
+                <img src="~/admin assets/img/logo.png" alt="Juan" />
+                <span>Admin</span>
+            </a>
+            <nav class="side-nav" aria-label="Admin navigation">
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Dashboard" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Index">Dashboard</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Products" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Products">Products</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Categories" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Categories">Categories</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Sliders" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Sliders">Sliders</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Users" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Users">Users</a>
+            </nav>
+            <div class="sidebar-card">
+                @RenderSection("SidebarCard", required: false)
+            </div>
+        </aside>
+
+        <main class="main-panel">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/admin assets/js/admin.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

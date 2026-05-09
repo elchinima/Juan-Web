@@ -1,0 +1,57 @@
+﻿@model List<Product>
+@{
+    ViewData["Title"] = "Products";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<div class="breadcrumb-area bg-img" data-bg="/main assets/img/banner/breadcrumb-banner.jpg">
+    <div class="container">
+        <div class="breadcrumb-wrap text-center">
+            <h2 class="breadcrumb-title">Products</h2>
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Products</li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<section class="shop-main-wrapper section-padding">
+    <div class="container">
+        @if (Model.Any())
+        {
+            <div class="row mbn-30">
+                @foreach (var product in Model)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-item mb-30">
+                            <div class="product-thumb">
+                                <a href="#">
+                                    <img src="@(string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/main assets/img/product/product-1.jpg") : product.ImageUrl)" alt="@product.Name" />
+                                </a>
+                            </div>
+                            <div class="product-content">
+                                <h5 class="product-name"><a href="#">@product.Name</a></h5>
+                                <div class="price-box">
+                                    <span class="price-regular">@product.Price.ToString("C")</span>
+                                </div>
+                                <p>@string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name))</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="section-title text-center">
+                <h2 class="title">No products yet</h2>
+                <p class="sub-title">Add products from the admin panel and they will appear here.</p>
+                <a class="btn btn-hero" asp-controller="Admin" asp-action="Products">Add Product</a>
+            </div>
+        }
+    </div>
+</section>

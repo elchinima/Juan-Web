@@ -1,0 +1,28 @@
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\bin\Debug\net10.0\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\bin\Debug\net10.0\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\bin\Debug\net10.0\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\bin\Debug\net10.0\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\bin\Debug\net10.0\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.csproj.AssemblyReference.cache
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.AssemblyInfoInputs.cache
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.AssemblyInfo.cs
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.csproj.CoreCompileInputs.cache
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.sourcelink.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.4501E8C3.Up2Date
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\refint\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\obj\Debug\net10.0\ref\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build2\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build2\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build2\Juan-NET.Persistence.pdb
+C:\Users\dmatc\AppData\Local\Temp\JuanNetVerifyBuild\Juan-NET.Persistence.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetVerifyBuild\Juan-NET.Persistence.dll
+C:\Users\dmatc\AppData\Local\Temp\JuanNetVerifyBuild\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Persistence.pdb

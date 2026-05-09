@@ -1,0 +1,110 @@
+﻿@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageName"] = "dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+}
+
+@section SidebarCard {
+    <span>Store Health</span>
+    <strong>Excellent</strong>
+    <p>All core sales channels are active.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Juan Online Store</p>
+        <h1>Dashboard</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Home" asp-action="Index">View Store</a>
+        <a class="primary-button" asp-controller="Admin" asp-action="Products">Add Product</a>
+    </div>
+</header>
+
+<section class="hero-panel reveal">
+    <div>
+        <p class="eyebrow">Today</p>
+        <h2>Manage your shoes store with clean, quick controls.</h2>
+        <p>Track revenue, orders, inventory, and customer activity from one focused admin workspace.</p>
+    </div>
+    <div class="hero-metric">
+        <span>Total Revenue</span>
+        <strong data-count="18420">$0</strong>
+        <small>+12.8% this month</small>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card reveal">
+        <span>Orders</span>
+        <strong data-count="248">0</strong>
+        <p>32 awaiting shipment</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Products</span>
+        <strong data-count="@ViewBag.ProductCount">0</strong>
+        <p>Saved in Products table</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Customers</span>
+        <strong data-count="@ViewBag.UserCount">0</strong>
+        <p>Saved in Users table</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Categories</span>
+        <strong data-count="@ViewBag.CategoryCount">0</strong>
+        <p>Available for product selection</p>
+    </article>
+</section>
+
+<section class="content-grid">
+    <article class="panel reveal">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Sales</p>
+                <h3>Weekly Revenue</h3>
+            </div>
+            <a href="#">Open Analytics</a>
+        </div>
+        <div class="bar-chart" aria-label="Weekly revenue chart">
+            <span style="--value: 54%" data-label="Mon"></span>
+            <span style="--value: 72%" data-label="Tue"></span>
+            <span style="--value: 48%" data-label="Wed"></span>
+            <span style="--value: 82%" data-label="Thu"></span>
+            <span style="--value: 64%" data-label="Fri"></span>
+            <span style="--value: 94%" data-label="Sat"></span>
+            <span style="--value: 76%" data-label="Sun"></span>
+        </div>
+    </article>
+
+    <article class="panel reveal">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Activity</p>
+                <h3>Recent Orders</h3>
+            </div>
+            <a href="#">View Orders</a>
+        </div>
+        <div class="table-list">
+            <div class="table-row">
+                <span>#JN-2048</span>
+                <strong>Running Sneakers</strong>
+                <em>Processing</em>
+            </div>
+            <div class="table-row">
+                <span>#JN-2047</span>
+                <strong>Leather Boots</strong>
+                <em>Shipped</em>
+            </div>
+            <div class="table-row">
+                <span>#JN-2046</span>
+                <strong>Classic Trainers</strong>
+                <em>Paid</em>
+            </div>
+        </div>
+    </article>
+</section>

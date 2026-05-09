@@ -1,0 +1,24 @@
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\bin\Debug\net10.0\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\bin\Debug\net10.0\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\bin\Debug\net10.0\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.AssemblyInfoInputs.cache
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.AssemblyInfo.cs
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.csproj.CoreCompileInputs.cache
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.sourcelink.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\refint\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Domain\obj\Debug\net10.0\ref\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build2\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build2\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build2\Juan-NET.Domain.pdb
+C:\Users\dmatc\AppData\Local\Temp\JuanNetVerifyBuild\Juan-NET.Domain.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetVerifyBuild\Juan-NET.Domain.dll
+C:\Users\dmatc\AppData\Local\Temp\JuanNetVerifyBuild\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Domain.pdb

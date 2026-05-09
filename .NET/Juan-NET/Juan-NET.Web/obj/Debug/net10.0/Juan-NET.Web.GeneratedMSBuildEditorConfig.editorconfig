@@ -22,12 +22,56 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBY2NvdW50XFJlZ2lzdGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/Categories.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxDYXRlZ29yaWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/Products.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxQcm9kdWN0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/Sliders.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxTbGlkZXJzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxVc2Vycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Categories/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xDYXRlZ29yaWVzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Home/Contact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xIb21lXENvbnRhY3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xIb21lXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Products/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xQcm9kdWN0c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Shared/_AdminLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTaGFyZWRcX0FkbWluTGF5b3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xTaGFyZWRcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Shared/_StoreHeader.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTaGFyZWRcX1N0b3JlSGVhZGVyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/_ViewImports.cshtml]

@@ -1,0 +1,133 @@
+@model AdminSlidersViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Sliders";
+    ViewData["PageName"] = "sliders";
+    ViewData["ActivePage"] = "Sliders";
+}
+
+@section SidebarCard {
+    <span>Homepage</span>
+    <strong>@Model.Sliders.Count Slides</strong>
+    <p>Carousel slides shown on the home page.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Homepage</p>
+        <h1>Sliders</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <button class="primary-button" type="button" data-open-slider-modal>Add Slider</button>
+    </div>
+</header>
+
+@if (TempData["SliderMessage"] is string message)
+{
+    <div class="status good admin-message">@message</div>
+}
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Carousel</p>
+            <h3>Slides</h3>
+        </div>
+    </div>
+    <div class="slider-admin-list">
+        @if (Model.Sliders.Any())
+        {
+            @foreach (var slider in Model.Sliders)
+            {
+                <form class="slider-admin-row" asp-controller="Admin" asp-action="EditSlider" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="Slider.Id" value="@slider.Id" />
+                    <input type="hidden" name="Slider.ImageUrl" value="@slider.ImageUrl" />
+                    <img src="@slider.ImageUrl" alt="@slider.Title" />
+                    <div class="slider-admin-fields">
+                        <input name="Slider.Subtitle" value="@slider.Subtitle" placeholder="Subtitle" />
+                        <input name="Slider.Title" value="@slider.Title" placeholder="Title" />
+                        <input name="Slider.Description" value="@slider.Description" placeholder="Description" />
+                        <input name="Slider.ButtonText" value="@slider.ButtonText" placeholder="Button text" />
+                        <input name="Slider.ButtonUrl" value="@slider.ButtonUrl" placeholder="Button URL" />
+                        <input name="Slider.DisplayOrder" value="@slider.DisplayOrder" type="number" placeholder="Order" />
+                        <label class="inline-check">
+                            <input name="Slider.IsActive" value="true" type="checkbox" checked="@slider.IsActive" />
+                            <input name="Slider.IsActive" value="false" type="hidden" />
+                            Active
+                        </label>
+                        <input name="ImageFile" type="file" accept="image/*" />
+                    </div>
+                    <div class="slider-admin-actions">
+                        <button class="primary-button" type="submit">Save</button>
+                        <button class="danger-button" type="submit" formaction="@Url.Action("DeleteSlider", "Admin", new { id = slider.Id })">Delete</button>
+                    </div>
+                </form>
+            }
+        }
+        else
+        {
+            <div class="product-row">
+                <div class="product-thumb">SL</div>
+                <div><strong>No sliders yet</strong><span>Homepage will use default slides until you add one.</span></div>
+                <em>-</em>
+                <small class="status off">Empty</small>
+            </div>
+        }
+    </div>
+</section>
+
+<div class="admin-modal @(ViewData.ModelState.IsValid ? "" : "is-open")" data-slider-modal>
+    <div class="admin-modal-backdrop" data-close-slider-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="slider-modal-title">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Create</p>
+                <h3 id="slider-modal-title">Add Slider</h3>
+            </div>
+            <button class="modal-close" type="button" aria-label="Close modal" data-close-slider-modal>&times;</button>
+        </div>
+        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddSlider" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
+            <label>
+                Subtitle
+                <input asp-for="Slider.Subtitle" placeholder="Top Selling!" />
+                <span asp-validation-for="Slider.Subtitle" class="status off"></span>
+            </label>
+            <label>
+                Title
+                <input asp-for="Slider.Title" placeholder="New Collection" />
+                <span asp-validation-for="Slider.Title" class="status off"></span>
+            </label>
+            <label class="form-wide">
+                Description
+                <input asp-for="Slider.Description" placeholder="Short slider description" />
+            </label>
+            <label>
+                Button Text
+                <input asp-for="Slider.ButtonText" placeholder="SHOP NOW" />
+            </label>
+            <label>
+                Button URL
+                <input asp-for="Slider.ButtonUrl" placeholder="/Products" />
+            </label>
+            <label>
+                Display Order
+                <input asp-for="Slider.DisplayOrder" type="number" />
+            </label>
+            <label class="image-picker">
+                Image
+                <input asp-for="ImageFile" type="file" accept="image/*" data-slider-image-input />
+                <span data-slider-image-name>Choose slider image</span>
+            </label>
+            <label class="inline-check form-wide">
+                <input asp-for="Slider.IsActive" checked />
+                Active slider
+            </label>
+            <button class="primary-button full form-wide" type="submit">Save Slider</button>
+        </form>
+    </section>
+</div>

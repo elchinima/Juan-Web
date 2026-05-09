@@ -1,0 +1,35 @@
+﻿@model List<string>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="shop-main-wrapper section-padding">
+    <div class="container">
+        <div class="section-title text-center">
+            <h2 class="title">Categories</h2>
+            <p class="sub-title">Browse the product groups currently available in the catalog.</p>
+        </div>
+        @if (Model.Any())
+        {
+            <div class="row justify-content-center">
+                @foreach (var category in Model)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="service-policy-item mt-30 bg-1">
+                            <div class="policy-content">
+                                <h5 class="policy-title">@category</h5>
+                                <p class="policy-desc">Available in catalog</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">Categories will appear after products are added.</p>
+        }
+    </div>
+</section>

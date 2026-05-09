@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Contact";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="contact-area section-padding">
+    <div class="container">
+        <div class="section-title text-center">
+            <h2 class="title">Contact us</h2>
+            <p class="sub-title">We are ready to help with products, orders, and store questions.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="contact-message">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6"><input type="text" placeholder="Name" /></div>
+                            <div class="col-md-6"><input type="email" placeholder="Email" /></div>
+                            <div class="col-12"><textarea placeholder="Message"></textarea></div>
+                            <div class="col-12"><button class="btn btn-sqr" type="button">Send message</button></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

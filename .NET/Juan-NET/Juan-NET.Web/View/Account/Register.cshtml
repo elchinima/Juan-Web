@@ -1,0 +1,49 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="login-register-wrapper section-padding">
+    <div class="container">
+        <div class="member-area-from-wrap">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="login-reg-form-wrap">
+                        <h2>Create account</h2>
+                        <p>Join Juan and keep your shopping profile ready for new collections.</p>
+
+                        @if (TempData["RegisterMessage"] is string message)
+                        {
+                            <div class="alert alert-success">@message</div>
+                        }
+
+                        <form asp-controller="Account" asp-action="Register" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="single-input-item">
+                                <input asp-for="FullName" placeholder="Full name" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            <div class="single-input-item">
+                                <input asp-for="Email" placeholder="Email address" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="single-input-item">
+                                <input asp-for="Password" placeholder="Password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="single-input-item">
+                                <input asp-for="ConfirmPassword" placeholder="Confirm password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                            <div class="single-input-item">
+                                <button class="btn btn-sqr" type="submit">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
