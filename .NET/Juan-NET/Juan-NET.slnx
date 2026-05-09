@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="Juan-NET.Application/Juan-NET.Application.csproj" />
+    <Project Path="Juan-NET.Domain/Juan-NET.Domain.csproj" />
+    <Project Path="Juan-NET.Infrastructure/Juan-NET.Infrastructure.csproj" />
+    <Project Path="Juan-NET.Persistence/Juan-NET.Persistence.csproj" />
+    <Project Path="Juan-NET.Web/Juan-NET.Web.csproj" />
+  </Folder>
+</Solution>

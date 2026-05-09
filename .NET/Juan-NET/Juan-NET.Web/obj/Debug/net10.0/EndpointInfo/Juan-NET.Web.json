@@ -1,0 +1,13 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Juan-NET.Web | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5122"
+    }
+  ],
+  "paths": { }
+}

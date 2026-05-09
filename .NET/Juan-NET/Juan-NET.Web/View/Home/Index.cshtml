@@ -1,0 +1,351 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<header class="header-area">
+    <div class="main-header d-none d-lg-block">
+        <div class="header-top theme-bg">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <div class="welcome-message">
+                            <p>Welcome to Juan online store</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-right">
+                        <div class="header-top-settings">
+                            <ul class="nav align-items-center justify-content-end">
+                                <li class="curreny-wrap">
+                                    $ Dollar (US) <i class="fa fa-angle-down"></i>
+                                    <ul class="dropdown-list curreny-list">
+                                        <li><a href="#">$ usd</a></li>
+                                        <li><a href="#">€ EURO</a></li>
+                                    </ul>
+                                </li>
+                                <li class="language">
+                                    <img src="~/main assets/img/icon/en.png" alt="flag" /> English
+                                    <i class="fa fa-angle-down"></i>
+                                    <ul class="dropdown-list">
+                                        <li><a href="#"><img src="~/main assets/img/icon/en.png" alt="flag" /> english</a></li>
+                                        <li><a href="#"><img src="~/main assets/img/icon/fr.png" alt="flag" /> french</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-main-area sticky">
+            <div class="container">
+                <div class="row align-items-center position-relative">
+                    <div class="col-lg-2">
+                        <div class="logo">
+                            <a asp-controller="Home" asp-action="Index">
+                                <img src="~/main assets/img/logo/logo.png" alt="Logo" />
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 position-static">
+                        <div class="main-menu-area">
+                            <div class="main-menu">
+                                <nav class="desktop-menu">
+                                    <ul>
+                                        <li class="active">
+                                            <a asp-controller="Home" asp-action="Index">Home</a>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Products" asp-action="Index">Shop <i class="fa fa-angle-down"></i></a>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Home" asp-action="Contact">Contact us</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="header-configure-wrapper">
+                            <div class="header-configure-area">
+                                <ul class="nav justify-content-end">
+                                    <li>
+                                        <a href="#" class="offcanvas-btn">
+                                            <i class="ion-ios-search-strong"></i>
+                                        </a>
+                                    </li>
+                                    <li class="user-hover">
+                                        <a href="#"><i class="ion-ios-gear-outline"></i></a>
+                                        <ul class="dropdown-list">
+                                            <li><a href="#">login</a></li>
+                                            <li><a href="#">register</a></li>
+                                            <li><a href="#">my account</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="minicart-btn">
+                                            <i class="ion-bag"></i>
+                                            <div class="notification">2</div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-header d-lg-none d-md-block sticky">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="mobile-main-header">
+                        <div class="mobile-logo">
+                            <a asp-controller="Home" asp-action="Index">
+                                <img src="~/main assets/img/logo/logo.png" alt="Brand Logo" />
+                            </a>
+                        </div>
+                        <div class="mobile-menu-toggler">
+                            <div class="mini-cart-wrap">
+                                <a href="#"><i class="ion-bag"></i></a>
+                            </div>
+                            <div class="mobile-menu-btn">
+                                <div class="off-canvas-btn">
+                                    <i class="ion-navicon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<aside class="off-canvas-wrapper">
+    <div class="off-canvas-overlay"></div>
+    <div class="off-canvas-inner-content">
+        <div class="btn-close-off-canvas">
+            <i class="ion-android-close"></i>
+        </div>
+        <div class="off-canvas-inner">
+            <div class="search-box-offcanvas">
+                <form>
+                    <input type="text" placeholder="Search Here..." />
+                    <button class="search-btn"><i class="ion-ios-search-strong"></i></button>
+                </form>
+            </div>
+            <div class="mobile-navigation">
+                <nav>
+                    <ul class="mobile-menu">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="Products" asp-action="Index">Shop</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact">Contact us</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="offcanvas-widget-area">
+                <div class="off-canvas-contact-widget">
+                    <ul>
+                        <li><i class="fa fa-mobile"></i><a href="#">0123456789</a></li>
+                        <li><i class="fa fa-envelope-o"></i><a href="#">info@yourdomain.com</a></li>
+                    </ul>
+                </div>
+                <div class="off-canvas-social-widget">
+                    <a href="#"><i class="fa fa-facebook"></i></a>
+                    <a href="#"><i class="fa fa-twitter"></i></a>
+                    <a href="#"><i class="fa fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<section class="hero-slider">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="hero-slider-active slick-arrow-style slick-arrow-style_hero slick-dot-style">
+                    <div class="hero-single-slide">
+                        <div class="hero-slider-item bg-img" data-bg="~/main assets/img/slider/slider-1.jpg">
+                            <div class="hero-slider-content slide-1">
+                                <h5 class="slide-subtitle">Top Selling!</h5>
+                                <h2 class="slide-title">New Collection</h2>
+                                <p class="slide-desc">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                                <a asp-controller="Products" asp-action="Index" class="btn btn-hero">SHOP NOW</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-single-slide">
+                        <div class="hero-slider-item bg-img" data-bg="~/main assets/img/slider/slider-2.jpg">
+                            <div class="hero-slider-content slide-1">
+                                <h5 class="slide-subtitle">Best Selling!</h5>
+                                <h2 class="slide-title">Top Collection</h2>
+                                <p class="slide-desc">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                                <a asp-controller="Products" asp-action="Index" class="btn btn-hero">SHOP NOW</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="service-policy-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="service-policy-item mt-30 bg-1">
+                    <div class="policy-icon"><img src="~/main assets/img/icon/policy-1.png" alt="policy icon" /></div>
+                    <div class="policy-content">
+                        <h5 class="policy-title">FREE SHIPPING</h5>
+                        <p class="policy-desc">Free shipping on all order</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="service-policy-item mt-30 bg-2">
+                    <div class="policy-icon"><img src="~/main assets/img/icon/policy-2.png" alt="policy icon" /></div>
+                    <div class="policy-content">
+                        <h5 class="policy-title">ONLINE SUPPORT</h5>
+                        <p class="policy-desc">Online support 24 hours a day</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="service-policy-item mt-30 bg-3">
+                    <div class="policy-icon"><img src="~/main assets/img/icon/policy-3.png" alt="policy icon" /></div>
+                    <div class="policy-content">
+                        <h5 class="policy-title">MONEY RETURN</h5>
+                        <p class="policy-desc">Back guarantee under 5 days</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="our-product section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-title text-center">
+                    <h2 class="title">Our Product</h2>
+                    <p class="sub-title">Lorem ipsum dolor sit amet consectetur adipisicing</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="product-carousel-4 mbn-50 slick-row-15 slick-arrow-style">
+                    @* TODO: заменить на @foreach (var product in Model.FeaturedProducts) *@
+                    <div class="product-item mb-50">
+                        <div class="product-thumb">
+                            <a href="#"><img src="~/main assets/img/product/product-1.jpg" alt="" /></a>
+                        </div>
+                        <div class="product-content">
+                            <h5 class="product-name"><a href="#">Leather Mens Slipper</a></h5>
+                            <div class="price-box">
+                                <span class="price-regular">$80.00</span>
+                                <span class="price-old"><del>$70.00</del></span>
+                            </div>
+                            <div class="product-action-link">
+                                <a href="#" data-toggle="tooltip" title="Wishlist"><i class="ion-android-favorite-outline"></i></a>
+                                <a href="#" data-toggle="tooltip" title="Add To Cart"><i class="ion-bag"></i></a>
+                                <a href="#" data-toggle="modal" data-target="#quick_view"><span data-toggle="tooltip" title="Quick View"><i class="ion-ios-eye-outline"></i></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="banner-statistics">
+    <div class="container">
+        <div class="row no-gutters mtn-30">
+            <div class="col-md-6">
+                <div class="img-container mt-30">
+                    <a asp-controller="Products" asp-action="Index">
+                        <img src="~/main assets/img/banner/banner-1.jpg" alt="banner-image" />
+                    </a>
+                    <div class="banner-text">
+                        <h5 class="banner-subtitle">sports shoes</h5>
+                        <h3 class="banner-title">20% Off<br />For Sports men</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="img-container mt-30">
+                    <a asp-controller="Products" asp-action="Index">
+                        <img src="~/main assets/img/banner/banner-2.jpg" alt="banner-image" />
+                    </a>
+                    <div class="banner-text">
+                        <h5 class="banner-subtitle">sports shoes</h5>
+                        <h3 class="banner-title">20% Off<br />For Sports men</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="brand-area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="brand-active-carousel">
+                    <div class="brand-item"><a href="#"><img src="~/main assets/img/brand/br1.png" alt="brand" /></a></div>
+                    <div class="brand-item"><a href="#"><img src="~/main assets/img/brand/br2.png" alt="brand" /></a></div>
+                    <div class="brand-item"><a href="#"><img src="~/main assets/img/brand/br3.png" alt="brand" /></a></div>
+                    <div class="brand-item"><a href="#"><img src="~/main assets/img/brand/br4.png" alt="brand" /></a></div>
+                    <div class="brand-item"><a href="#"><img src="~/main assets/img/brand/br5.png" alt="brand" /></a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="quick_view">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-details-inner">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="product-large-slider mb-20">
+                                <div class="pro-large-img img-zoom">
+                                    <img src="~/main assets/img/product/product-details-img1.jpg" alt="product" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="product-details-des">
+                                <h3 class="pro-det-title">Primitive Mens Premium Shoes</h3>
+                                <div class="price-box">
+                                    <span class="regular-price">$70.00</span>
+                                    <span class="old-price"><del>$80.00</del></span>
+                                </div>
+                                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
+                                <div class="quantity-cart-box d-flex align-items-center mb-20">
+                                    <div class="quantity">
+                                        <div class="pro-qty"><input type="text" value="1" /></div>
+                                    </div>
+                                    <a href="#" class="btn btn-default">Add To Cart</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

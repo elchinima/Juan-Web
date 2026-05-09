@@ -1,0 +1,6 @@
+@Juan_NET.Web_HostAddress = http://localhost:5122
+
+GET {{Juan_NET.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

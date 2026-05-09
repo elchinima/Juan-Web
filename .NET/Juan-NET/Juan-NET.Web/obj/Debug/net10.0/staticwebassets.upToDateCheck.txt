@@ -1,0 +1,97 @@
+wwwroot\main assets\js\vendor.js
+wwwroot\main assets\js\plugins.js
+wwwroot\main assets\js\modernizr-2.8.3.min.js
+wwwroot\main assets\js\active.js
+wwwroot\main assets\img\testimonial\tm-3.jpg
+wwwroot\main assets\img\testimonial\tm-2.jpg
+wwwroot\main assets\img\testimonial\tm-1.jpg
+wwwroot\main assets\img\slider\slider-2.jpg
+wwwroot\main assets\img\slider\slider-1.jpg
+wwwroot\main assets\img\product\product-details-img4.jpg
+wwwroot\main assets\img\product\product-details-img3.jpg
+wwwroot\main assets\img\product\product-details-img2.jpg
+wwwroot\main assets\img\product\product-details-img1.jpg
+wwwroot\main assets\img\product\product-9.jpg
+wwwroot\main assets\img\product\product-8.jpg
+wwwroot\main assets\img\product\product-7.jpg
+wwwroot\main assets\img\product\product-6.jpg
+wwwroot\main assets\img\product\product-5.jpg
+wwwroot\main assets\img\product\product-4.jpg
+wwwroot\main assets\img\product\product-3.jpg
+wwwroot\main assets\img\product\product-2.jpg
+wwwroot\main assets\img\product\product-12.jpg
+wwwroot\main assets\img\product\product-11.jpg
+wwwroot\main assets\img\product\product-10.jpg
+wwwroot\main assets\img\product\product-1.jpg
+wwwroot\main assets\img\product\pro-small-4.jpg
+wwwroot\main assets\img\product\pro-small-3.jpg
+wwwroot\main assets\img\product\pro-small-2.jpg
+wwwroot\main assets\img\product\pro-small-1.jpg
+wwwroot\main assets\img\paypal-card.jpg
+wwwroot\main assets\img\logo\logo.png
+wwwroot\main assets\img\icon\policy-3.png
+wwwroot\main assets\img\icon\policy-2.png
+wwwroot\main assets\img\icon\policy-1.png
+wwwroot\main assets\img\icon\fr.png
+wwwroot\main assets\img\icon\en.png
+wwwroot\main assets\img\icon\cancel.png
+wwwroot\main assets\img\favicon.ico
+wwwroot\main assets\img\cart\cart-2.jpg
+wwwroot\main assets\img\cart\cart-1.jpg
+wwwroot\main assets\img\brand\br5.png
+wwwroot\main assets\img\brand\br4.png
+wwwroot\main assets\img\brand\br3.png
+wwwroot\main assets\img\brand\br2.png
+wwwroot\main assets\img\brand\br1.png
+wwwroot\main assets\img\blog\recent-04.jpg
+wwwroot\main assets\img\blog\recent-03.jpg
+wwwroot\main assets\img\blog\recent-02.jpg
+wwwroot\main assets\img\blog\recent-01.jpg
+wwwroot\main assets\img\blog\comment-icon.png
+wwwroot\main assets\img\blog\blog-details-2.jpg
+wwwroot\main assets\img\blog\blog-details-1.jpg
+wwwroot\main assets\img\blog\blog-4.jpg
+wwwroot\main assets\img\blog\blog-3.jpg
+wwwroot\main assets\img\blog\blog-2.jpg
+wwwroot\main assets\img\blog\blog-1.jpg
+wwwroot\main assets\img\blog\11.jpg
+wwwroot\main assets\img\banner\banner_left.jpg
+wwwroot\main assets\img\banner\banner-3.jpg
+wwwroot\main assets\img\banner\banner-2.jpg
+wwwroot\main assets\img\banner\banner-1.jpg
+wwwroot\main assets\img\about\services.jpg
+wwwroot\main assets\img\about\avatar.jpg
+wwwroot\main assets\fonts\ionicons28b5.woff
+wwwroot\main assets\fonts\ionicons28b5.ttf
+wwwroot\main assets\fonts\ionicons28b5.svg
+wwwroot\main assets\fonts\ionicons28b5.eot
+wwwroot\main assets\fonts\fontawesome-webfontd41d.eot
+wwwroot\main assets\fonts\fontawesome-webfont3e6e.woff2
+wwwroot\main assets\fonts\fontawesome-webfont3e6e.woff
+wwwroot\main assets\fonts\fontawesome-webfont3e6e.ttf
+wwwroot\main assets\fonts\fontawesome-webfont3e6e.svg
+wwwroot\main assets\fonts\fontawesome-webfont3e6e.eot
+wwwroot\main assets\css\vendor.css
+wwwroot\main assets\css\style.css
+wwwroot\main assets\css\plugins.css
+wwwroot\main assets\css\images\ui-icons_ffffff_256x240.png
+wwwroot\main assets\css\images\ui-icons_cc0000_256x240.png
+wwwroot\main assets\css\images\ui-icons_777777_256x240.png
+wwwroot\main assets\css\images\ui-icons_777620_256x240.png
+wwwroot\main assets\css\images\ui-icons_555555_256x240.png
+wwwroot\main assets\css\images\ui-icons_444444_256x240.png
+wwwroot\admin assets\js\admin.js
+wwwroot\admin assets\img\logo.png
+wwwroot\admin assets\css\admin.css
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\js\vendor.js
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\js\plugins.js
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\js\modernizr-2.8.3.min.js
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\js\active.js
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\img\favicon.ico
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\fonts\ionicons28b5.svg
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\fonts\fontawesome-webfont3e6e.svg
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\css\vendor.css
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\css\style.css
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\main assets\css\plugins.css
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\admin assets\js\admin.js
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\wwwroot\admin assets\css\admin.css
