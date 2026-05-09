@@ -93,7 +93,7 @@ namespace Juan_NET.Web.Controllers
                 return View("Products", viewModel);
             }
 
-            var product = viewModel.Product;
+            var product = viewModel.Product!;
             product.CreatedAt = DateTime.UtcNow;
             product.CategoryName = string.Join(", ", selectedCategories.Select(category => category.Name));
 
@@ -114,6 +114,87 @@ namespace Juan_NET.Web.Controllers
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             TempData["ProductMessage"] = "Product added successfully.";
+
+            return RedirectToAction(nameof(Products));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProduct(AdminProductsViewModel viewModel)
+        {
+            ModelState.Remove(nameof(AdminProductsViewModel.Products));
+            ModelState.Remove(nameof(AdminProductsViewModel.Categories));
+            ModelState.Remove($"{nameof(AdminProductsViewModel.Product)}.{nameof(Product.CategoryName)}");
+            ModelState.Remove($"{nameof(AdminProductsViewModel.Product)}.{nameof(Product.ProductCategories)}");
+
+            viewModel.SelectedCategoryIds = (viewModel.SelectedCategoryIds ?? new List<int>()).Distinct().ToList();
+
+            if (viewModel.Product is null)
+            {
+                ModelState.AddModelError(nameof(AdminProductsViewModel.Product), "Product details are required.");
+            }
+
+            if (viewModel.SelectedCategoryIds.Count < 1 || viewModel.SelectedCategoryIds.Count > 3)
+            {
+                ModelState.AddModelError(nameof(AdminProductsViewModel.SelectedCategoryIds), "Select from 1 to 3 categories.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["OpenEditProductModal"] = true;
+                await PopulateProductsViewModelAsync(viewModel);
+                return View("Products", viewModel);
+            }
+
+            var productInput = viewModel.Product!;
+            var product = await _context.Products
+                .Include(item => item.ProductCategories)
+                .FirstOrDefaultAsync(item => item.Id == productInput.Id);
+
+            if (product is null)
+            {
+                TempData["ProductMessage"] = "Product was not found.";
+                return RedirectToAction(nameof(Products));
+            }
+
+            var selectedCategories = await _context.Categories
+                .Where(category => viewModel.SelectedCategoryIds.Contains(category.Id))
+                .OrderBy(category => category.Name)
+                .ToListAsync();
+
+            if (selectedCategories.Count != viewModel.SelectedCategoryIds.Count)
+            {
+                ModelState.AddModelError(nameof(AdminProductsViewModel.SelectedCategoryIds), "Selected categories are invalid.");
+                ViewData["OpenEditProductModal"] = true;
+                await PopulateProductsViewModelAsync(viewModel);
+                return View("Products", viewModel);
+            }
+
+            product.Name = productInput.Name;
+            product.Price = productInput.Price;
+            product.StockCount = productInput.StockCount;
+            product.Description = productInput.Description;
+            product.IsActive = productInput.IsActive;
+            product.CategoryName = string.Join(", ", selectedCategories.Select(category => category.Name));
+
+            if (viewModel.ImageFile is { Length: > 0 })
+            {
+                product.ImageUrl = await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "products");
+            }
+            else if (!string.IsNullOrWhiteSpace(productInput.ImageUrl))
+            {
+                product.ImageUrl = productInput.ImageUrl;
+            }
+
+            product.ProductCategories.Clear();
+
+            foreach (var category in selectedCategories)
+            {
+                product.ProductCategories.Add(new ProductCategory { ProductId = product.Id, CategoryId = category.Id });
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["ProductMessage"] = "Product updated successfully.";
 
             return RedirectToAction(nameof(Products));
         }
@@ -217,6 +298,12 @@ namespace Juan_NET.Web.Controllers
         {
             ModelState.Remove(nameof(AdminSlidersViewModel.Sliders));
 
+            if (await _context.Sliders.CountAsync() >= 6)
+            {
+                ModelState.AddModelError(string.Empty, "Maximum slider count is 6.");
+                ModelState.AddModelError(nameof(AdminSlidersViewModel.Slider), "Maximum slider count is 6.");
+            }
+
             if (viewModel.Slider is null)
             {
                 ModelState.AddModelError(nameof(AdminSlidersViewModel.Slider), "Slider details are required.");
@@ -228,7 +315,7 @@ namespace Juan_NET.Web.Controllers
                 return View("Sliders", viewModel);
             }
 
-            var slider = viewModel.Slider;
+            var slider = viewModel.Slider!;
 
             if (viewModel.ImageFile is { Length: > 0 })
             {
@@ -305,21 +392,33 @@ namespace Juan_NET.Web.Controllers
             return RedirectToAction(nameof(Sliders));
         }
 
-        public async Task<IActionResult> Users()
+        public async Task<IActionResult> Users(string? search)
         {
-            var users = await _context.Users.OrderByDescending(user => user.CreatedAt).ToListAsync();
+            var usersQuery = _context.Users.AsQueryable();
+            var normalizedSearch = search?.Trim();
+
+            if (!string.IsNullOrWhiteSpace(normalizedSearch))
+            {
+                usersQuery = usersQuery.Where(user => user.FullName.Contains(normalizedSearch) || user.Email.Contains(normalizedSearch));
+            }
+
+            ViewBag.UserSearch = normalizedSearch ?? string.Empty;
+
+            var users = await usersQuery.OrderByDescending(user => user.CreatedAt).ToListAsync();
             return View(users);
         }
 
-        public async Task<IActionResult> Subscribe()
+        public async Task<IActionResult> Subscribe(string? userSearch)
         {
-            return View(await CreateSubscribeViewModelAsync(new AdminSubscribeViewModel()));
+            return View(await CreateSubscribeViewModelAsync(new AdminSubscribeViewModel { UserSearch = userSearch }));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendSubscribe(AdminSubscribeViewModel viewModel)
         {
+            viewModel.SelectedEmails ??= [];
+
             if (!viewModel.SendToAll && !viewModel.SelectedEmails.Any())
             {
                 ModelState.AddModelError(nameof(AdminSubscribeViewModel.SelectedEmails), "Select at least one recipient.");
@@ -331,7 +430,7 @@ namespace Juan_NET.Web.Controllers
             }
 
             var recipients = viewModel.SendToAll
-                ? await GetSubscribeRecipientsQuery().ToListAsync()
+                ? (await GetSubscribeRecipientsQuery().ToListAsync()).Concat(viewModel.SelectedEmails).Distinct(StringComparer.OrdinalIgnoreCase).ToList()
                 : viewModel.SelectedEmails.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             var body = WebUtility.HtmlEncode(viewModel.Message).Replace("\n", "<br />");
@@ -343,22 +442,38 @@ namespace Juan_NET.Web.Controllers
 
             TempData["SubscribeMessage"] = $"Message sent to {recipients.Count} recipient(s).";
 
-            return RedirectToAction(nameof(Subscribe));
+            return RedirectToAction(nameof(Subscribe), new { userSearch = viewModel.UserSearch });
+        }
+
+        private async Task PopulateProductsViewModelAsync(AdminProductsViewModel viewModel)
+        {
+            viewModel.Products = await _context.Products
+                .Include(product => product.ProductCategories)
+                .ThenInclude(productCategory => productCategory.Category)
+                .OrderByDescending(product => product.CreatedAt)
+                .ToListAsync();
+            viewModel.Categories = await _context.Categories.OrderBy(category => category.Name).ToListAsync();
         }
 
         private async Task<AdminSubscribeViewModel> CreateSubscribeViewModelAsync(AdminSubscribeViewModel viewModel)
         {
-            viewModel.Users = await _context.Users.OrderBy(user => user.Email).ToListAsync();
+            var usersQuery = _context.Users.AsQueryable();
+            var normalizedSearch = viewModel.UserSearch?.Trim();
+
+            if (!string.IsNullOrWhiteSpace(normalizedSearch))
+            {
+                usersQuery = usersQuery.Where(user => user.FullName.Contains(normalizedSearch) || user.Email.Contains(normalizedSearch));
+            }
+
+            viewModel.UserSearch = normalizedSearch;
+            viewModel.Users = await usersQuery.OrderBy(user => user.Email).Take(20).ToListAsync();
             viewModel.Subscribers = await _context.Subscribers.OrderBy(subscriber => subscriber.Email).ToListAsync();
             return viewModel;
         }
 
         private IQueryable<string> GetSubscribeRecipientsQuery()
         {
-            var userEmails = _context.Users.Select(user => user.Email);
-            var subscriberEmails = _context.Subscribers.Select(subscriber => subscriber.Email);
-
-            return userEmails.Concat(subscriberEmails).Distinct();
+            return _context.Subscribers.Select(subscriber => subscriber.Email).Distinct();
         }
     }
 }

@@ -242,8 +242,8 @@
 	});
 
 
-	// image zoom effect
-	$('.img-zoom').zoom();
+	// image zoom effect (exclude quick view modal)
+	$('.img-zoom').not('#quick_view .img-zoom').zoom();
 
 	// pricing filter
 	var rangeSlider = $(".price-range"),

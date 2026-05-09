@@ -8,6 +8,9 @@
   var productModal = document.querySelector("[data-product-modal]");
   var openProductModal = document.querySelector("[data-open-product-modal]");
   var closeProductModal = document.querySelectorAll("[data-close-product-modal]");
+  var editProductModal = document.querySelector("[data-edit-product-modal]");
+  var openEditProductModal = document.querySelectorAll("[data-open-edit-product-modal]");
+  var closeEditProductModal = document.querySelectorAll("[data-close-edit-product-modal]");
   var sliderModal = document.querySelector("[data-slider-modal]");
   var openSliderModal = document.querySelector("[data-open-slider-modal]");
   var closeSliderModal = document.querySelectorAll("[data-close-slider-modal]");
@@ -18,7 +21,10 @@
   var imageName = document.querySelector("[data-image-name]");
   var sliderImageInput = document.querySelector("[data-slider-image-input]");
   var sliderImageName = document.querySelector("[data-slider-image-name]");
+  var editImageInput = document.querySelector("[data-edit-image-input]");
+  var editImageName = document.querySelector("[data-edit-image-name]");
   var categoryChoices = document.querySelectorAll("[data-category-choice]");
+  var editCategoryChoices = document.querySelectorAll("[data-edit-category-choice]");
   var confirmModal = document.querySelector("[data-confirm-modal]");
   var confirmMessage = document.querySelector("[data-confirm-message]");
   var confirmAccept = document.querySelector("[data-confirm-accept]");
@@ -62,6 +68,10 @@
     body.classList.add("modal-open");
   }
 
+  if (editProductModal && editProductModal.classList.contains("is-open")) {
+    body.classList.add("modal-open");
+  }
+
   if (sliderModal && sliderModal.classList.contains("is-open")) {
     body.classList.add("modal-open");
   }
@@ -80,6 +90,21 @@
   closeProductModal.forEach(function (item) {
     item.addEventListener("click", function () {
       productModal.classList.remove("is-open");
+      body.classList.remove("modal-open");
+    });
+  });
+
+  openEditProductModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      fillEditProductForm(item);
+      editProductModal.classList.add("is-open");
+      body.classList.add("modal-open");
+    });
+  });
+
+  closeEditProductModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      editProductModal.classList.remove("is-open");
       body.classList.remove("modal-open");
     });
   });
@@ -124,10 +149,25 @@
     });
   }
 
+  if (editImageInput && editImageName) {
+    editImageInput.addEventListener("change", function () {
+      editImageName.textContent = editImageInput.files.length ? editImageInput.files[0].name : "Keep current image";
+    });
+  }
+
   categoryChoices.forEach(function (choice) {
-    choice.addEventListener("change", syncCategoryChoices);
+    choice.addEventListener("change", function () {
+      syncCategoryChoices(categoryChoices);
+    });
   });
-  syncCategoryChoices();
+  syncCategoryChoices(categoryChoices);
+
+  editCategoryChoices.forEach(function (choice) {
+    choice.addEventListener("change", function () {
+      syncCategoryChoices(editCategoryChoices);
+    });
+  });
+  syncCategoryChoices(editCategoryChoices);
 
   document.querySelectorAll("form[data-confirm]").forEach(function (form) {
     form.addEventListener("submit", function (event) {
@@ -218,18 +258,53 @@
     return 1 - Math.pow(1 - progress, 3);
   }
 
-  function syncCategoryChoices() {
-    if (!categoryChoices.length) {
+  function syncCategoryChoices(choices) {
+    if (!choices.length) {
       return;
     }
 
-    var selectedCount = Array.prototype.filter.call(categoryChoices, function (choice) {
+    var selectedCount = Array.prototype.filter.call(choices, function (choice) {
       return choice.checked;
     }).length;
 
-    categoryChoices.forEach(function (choice) {
+    choices.forEach(function (choice) {
       choice.disabled = !choice.checked && selectedCount >= 3;
     });
+  }
+
+  function fillEditProductForm(button) {
+    setValue("[data-edit-product-id]", button.dataset.productId);
+    setValue("[data-edit-product-image]", button.dataset.productImage || "");
+    setValue("[data-edit-product-name]", button.dataset.productName || "");
+    setValue("[data-edit-product-price]", button.dataset.productPrice || "");
+    setValue("[data-edit-product-stock]", button.dataset.productStock || "");
+    setValue("[data-edit-product-description]", button.dataset.productDescription || "");
+
+    var activeInput = document.querySelector("[data-edit-product-active]");
+    if (activeInput) {
+      activeInput.checked = button.dataset.productActive === "true";
+    }
+
+    var selectedIds = (button.dataset.productCategories || "").split(",");
+    editCategoryChoices.forEach(function (choice) {
+      choice.checked = selectedIds.indexOf(choice.value) !== -1;
+    });
+    syncCategoryChoices(editCategoryChoices);
+
+    if (editImageInput) {
+      editImageInput.value = "";
+    }
+
+    if (editImageName) {
+      editImageName.textContent = "Keep current image";
+    }
+  }
+
+  function setValue(selector, value) {
+    var field = document.querySelector(selector);
+    if (field) {
+      field.value = value;
+    }
   }
 
   function openConfirm(form, submitter, message) {

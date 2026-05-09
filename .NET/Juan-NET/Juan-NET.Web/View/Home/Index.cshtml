@@ -78,20 +78,30 @@
                 <div class="product-carousel-4 mbn-50 slick-row-15 slick-arrow-style">
                     @foreach (var product in Model.Products)
                     {
-                        <div class="product-item mb-50">
+                        var imageUrl = string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/main assets/img/product/product-1.jpg") : product.ImageUrl;
+                        var categories = string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name));
+                        var description = string.IsNullOrWhiteSpace(product.Description) ? "No description available." : product.Description;
+                        <div class="product-item mb-50"
+                             data-product-card
+                             data-product-name="@product.Name"
+                             data-product-price="@product.Price.ToString("C")"
+                             data-product-image="@imageUrl"
+                             data-product-description="@description"
+                             data-product-categories="@categories"
+                             data-product-stock="@product.StockCount">
                             <div class="product-thumb">
-                                <a href="#"><img src="@(string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/main assets/img/product/product-1.jpg") : product.ImageUrl)" alt="@product.Name" /></a>
+                                <a href="#" data-product-quick-view><img src="@imageUrl" alt="@product.Name" /></a>
                             </div>
                             <div class="product-content">
-                                <h5 class="product-name"><a href="#">@product.Name</a></h5>
+                                <h5 class="product-name"><a href="#" data-product-quick-view>@product.Name</a></h5>
                                 <div class="price-box">
                                     <span class="price-regular">@product.Price.ToString("C")</span>
                                 </div>
-                                <p>@string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name))</p>
+                                <p>@categories</p>
                                 <div class="product-action-link">
                                     <a href="#" data-toggle="tooltip" title="Wishlist"><i class="ion-android-favorite-outline"></i></a>
                                     <a href="#" data-toggle="tooltip" title="Add To Cart"><i class="ion-bag"></i></a>
-                                    <a href="#" data-toggle="modal" data-target="#quick_view"><span data-toggle="tooltip" title="Quick View"><i class="ion-ios-eye-outline"></i></span></a>
+                                    <a href="#" data-product-quick-view data-toggle="tooltip" title="Quick View"><i class="ion-ios-eye-outline"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -159,18 +169,19 @@
                         <div class="col-lg-5">
                             <div class="product-large-slider mb-20">
                                 <div class="pro-large-img img-zoom">
-                                    <img src="~/main assets/img/product/product-details-img1.jpg" alt="product" />
+                                    <img src="~/main assets/img/product/product-details-img1.jpg" alt="product" data-modal-product-image />
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-7">
                             <div class="product-details-des">
-                                <h3 class="pro-det-title">Primitive Mens Premium Shoes</h3>
+                                <h3 class="pro-det-title" data-modal-product-name>Primitive Mens Premium Shoes</h3>
                                 <div class="price-box">
-                                    <span class="regular-price">$70.00</span>
-                                    <span class="old-price"><del>$80.00</del></span>
+                                    <span class="regular-price" data-modal-product-price>$70.00</span>
                                 </div>
-                                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
+                                <p data-modal-product-description>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
+                                <p><strong>Category:</strong> <span data-modal-product-categories>-</span></p>
+                                <p><strong>Stock:</strong> <span data-modal-product-stock>-</span></p>
                                 <div class="quantity-cart-box d-flex align-items-center mb-20">
                                     <div class="quantity">
                                         <div class="pro-qty"><input type="text" value="1" /></div>
@@ -185,3 +196,50 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var modal = document.getElementById("quick_view");
+            var cards = document.querySelectorAll("[data-product-card]");
+
+            cards.forEach(function (card) {
+                card.addEventListener("click", function (event) {
+                    var ignoredAction = event.target.closest(".product-action-link a:not([data-product-quick-view])");
+
+                    if (ignoredAction) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    fillProductModal(card);
+
+                    if (window.jQuery && window.jQuery.fn.modal) {
+                        window.jQuery(modal).modal("show");
+                    }
+                });
+            });
+
+            function fillProductModal(card) {
+                setText("[data-modal-product-name]", card.dataset.productName);
+                setText("[data-modal-product-price]", card.dataset.productPrice);
+                setText("[data-modal-product-description]", card.dataset.productDescription);
+                setText("[data-modal-product-categories]", card.dataset.productCategories || "-");
+                setText("[data-modal-product-stock]", card.dataset.productStock ? card.dataset.productStock + " item(s)" : "-");
+
+                var image = modal.querySelector("[data-modal-product-image]");
+                if (image) {
+                    image.src = card.dataset.productImage;
+                    image.alt = card.dataset.productName;
+                }
+            }
+
+            function setText(selector, value) {
+                var element = modal.querySelector(selector);
+                if (element) {
+                    element.textContent = value || "";
+                }
+            }
+        })();
+    </script>
+}

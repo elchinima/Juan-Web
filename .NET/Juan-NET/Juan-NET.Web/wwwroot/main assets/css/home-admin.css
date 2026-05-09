@@ -213,6 +213,7 @@ body {
 
 .product-item {
   overflow: hidden;
+  cursor: pointer;
 }
 
 .product-thumb {

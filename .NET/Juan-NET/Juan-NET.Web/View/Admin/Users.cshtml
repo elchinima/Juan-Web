@@ -4,6 +4,7 @@
     ViewData["Title"] = "Users";
     ViewData["PageName"] = "customers";
     ViewData["ActivePage"] = "Users";
+    var search = ViewBag.UserSearch as string ?? string.Empty;
 }
 
 @section SidebarCard {
@@ -32,6 +33,14 @@
             <p class="eyebrow">Users</p>
             <h3>Registered Customers</h3>
         </div>
+        <form class="admin-search-form" asp-controller="Admin" asp-action="Users" method="get">
+            <input name="search" value="@search" placeholder="Search name or email" />
+            <button class="primary-button" type="submit">Search</button>
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a class="ghost-button" asp-controller="Admin" asp-action="Users">Reset</a>
+            }
+        </form>
     </div>
     <div class="admin-table users-table">
         <div class="admin-table-head">

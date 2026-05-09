@@ -4,17 +4,17 @@
     ViewData["Title"] = "Subscribe";
     ViewData["PageName"] = "subscribe";
     ViewData["ActivePage"] = "Subscribe";
-    var recipients = Model.Users.Select(user => user.Email)
-        .Concat(Model.Subscribers.Select(subscriber => subscriber.Email))
+    var recipients = Model.Subscribers.Select(subscriber => subscriber.Email)
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .OrderBy(email => email)
         .ToList();
+    var userSearch = Model.UserSearch ?? string.Empty;
 }
 
 @section SidebarCard {
     <span>Email</span>
-    <strong>@recipients.Count Recipients</strong>
-    <p>Newsletter delivery for users and subscribers.</p>
+    <strong>@recipients.Count Subscribers</strong>
+    <p>Newsletter delivery for subscribed emails.</p>
 }
 
 <header class="topbar">
@@ -41,26 +41,26 @@
         <div class="panel-head">
             <div>
                 <p class="eyebrow">Recipients</p>
-                <h3>Audience List</h3>
+            <h3>Subscribers</h3>
             </div>
         </div>
         <div class="admin-table subscribe-table">
             <div class="admin-table-head">
                 <span>Email</span>
-                <span>Source</span>
+                <span>Created</span>
                 <span>Status</span>
                 <span>Selected</span>
             </div>
             @if (recipients.Any())
             {
-                @foreach (var email in recipients)
+                @foreach (var subscriber in Model.Subscribers)
                 {
-                    var source = Model.Users.Any(user => user.Email == email) ? "User" : "Subscriber";
+                    var email = subscriber.Email;
                     <label class="admin-table-row subscribe-row" form="subscribe-send-form">
                         <strong>@email</strong>
-                        <span>@source</span>
+                        <span>@subscriber.CreatedAt.ToString("MMM dd, yyyy")</span>
                         <span class="status good">Ready</span>
-                        <input type="checkbox" name="SelectedEmails" value="@email" form="subscribe-send-form" checked="@Model.SelectedEmails.Contains(email)" />
+                        <input type="checkbox" name="SelectedEmails" value="@email" form="subscribe-send-form" checked="@Model.SelectedEmails.Contains(email, StringComparer.OrdinalIgnoreCase)" />
                     </label>
                 }
             }
@@ -79,11 +79,38 @@
     <article class="panel reveal subscribe-action-panel">
         <div class="panel-head">
             <div>
-                <p class="eyebrow">Delivery</p>
-                <h3>Send real email</h3>
+                <p class="eyebrow">Users</p>
+                <h3>Find User</h3>
             </div>
         </div>
-        <p class="muted-text">Select recipients from the audience list, then compose the email in a modal window.</p>
+        <form class="admin-search-form stacked" asp-controller="Admin" asp-action="Subscribe" method="get">
+            <input name="userSearch" value="@userSearch" placeholder="Search name or email" />
+            <button class="primary-button full" type="submit">Search</button>
+            @if (!string.IsNullOrWhiteSpace(userSearch))
+            {
+                <a class="ghost-button full" asp-controller="Admin" asp-action="Subscribe">Reset</a>
+            }
+        </form>
+        <div class="user-pick-list">
+            @if (Model.Users.Any())
+            {
+                @foreach (var user in Model.Users)
+                {
+                    <label>
+                        <span>
+                            <strong>@user.FullName</strong>
+                            <em>@user.Email</em>
+                        </span>
+                        <input type="checkbox" name="SelectedEmails" value="@user.Email" form="subscribe-send-form" checked="@Model.SelectedEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase)" />
+                    </label>
+                }
+            }
+            else
+            {
+                <p class="muted-text">No users found.</p>
+            }
+        </div>
+        <p class="muted-text">Select subscribers or individual users, then compose the email in a modal window.</p>
         <button class="primary-button full" type="button" data-open-subscribe-modal>Send Message</button>
     </article>
 </section>
@@ -99,10 +126,11 @@
             <button class="modal-close" type="button" aria-label="Close modal" data-close-subscribe-modal>&times;</button>
         </div>
         <form id="subscribe-send-form" class="admin-form" asp-controller="Admin" asp-action="SendSubscribe" method="post" data-confirm="Send this message to selected recipients?">
+            <input asp-for="UserSearch" type="hidden" />
             <div asp-validation-summary="ModelOnly" class="status off"></div>
             <label class="inline-check">
                 <input asp-for="SendToAll" />
-                Send to all users and subscribers
+                Send to all subscribers
             </label>
             <span asp-validation-for="SelectedEmails" class="status off"></span>
             <label>

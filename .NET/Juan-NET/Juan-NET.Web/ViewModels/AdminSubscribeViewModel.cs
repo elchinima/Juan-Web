@@ -12,6 +12,8 @@ namespace Juan_NET.Web.ViewModels
 
         public bool SendToAll { get; set; }
 
+        public string? UserSearch { get; set; }
+
         [Required, MaxLength(120)]
         public string Subject { get; set; } = string.Empty;
 

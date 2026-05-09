@@ -4,11 +4,14 @@
     ViewData["Title"] = "Sliders";
     ViewData["PageName"] = "sliders";
     ViewData["ActivePage"] = "Sliders";
+    var maxSliders = 6;
+    var slotsLeft = Math.Max(0, maxSliders - Model.Sliders.Count);
+    var canAddSlider = slotsLeft > 0;
 }
 
 @section SidebarCard {
     <span>Homepage</span>
-    <strong>@Model.Sliders.Count Slides</strong>
+    <strong>@Model.Sliders.Count / @maxSliders Slides</strong>
     <p>Carousel slides shown on the home page.</p>
 }
 
@@ -22,7 +25,7 @@
     </div>
     <div class="topbar-actions">
         <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
-        <button class="primary-button" type="button" data-open-slider-modal>Add Slider</button>
+        <button class="primary-button" type="button" data-open-slider-modal disabled="@(!canAddSlider)">Add Slider</button>
     </div>
 </header>
 
@@ -31,26 +34,43 @@
     <div class="status good admin-message">@message</div>
 }
 
-<section class="panel reveal">
+<section class="slider-overview reveal">
+    <div>
+        <p class="eyebrow">Capacity</p>
+        <h2>@slotsLeft slots left</h2>
+        <span>Maximum carousel size is @maxSliders slides.</span>
+    </div>
+    <div class="slider-capacity">
+        @for (var i = 1; i <= maxSliders; i++)
+        {
+            <i class="@(i <= Model.Sliders.Count ? "filled" : "")"></i>
+        }
+    </div>
+</section>
+
+<section class="panel reveal slider-studio-panel">
     <div class="panel-head">
         <div>
             <p class="eyebrow">Carousel</p>
-            <h3>Slides</h3>
+            <h3>Slide Studio</h3>
         </div>
     </div>
-    <div class="slider-admin-list">
+    <div class="slider-admin-grid">
         @if (Model.Sliders.Any())
         {
             @foreach (var slider in Model.Sliders)
             {
-                <form class="slider-admin-row" asp-controller="Admin" asp-action="EditSlider" method="post" enctype="multipart/form-data" data-confirm="Save slider changes?">
+                <form class="slider-admin-card" asp-controller="Admin" asp-action="EditSlider" method="post" enctype="multipart/form-data" data-confirm="Save slider changes?">
                     <input type="hidden" name="Slider.Id" value="@slider.Id" />
                     <input type="hidden" name="Slider.ImageUrl" value="@slider.ImageUrl" />
-                    <img src="@slider.ImageUrl" alt="@slider.Title" />
+                    <div class="slider-preview">
+                        <img src="@slider.ImageUrl" alt="@slider.Title" />
+                        <span class="status @(slider.IsActive ? "good" : "off")">@(slider.IsActive ? "Active" : "Hidden")</span>
+                    </div>
                     <div class="slider-admin-fields">
                         <input name="Slider.Subtitle" value="@slider.Subtitle" placeholder="Subtitle" />
                         <input name="Slider.Title" value="@slider.Title" placeholder="Title" />
-                        <input name="Slider.Description" value="@slider.Description" placeholder="Description" />
+                        <textarea name="Slider.Description" rows="3" placeholder="Description">@slider.Description</textarea>
                         <input name="Slider.ButtonText" value="@slider.ButtonText" placeholder="Button text" />
                         <input name="Slider.ButtonUrl" value="@slider.ButtonUrl" placeholder="Button URL" />
                         <input name="Slider.DisplayOrder" value="@slider.DisplayOrder" type="number" placeholder="Order" />
