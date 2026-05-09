@@ -63,7 +63,7 @@
                     <div><strong>@product.Name</strong><span>@string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name))</span></div>
                     <em>@product.Price.ToString("C")</em>
                     <small class="status @(product.IsActive ? (product.StockCount <= 5 ? "warn" : "good") : "off")">@(product.IsActive ? (product.StockCount <= 5 ? "Low Stock" : "In Stock") : "Draft")</small>
-                    <form asp-controller="Admin" asp-action="DeleteProduct" method="post">
+                    <form asp-controller="Admin" asp-action="DeleteProduct" method="post" data-confirm="Delete this product?">
                         <input type="hidden" name="id" value="@product.Id" />
                         <button class="danger-button" type="submit">Delete</button>
                     </form>
@@ -93,7 +93,7 @@
             <button class="modal-close" type="button" aria-label="Close modal" data-close-product-modal>&times;</button>
         </div>
 
-        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddProduct" method="post" enctype="multipart/form-data">
+        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddProduct" method="post" enctype="multipart/form-data" data-confirm="Save this product?">
             <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
             <label>
                 Product Name

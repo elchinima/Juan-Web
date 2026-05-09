@@ -77,10 +77,29 @@
                                         </a>
                                     </li>
                                     <li class="user-hover">
-                                        <a href="#"><i class="ion-ios-gear-outline"></i></a>
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            <a asp-controller="Account" asp-action="Profile" class="header-user-name">@User.Identity.Name</a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Account" asp-action="Login"><i class="ion-log-in"></i></a>
+                                        }
                                         <ul class="dropdown-list">
-                                            <li><a asp-controller="Account" asp-action="Register">register</a></li>
-                                            <li><a asp-controller="Account" asp-action="Register">register</a></li>
+                                            @if (User.Identity?.IsAuthenticated == true)
+                                            {
+                                                <li><a asp-controller="Account" asp-action="Profile">profile</a></li>
+                                                <li>
+                                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                                        <button type="submit">logout</button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li><a asp-controller="Account" asp-action="Login">login</a></li>
+                                                <li><a asp-controller="Account" asp-action="Register">register</a></li>
+                                            }
                                             <li><a asp-controller="Admin" asp-action="Index">admin</a></li>
                                         </ul>
                                     </li>
@@ -110,6 +129,16 @@
                             </a>
                         </div>
                         <div class="mobile-menu-toggler">
+                            <a asp-controller="Account" asp-action="@(User.Identity?.IsAuthenticated == true ? "Profile" : "Login")">
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <span class="mobile-user-name">@User.Identity.Name</span>
+                                }
+                                else
+                                {
+                                    <i class="ion-log-in"></i>
+                                }
+                            </a>
                             <div class="mini-cart-wrap">
                                 <a href="#"><i class="ion-bag"></i></a>
                             </div>

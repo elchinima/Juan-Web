@@ -53,7 +53,7 @@
                         <em>#@category.Id</em>
                         <strong>@category.Name</strong>
                         <span>@category.ProductCategories.Count</span>
-                        <form asp-controller="Admin" asp-action="DeleteCategory" method="post">
+                        <form asp-controller="Admin" asp-action="DeleteCategory" method="post" data-confirm="Delete this category?">
                             <input type="hidden" name="id" value="@category.Id" />
                             <button class="danger-button" type="submit">Delete</button>
                         </form>
@@ -79,7 +79,7 @@
                 <h3>Add Category</h3>
             </div>
         </div>
-        <form class="admin-form" asp-controller="Admin" asp-action="AddCategory" method="post">
+        <form class="admin-form" asp-controller="Admin" asp-action="AddCategory" method="post" data-confirm="Save this category?">
             <div asp-validation-summary="ModelOnly" class="status off"></div>
             <label>
                 Category Name

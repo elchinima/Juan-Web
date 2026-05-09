@@ -623,6 +623,22 @@ button {
   box-shadow: var(--shadow);
 }
 
+.confirm-modal-panel {
+  width: min(430px, 100%);
+}
+
+.confirm-modal-panel p {
+  margin: 0 0 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 .modal-close {
   display: inline-flex;
   align-items: center;
@@ -884,6 +900,10 @@ body.modal-open {
 }
 
 @media (max-width: 820px) {
+  body {
+    overflow-x: hidden;
+  }
+
   .admin-shell {
     display: block;
   }
@@ -918,12 +938,17 @@ body.modal-open {
   }
 
   .topbar {
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    align-items: start;
   }
 
   .topbar-actions {
+    grid-column: 1 / -1;
     width: 100%;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
   }
 
   .stats-grid,
@@ -936,24 +961,39 @@ body.modal-open {
     grid-template-columns: 1fr;
   }
 
-  .admin-table {
-    overflow-x: auto;
-    padding-bottom: 6px;
+  .admin-table-head {
+    display: none;
   }
 
-  .admin-table-head,
   .admin-table-row {
-    min-width: 680px;
+    grid-template-columns: 1fr;
+    align-items: start;
+    min-width: 0;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .admin-table-row form,
+  .admin-table-row .danger-button {
+    width: 100%;
+  }
+
+  .slider-admin-row {
+    grid-template-columns: 1fr;
+  }
+
+  .slider-admin-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .slider-admin-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 560px) {
   .main-panel {
     padding: 16px;
-  }
-
-  .topbar {
-    display: grid;
   }
 
   .hero-panel,
@@ -977,5 +1017,33 @@ body.modal-open {
   .filter-button,
   .danger-button {
     width: 100%;
+    min-width: 0;
+    padding-right: 12px;
+    padding-left: 12px;
+    white-space: normal;
+  }
+
+  .confirm-actions {
+    display: grid;
+  }
+
+  .topbar-actions,
+  .slider-admin-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-modal {
+    align-items: stretch;
+    padding: 12px;
+  }
+
+  .admin-modal-panel {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+  }
+
+  .bar-chart.large,
+  .bar-chart {
+    min-height: 220px;
   }
 }

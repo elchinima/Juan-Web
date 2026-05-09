@@ -1,0 +1,106 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+    var initials = string.IsNullOrWhiteSpace(Model.FullName) ? "JN" : Model.FullName[..Math.Min(Model.FullName.Length, 2)].ToUpper();
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="profile-page">
+    <div class="container">
+        @if (TempData["ProfileMessage"] is string message)
+        {
+            <div class="auth-alert">@message</div>
+        }
+
+        <div class="profile-hero">
+            <div class="profile-avatar">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfileImageUrl))
+                {
+                    <img src="@Model.ProfileImageUrl" alt="@Model.FullName" />
+                }
+                else
+                {
+                    <span>@initials</span>
+                }
+            </div>
+            <div>
+                <span class="auth-kicker">My Account</span>
+                <h1>@Model.FullName</h1>
+                <p>@Model.Email</p>
+            </div>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button class="profile-secondary" type="submit">Logout</button>
+            </form>
+        </div>
+
+        <div class="profile-grid">
+            <section class="profile-card">
+                <h2>Profile details</h2>
+                <form asp-controller="Account" asp-action="UpdateProfile" method="post" class="auth-form">
+                    <input type="hidden" asp-for="UserId" />
+                    <label>
+                        Full name
+                        <input asp-for="FullName" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </label>
+                    <label>
+                        Email
+                        <input asp-for="Email" disabled />
+                    </label>
+                    <button class="auth-submit" type="submit">Save profile</button>
+                </form>
+            </section>
+
+            <section class="profile-card">
+                <h2>Profile image</h2>
+                <form asp-controller="Account" asp-action="UploadProfileImage" method="post" enctype="multipart/form-data" class="auth-form">
+                    <input type="hidden" asp-for="UserId" />
+                    <label>
+                        Image
+                        <input asp-for="ImageFile" type="file" accept="image/png,image/jpeg,image/jpg,image/gif" />
+                    </label>
+                    <button class="auth-submit" type="submit">Save image</button>
+                </form>
+                <form asp-controller="Account" asp-action="DeleteProfileImage" method="post" class="profile-inline-form">
+                    <button class="profile-secondary" type="submit">Delete image</button>
+                </form>
+            </section>
+
+            <section class="profile-card">
+                <h2>Two-factor authentication</h2>
+                <p class="profile-muted">When enabled, login requires a six-digit code sent to your email.</p>
+                <form asp-controller="Account" asp-action="ToggleTwoFactor" method="post" class="profile-toggle">
+                    <label>
+                        <input type="checkbox" name="isTwoFactorEnabled" value="true" checked="@Model.IsTwoFactorEnabled" />
+                        Email 2FA
+                    </label>
+                    <button class="profile-secondary" type="submit">Save security</button>
+                </form>
+            </section>
+
+            <section class="profile-card">
+                <h2>Change password</h2>
+                <p class="profile-muted">A confirmation link will be sent to your email before the new password is applied.</p>
+                <form asp-controller="Account" asp-action="RequestPasswordChange" method="post" class="auth-form">
+                    <label>
+                        Current password
+                        <input asp-for="ChangePassword.CurrentPassword" placeholder="Current password" />
+                        <span asp-validation-for="ChangePassword.CurrentPassword" class="text-danger"></span>
+                    </label>
+                    <label>
+                        New password
+                        <input asp-for="ChangePassword.NewPassword" placeholder="New password" />
+                        <span asp-validation-for="ChangePassword.NewPassword" class="text-danger"></span>
+                    </label>
+                    <label>
+                        Confirm new password
+                        <input asp-for="ChangePassword.ConfirmNewPassword" placeholder="Repeat password" />
+                        <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="text-danger"></span>
+                    </label>
+                    <button class="auth-submit" type="submit">Send confirmation</button>
+                </form>
+            </section>
+        </div>
+    </div>
+</section>

@@ -43,7 +43,7 @@
         {
             @foreach (var slider in Model.Sliders)
             {
-                <form class="slider-admin-row" asp-controller="Admin" asp-action="EditSlider" method="post" enctype="multipart/form-data">
+                <form class="slider-admin-row" asp-controller="Admin" asp-action="EditSlider" method="post" enctype="multipart/form-data" data-confirm="Save slider changes?">
                     <input type="hidden" name="Slider.Id" value="@slider.Id" />
                     <input type="hidden" name="Slider.ImageUrl" value="@slider.ImageUrl" />
                     <img src="@slider.ImageUrl" alt="@slider.Title" />
@@ -63,7 +63,7 @@
                     </div>
                     <div class="slider-admin-actions">
                         <button class="primary-button" type="submit">Save</button>
-                        <button class="danger-button" type="submit" formaction="@Url.Action("DeleteSlider", "Admin", new { id = slider.Id })">Delete</button>
+                        <button class="danger-button" type="submit" formaction="@Url.Action("DeleteSlider", "Admin", new { id = slider.Id })" data-confirm="Delete this slider?">Delete</button>
                     </div>
                 </form>
             }
@@ -90,7 +90,7 @@
             </div>
             <button class="modal-close" type="button" aria-label="Close modal" data-close-slider-modal>&times;</button>
         </div>
-        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddSlider" method="post" enctype="multipart/form-data">
+        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddSlider" method="post" enctype="multipart/form-data" data-confirm="Save this slider?">
             <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
             <label>
                 Subtitle

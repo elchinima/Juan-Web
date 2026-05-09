@@ -65,4 +65,23 @@ public class HomeController : Controller
     {
         return View();
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubscribeEmail(string email)
+    {
+        if (!string.IsNullOrWhiteSpace(email) && !await _context.Subscribers.AnyAsync(subscriber => subscriber.Email == email))
+        {
+            _context.Subscribers.Add(new Subscriber
+            {
+                Email = email.Trim(),
+                CreatedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+            TempData["SubscribeMessage"] = "Thank you for subscribing.";
+        }
+
+        var returnUrl = Request.Headers.Referer.ToString();
+        return Redirect(string.IsNullOrWhiteSpace(returnUrl) ? Url.Action(nameof(Index))! : returnUrl);
+    }
 }

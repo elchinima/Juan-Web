@@ -9,10 +9,12 @@ namespace Juan_NET.Web.Controllers
     public class AdminController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly ImageStorageService _imageStorage;
 
-        public AdminController(AppDbContext context)
+        public AdminController(AppDbContext context, ImageStorageService imageStorage)
         {
             _context = context;
+            _imageStorage = imageStorage;
         }
 
         public async Task<IActionResult> Index()
@@ -89,7 +91,7 @@ namespace Juan_NET.Web.Controllers
 
             if (viewModel.ImageFile is { Length: > 0 })
             {
-                product.ImageUrl = await SaveFileAsync(viewModel.ImageFile, "products");
+                product.ImageUrl = await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "products");
             }
             else
             {
@@ -212,7 +214,7 @@ namespace Juan_NET.Web.Controllers
 
             if (viewModel.ImageFile is { Length: > 0 })
             {
-                slider.ImageUrl = await SaveFileAsync(viewModel.ImageFile, "sliders");
+                slider.ImageUrl = await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "sliders");
             }
 
             _context.Sliders.Add(slider);
@@ -251,7 +253,7 @@ namespace Juan_NET.Web.Controllers
 
             if (viewModel.ImageFile is { Length: > 0 })
             {
-                slider.ImageUrl = await SaveFileAsync(viewModel.ImageFile, "sliders");
+                slider.ImageUrl = await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "sliders");
             }
             else if (!string.IsNullOrWhiteSpace(viewModel.Slider.ImageUrl))
             {
@@ -280,25 +282,53 @@ namespace Juan_NET.Web.Controllers
             return RedirectToAction(nameof(Sliders));
         }
 
-        private static async Task<string> SaveFileAsync(IFormFile file, string folder)
-        {
-            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folder);
-            Directory.CreateDirectory(uploadsPath);
-
-            var extension = Path.GetExtension(file.FileName);
-            var fileName = $"{Guid.NewGuid():N}{extension}";
-            var filePath = Path.Combine(uploadsPath, fileName);
-
-            await using var stream = System.IO.File.Create(filePath);
-            await file.CopyToAsync(stream);
-
-            return $"/uploads/{folder}/{fileName}";
-        }
-
         public async Task<IActionResult> Users()
         {
             var users = await _context.Users.OrderByDescending(user => user.CreatedAt).ToListAsync();
             return View(users);
+        }
+
+        public async Task<IActionResult> Subscribe()
+        {
+            return View(await CreateSubscribeViewModelAsync(new AdminSubscribeViewModel()));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendSubscribe(AdminSubscribeViewModel viewModel)
+        {
+            if (!viewModel.SendToAll && !viewModel.SelectedEmails.Any())
+            {
+                ModelState.AddModelError(nameof(AdminSubscribeViewModel.SelectedEmails), "Select at least one recipient.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Subscribe", await CreateSubscribeViewModelAsync(viewModel));
+            }
+
+            var recipients = viewModel.SendToAll
+                ? await GetSubscribeRecipientsQuery().ToListAsync()
+                : viewModel.SelectedEmails.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+            TempData["SubscribeMessage"] = $"Message simulated for {recipients.Count} recipient(s).";
+
+            return RedirectToAction(nameof(Subscribe));
+        }
+
+        private async Task<AdminSubscribeViewModel> CreateSubscribeViewModelAsync(AdminSubscribeViewModel viewModel)
+        {
+            viewModel.Users = await _context.Users.OrderBy(user => user.Email).ToListAsync();
+            viewModel.Subscribers = await _context.Subscribers.OrderBy(subscriber => subscriber.Email).ToListAsync();
+            return viewModel;
+        }
+
+        private IQueryable<string> GetSubscribeRecipientsQuery()
+        {
+            var userEmails = _context.Users.Select(user => user.Email);
+            var subscriberEmails = _context.Subscribers.Select(subscriber => subscriber.Email);
+
+            return userEmails.Concat(subscriberEmails).Distinct();
         }
     }
 }

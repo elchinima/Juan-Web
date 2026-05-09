@@ -12,7 +12,15 @@
                         <div class="header-top-settings">
                             <ul class="nav align-items-center justify-content-end">
                                 <li><a asp-controller="Admin" asp-action="Index">Admin Panel</a></li>
-                                <li><a asp-controller="Account" asp-action="Register">Register</a></li>
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <li><a asp-controller="Account" asp-action="Profile">@User.Identity.Name</a></li>
+                                }
+                                else
+                                {
+                                    <li><a asp-controller="Account" asp-action="Login">Login</a></li>
+                                    <li><a asp-controller="Account" asp-action="Register">Register</a></li>
+                                }
                             </ul>
                         </div>
                     </div>
@@ -48,9 +56,29 @@
                             <div class="header-configure-area">
                                 <ul class="nav justify-content-end">
                                     <li class="user-hover">
-                                        <a asp-controller="Account" asp-action="Register"><i class="ion-ios-gear-outline"></i></a>
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            <a asp-controller="Account" asp-action="Profile" class="header-user-name">@User.Identity.Name</a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Account" asp-action="Login"><i class="ion-log-in"></i></a>
+                                        }
                                         <ul class="dropdown-list">
-                                            <li><a asp-controller="Account" asp-action="Register">register</a></li>
+                                            @if (User.Identity?.IsAuthenticated == true)
+                                            {
+                                                <li><a asp-controller="Account" asp-action="Profile">profile</a></li>
+                                                <li>
+                                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                                        <button type="submit">logout</button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li><a asp-controller="Account" asp-action="Login">login</a></li>
+                                                <li><a asp-controller="Account" asp-action="Register">register</a></li>
+                                            }
                                             <li><a asp-controller="Admin" asp-action="Index">admin</a></li>
                                         </ul>
                                     </li>
@@ -74,7 +102,16 @@
                             <a asp-controller="Home" asp-action="Index"><img src="~/main assets/img/logo/logo.png" alt="Brand Logo" /></a>
                         </div>
                         <div class="mobile-menu-toggler">
-                            <a asp-controller="Account" asp-action="Register"><i class="ion-ios-gear-outline"></i></a>
+                            <a asp-controller="Account" asp-action="@(User.Identity?.IsAuthenticated == true ? "Profile" : "Login")">
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <span class="mobile-user-name">@User.Identity.Name</span>
+                                }
+                                else
+                                {
+                                    <i class="ion-log-in"></i>
+                                }
+                            </a>
                             <a asp-controller="Products" asp-action="Index"><i class="ion-bag"></i></a>
                         </div>
                     </div>

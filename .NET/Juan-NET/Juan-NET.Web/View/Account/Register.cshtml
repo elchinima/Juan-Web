@@ -1,49 +1,55 @@
-﻿@model RegisterViewModel
+@model RegisterViewModel
 @{
     ViewData["Title"] = "Register";
 }
 
 @await Html.PartialAsync("_StoreHeader")
 
-<section class="login-register-wrapper section-padding">
-    <div class="container">
-        <div class="member-area-from-wrap">
-            <div class="row justify-content-center">
-                <div class="col-lg-6">
-                    <div class="login-reg-form-wrap">
-                        <h2>Create account</h2>
-                        <p>Join Juan and keep your shopping profile ready for new collections.</p>
+<section class="auth-page">
+    <div class="auth-wrap">
+        <div class="auth-panel">
+            <span class="auth-kicker">Juan Account</span>
+            <h1>Create account</h1>
+            <p>Save your profile, secure your login, and keep checkout details ready.</p>
 
-                        @if (TempData["RegisterMessage"] is string message)
-                        {
-                            <div class="alert alert-success">@message</div>
-                        }
+            @if (TempData["AuthMessage"] is string message)
+            {
+                <div class="auth-alert">@message</div>
+            }
 
-                        <form asp-controller="Account" asp-action="Register" method="post">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <div class="single-input-item">
-                                <input asp-for="FullName" placeholder="Full name" />
-                                <span asp-validation-for="FullName" class="text-danger"></span>
-                            </div>
-                            <div class="single-input-item">
-                                <input asp-for="Email" placeholder="Email address" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                            <div class="single-input-item">
-                                <input asp-for="Password" placeholder="Password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-                            <div class="single-input-item">
-                                <input asp-for="ConfirmPassword" placeholder="Confirm password" />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                            <div class="single-input-item">
-                                <button class="btn btn-sqr" type="submit">Register</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <a class="google-button" asp-controller="Account" asp-action="GoogleLogin">
+                <span>G</span>
+                Continue with Google
+            </a>
+
+            <div class="auth-divider"><span>or register with email</span></div>
+
+            <form asp-controller="Account" asp-action="Register" method="post" class="auth-form">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <label>
+                    Full name
+                    <input asp-for="FullName" placeholder="Your name" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </label>
+                <label>
+                    Email
+                    <input asp-for="Email" placeholder="email@example.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </label>
+                <label>
+                    Password
+                    <input asp-for="Password" placeholder="Create password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </label>
+                <label>
+                    Confirm password
+                    <input asp-for="ConfirmPassword" placeholder="Repeat password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </label>
+                <button class="auth-submit" type="submit">Register</button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a></p>
         </div>
     </div>
 </section>

@@ -1,0 +1,12 @@
+global using Juan_NET.Domain.Entities;
+global using Juan_NET.Persistence.Context;
+global using Juan_NET.Web.Services;
+global using Juan_NET.Web.ViewModels;
+global using Microsoft.AspNetCore.Authentication;
+global using Microsoft.AspNetCore.Authentication.Cookies;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
+global using System.Security.Claims;
+global using Microsoft.AspNetCore.Localization;
+global using System.Globalization;

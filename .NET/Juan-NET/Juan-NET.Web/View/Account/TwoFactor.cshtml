@@ -1,0 +1,27 @@
+@model TwoFactorViewModel
+@{
+    ViewData["Title"] = "Two-Factor Authentication";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="auth-page">
+    <div class="auth-wrap">
+        <div class="auth-panel compact">
+            <span class="auth-kicker">Verification</span>
+            <h1>Enter code</h1>
+            <p>We sent a six-digit verification code to your email.</p>
+
+            <form asp-controller="Account" asp-action="TwoFactor" method="post" class="auth-form">
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="RememberMe" />
+                <label>
+                    Code
+                    <input asp-for="Code" inputmode="numeric" maxlength="6" placeholder="000000" />
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </label>
+                <button class="auth-submit" type="submit">Verify</button>
+            </form>
+        </div>
+    </div>
+</section>

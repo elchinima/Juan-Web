@@ -16,6 +16,11 @@
   var sliderImageInput = document.querySelector("[data-slider-image-input]");
   var sliderImageName = document.querySelector("[data-slider-image-name]");
   var categoryChoices = document.querySelectorAll("[data-category-choice]");
+  var confirmModal = document.querySelector("[data-confirm-modal]");
+  var confirmMessage = document.querySelector("[data-confirm-message]");
+  var confirmAccept = document.querySelector("[data-confirm-accept]");
+  var confirmCancel = document.querySelectorAll("[data-confirm-cancel]");
+  var pendingConfirm = null;
 
   window.addEventListener("load", function () {
     body.classList.add("page-ready");
@@ -103,6 +108,45 @@
   });
   syncCategoryChoices();
 
+  document.querySelectorAll("form[data-confirm]").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (form.dataset.confirmed === "true") {
+        delete form.dataset.confirmed;
+        return;
+      }
+
+      var submitter = event.submitter;
+      var message = submitter && submitter.getAttribute("data-confirm")
+        ? submitter.getAttribute("data-confirm")
+        : form.getAttribute("data-confirm");
+
+      event.preventDefault();
+      openConfirm(form, submitter, message);
+    });
+  });
+
+  if (confirmAccept) {
+    confirmAccept.addEventListener("click", function () {
+      if (!pendingConfirm) {
+        closeConfirm();
+        return;
+      }
+
+      var confirmed = pendingConfirm;
+      confirmed.form.dataset.confirmed = "true";
+      closeConfirm();
+      if (confirmed.submitter) {
+        confirmed.form.requestSubmit(confirmed.submitter);
+      } else {
+        confirmed.form.requestSubmit();
+      }
+    });
+  }
+
+  confirmCancel.forEach(function (item) {
+    item.addEventListener("click", closeConfirm);
+  });
+
   document.addEventListener("click", function (event) {
     if (body.classList.contains("menu-open") && !event.target.closest(".sidebar") && !event.target.closest("[data-menu-toggle]")) {
       body.classList.remove("menu-open");
@@ -165,5 +209,34 @@
     categoryChoices.forEach(function (choice) {
       choice.disabled = !choice.checked && selectedCount >= 3;
     });
+  }
+
+  function openConfirm(form, submitter, message) {
+    if (!confirmModal) {
+      form.dataset.confirmed = "true";
+      if (submitter) {
+        form.requestSubmit(submitter);
+      } else {
+        form.requestSubmit();
+      }
+      return;
+    }
+
+    pendingConfirm = { form: form, submitter: submitter };
+    confirmMessage.textContent = message || "Are you sure you want to continue?";
+    confirmModal.classList.add("is-open");
+    body.classList.add("modal-open");
+  }
+
+  function closeConfirm() {
+    pendingConfirm = null;
+
+    if (confirmModal) {
+      confirmModal.classList.remove("is-open");
+    }
+
+    if (!document.querySelector(".admin-modal.is-open")) {
+      body.classList.remove("modal-open");
+    }
   }
 })();

@@ -1,7 +1,4 @@
-﻿using Juan_NET.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-
-namespace Juan_NET.Persistence.Context
+﻿namespace Juan_NET.Persistence.Context
 {
     public class AppDbContext : DbContext
     {
@@ -18,6 +15,8 @@ namespace Juan_NET.Persistence.Context
         public DbSet<Slider> Sliders => Set<Slider>();
 
         public DbSet<User> Users => Set<User>();
+
+        public DbSet<Subscriber> Subscribers => Set<Subscriber>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,6 +51,12 @@ namespace Juan_NET.Persistence.Context
             {
                 entity.HasIndex(user => user.Email).IsUnique();
                 entity.Property(user => user.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<Subscriber>(entity =>
+            {
+                entity.HasIndex(subscriber => subscriber.Email).IsUnique();
+                entity.Property(subscriber => subscriber.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
             });
         }
     }

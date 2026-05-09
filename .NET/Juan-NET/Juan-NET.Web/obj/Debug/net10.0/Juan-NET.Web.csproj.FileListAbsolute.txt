@@ -66,7 +66,6 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Jua
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\scopedcss\bundle\Juan-NET.Web.styles.css
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\5a3n6b3ann-{0}-v3sa88hf69-v3sa88hf69.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\c0dlqfi59e-{0}-h7x9x98b9d-h7x9x98b9d.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\xfhzxcb05n-{0}-2ooh12ub0y-2ooh12ub0y.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\g0gcr14xzg-{0}-68fh7bv7bd-68fh7bv7bd.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\cdby3cbgc1-{0}-1vk9wz8pw2-1vk9wz8pw2.gz
@@ -122,6 +121,8 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\art
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Web.runtimeconfig.json
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Web.dll
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Web.pdb
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\gyi4rew5zq-{0}-2kmdjrqmlq-2kmdjrqmlq.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\tzkcqpjac4-{0}-7190fnfuky-7190fnfuky.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\bin\Debug\net10.0\SixLabors.ImageSharp.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\c0dlqfi59e-{0}-pgk8z0afru-pgk8z0afru.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\tzkcqpjac4-{0}-cuvnmwuihl-cuvnmwuihl.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\gyi4rew5zq-{0}-55vhf7xrxl-55vhf7xrxl.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\zkuu6267hi-{0}-ti6b6fsynf-ti6b6fsynf.gz

@@ -1,0 +1,105 @@
+@model AdminSubscribeViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Subscribe";
+    ViewData["PageName"] = "subscribe";
+    ViewData["ActivePage"] = "Subscribe";
+    var recipients = Model.Users.Select(user => user.Email)
+        .Concat(Model.Subscribers.Select(subscriber => subscriber.Email))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(email => email)
+        .ToList();
+}
+
+@section SidebarCard {
+    <span>Email</span>
+    <strong>@recipients.Count Recipients</strong>
+    <p>Newsletter message simulation for users and subscribers.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Email</p>
+        <h1>Subscribe</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+    </div>
+</header>
+
+@if (TempData["SubscribeMessage"] is string message)
+{
+    <div class="status good admin-message">@message</div>
+}
+
+<section class="content-grid wide-left">
+    <article class="panel reveal">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Recipients</p>
+                <h3>Audience List</h3>
+            </div>
+        </div>
+        <div class="admin-table subscribe-table">
+            <div class="admin-table-head">
+                <span>Email</span>
+                <span>Source</span>
+                <span>Status</span>
+                <span>Selected</span>
+            </div>
+            @if (recipients.Any())
+            {
+                @foreach (var email in recipients)
+                {
+                    var source = Model.Users.Any(user => user.Email == email) ? "User" : "Subscriber";
+                    <label class="admin-table-row subscribe-row" form="subscribe-send-form">
+                        <strong>@email</strong>
+                        <span>@source</span>
+                        <span class="status good">Ready</span>
+                        <input type="checkbox" name="SelectedEmails" value="@email" form="subscribe-send-form" checked="@Model.SelectedEmails.Contains(email)" />
+                    </label>
+                }
+            }
+            else
+            {
+                <div class="admin-table-row">
+                    <strong>No recipients yet</strong>
+                    <span>-</span>
+                    <span class="status off">Empty</span>
+                    <span>-</span>
+                </div>
+            }
+        </div>
+    </article>
+
+    <article class="panel reveal">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Simulation</p>
+                <h3>Send Message</h3>
+            </div>
+        </div>
+        <form id="subscribe-send-form" class="admin-form" asp-controller="Admin" asp-action="SendSubscribe" method="post" data-confirm="Simulate sending this message?">
+            <div asp-validation-summary="ModelOnly" class="status off"></div>
+            <label class="inline-check">
+                <input asp-for="SendToAll" />
+                Send to all users
+            </label>
+            <span asp-validation-for="SelectedEmails" class="status off"></span>
+            <label>
+                Subject
+                <input asp-for="Subject" placeholder="New Juan update" />
+                <span asp-validation-for="Subject" class="status off"></span>
+            </label>
+            <label>
+                Message
+                <textarea asp-for="Message" rows="6" placeholder="Write message text"></textarea>
+                <span asp-validation-for="Message" class="status off"></span>
+            </label>
+            <button class="primary-button full" type="submit">Send Simulation</button>
+        </form>
+    </article>
+</section>
