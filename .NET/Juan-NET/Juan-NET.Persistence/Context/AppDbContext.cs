@@ -26,6 +26,8 @@
 
         public DbSet<UserAdminRole> UserAdminRoles => Set<UserAdminRole>();
 
+        public DbSet<UserFavoriteCategory> UserFavoriteCategories => Set<UserFavoriteCategory>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -91,6 +93,22 @@
                 entity.HasOne(userRole => userRole.AdminRole)
                     .WithMany(role => role.UserRoles)
                     .HasForeignKey(userRole => userRole.AdminRoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserFavoriteCategory>(entity =>
+            {
+                entity.HasKey(favorite => new { favorite.UserId, favorite.CategoryId });
+                entity.Property(favorite => favorite.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(favorite => favorite.User)
+                    .WithMany(user => user.FavoriteCategories)
+                    .HasForeignKey(favorite => favorite.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(favorite => favorite.Category)
+                    .WithMany(category => category.FavoriteUsers)
+                    .HasForeignKey(favorite => favorite.CategoryId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

@@ -1,29 +1,37 @@
-﻿@model List<string>
+@model CategoriesViewModel
 @{
     ViewData["Title"] = "Categories";
 }
 
 @await Html.PartialAsync("_StoreHeader")
 
-<section class="shop-main-wrapper section-padding">
+<section class="shop-main-wrapper section-padding category-page">
     <div class="container">
         <div class="section-title text-center">
             <h2 class="title">Categories</h2>
             <p class="sub-title">Browse the product groups currently available in the catalog.</p>
         </div>
-        @if (Model.Any())
+        @if (Model.Categories.Any())
         {
-            <div class="row justify-content-center">
-                @foreach (var category in Model)
+            <div class="category-card-grid">
+                @foreach (var category in Model.Categories)
                 {
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="service-policy-item mt-30 bg-1">
-                            <div class="policy-content">
-                                <h5 class="policy-title">@category</h5>
-                                <p class="policy-desc">Available in catalog</p>
-                            </div>
+                    <article class="category-card">
+                        <div class="category-card-top">
+                            <span class="category-mark">@category.Name.Substring(0, 1).ToUpperInvariant()</span>
+                            <form asp-controller="Categories" asp-action="ToggleFavorite" asp-route-id="@category.Id" method="post">
+                                <button class="category-favorite @(category.IsFavorite ? "active" : "")"
+                                        type="submit"
+                                        title="@(Model.IsAuthenticated ? "Toggle favorite" : "Sign in to save favorites")"
+                                        aria-label="@(category.IsFavorite ? "Remove from favorites" : "Add to favorites")">
+                                    <i class="fa @(category.IsFavorite ? "fa-heart" : "fa-heart-o")"></i>
+                                </button>
+                            </form>
                         </div>
-                    </div>
+                        <h3>@category.Name</h3>
+                        <p>@category.ProductCount @(category.ProductCount == 1 ? "product" : "products") available</p>
+                        <a asp-controller="Products" asp-action="Index" class="category-link">Browse category</a>
+                    </article>
                 }
             </div>
         }

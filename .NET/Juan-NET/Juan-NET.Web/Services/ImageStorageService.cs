@@ -1,4 +1,5 @@
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace Juan_NET.Web.Services
 {
@@ -29,7 +30,10 @@ namespace Juan_NET.Web.Services
 
             await using var input = file.OpenReadStream();
             using var image = await Image.LoadAsync(input);
-            await image.SaveAsWebpAsync(filePath);
+            await image.SaveAsWebpAsync(filePath, new WebpEncoder
+            {
+                Quality = 40
+            });
 
             return $"/uploads/{folder}/{fileName}";
         }

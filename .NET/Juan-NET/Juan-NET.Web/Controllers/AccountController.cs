@@ -107,6 +107,41 @@ namespace Juan_NET.Web.Controllers
             return Redirect(url);
         }
 
+        public IActionResult MetaLogin()
+        {
+            var meta = _configuration.GetSection("Authentication:Meta");
+            var clientId = meta["ClientId"];
+
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                TempData["AuthMessage"] = "Meta sign in is not configured yet.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var redirectUri = $"{Request.Scheme}://{Request.Host}/signin-meta";
+            var url = "https://www.facebook.com/v20.0/dialog/oauth"
+                + $"?client_id={Uri.EscapeDataString(clientId)}"
+                + $"&redirect_uri={Uri.EscapeDataString(redirectUri)}"
+                + "&response_type=code"
+                + $"&scope={Uri.EscapeDataString("email public_profile")}";
+
+            return Redirect(url);
+        }
+
+        public IActionResult XLogin()
+        {
+            var x = _configuration.GetSection("Authentication:X");
+
+            if (string.IsNullOrWhiteSpace(x["ClientId"]))
+            {
+                TempData["AuthMessage"] = "X sign in is not configured yet.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            TempData["AuthMessage"] = "X sign in needs OAuth 2.0 PKCE setup before it can be used.";
+            return RedirectToAction(nameof(Login));
+        }
+
         [Route("signin-google")]
         public async Task<IActionResult> GoogleCallback(string? code)
         {
@@ -173,6 +208,87 @@ namespace Juan_NET.Web.Controllers
             else
             {
                 user.ExternalProvider = "Google";
+                user.ExternalProviderId = providerId;
+            }
+
+            await _context.SaveChangesAsync();
+            await _adminAccessService.EnsureDeveloperRoleAssignmentAsync(user);
+            await SignInAsync(user, true);
+            return RedirectToAction(nameof(Profile));
+        }
+
+        [Route("signin-meta")]
+        public async Task<IActionResult> MetaCallback(string? code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                TempData["AuthMessage"] = "Meta sign in was cancelled.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var meta = _configuration.GetSection("Authentication:Meta");
+            var redirectUri = $"{Request.Scheme}://{Request.Host}/signin-meta";
+
+            using var httpClient = new HttpClient();
+            var tokenUrl = "https://graph.facebook.com/v20.0/oauth/access_token"
+                + $"?client_id={Uri.EscapeDataString(meta["ClientId"] ?? string.Empty)}"
+                + $"&client_secret={Uri.EscapeDataString(meta["ClientSecret"] ?? string.Empty)}"
+                + $"&code={Uri.EscapeDataString(code)}"
+                + $"&redirect_uri={Uri.EscapeDataString(redirectUri)}";
+            using var tokenResponse = await httpClient.GetAsync(tokenUrl);
+
+            if (!tokenResponse.IsSuccessStatusCode)
+            {
+                TempData["AuthMessage"] = "Meta sign in failed.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            using var tokenJson = await JsonDocument.ParseAsync(await tokenResponse.Content.ReadAsStreamAsync());
+            var accessToken = tokenJson.RootElement.GetProperty("access_token").GetString();
+            var profileUrl = "https://graph.facebook.com/me"
+                + $"?fields={Uri.EscapeDataString("id,name,email")}"
+                + $"&access_token={Uri.EscapeDataString(accessToken ?? string.Empty)}";
+            using var profileResponse = await httpClient.GetAsync(profileUrl);
+
+            if (!profileResponse.IsSuccessStatusCode)
+            {
+                TempData["AuthMessage"] = "Meta profile could not be loaded.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            using var profileJson = await JsonDocument.ParseAsync(await profileResponse.Content.ReadAsStreamAsync());
+            var email = profileJson.RootElement.TryGetProperty("email", out var emailElement)
+                ? emailElement.GetString()?.Trim().ToLowerInvariant()
+                : null;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["AuthMessage"] = "Meta account did not provide an email address.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var fullName = profileJson.RootElement.TryGetProperty("name", out var name) ? name.GetString() ?? email : email;
+            var providerId = profileJson.RootElement.TryGetProperty("id", out var id) ? id.GetString() : null;
+            var user = await _context.Users.FirstOrDefaultAsync(item => item.Email == email);
+
+            if (user is null)
+            {
+                var (hash, salt) = HashSecret(Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
+                user = new User
+                {
+                    FullName = fullName,
+                    Email = email,
+                    PasswordHash = hash,
+                    PasswordSalt = salt,
+                    ExternalProvider = "Meta",
+                    ExternalProviderId = providerId,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Users.Add(user);
+            }
+            else
+            {
+                user.ExternalProvider = "Meta";
                 user.ExternalProviderId = providerId;
             }
 

@@ -121,9 +121,10 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\art
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Web.dll
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Web.pdb
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\bin\Debug\net10.0\SixLabors.ImageSharp.dll
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\zkuu6267hi-{0}-scoi3e18a7-scoi3e18a7.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\mlmam3ig23-{0}-mibgo99c5a-mibgo99c5a.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\gyi4rew5zq-{0}-4wozs30dtq-4wozs30dtq.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\tzkcqpjac4-{0}-9s1ogco112-9s1ogco112.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\c0dlqfi59e-{0}-l9lc54cq4h-l9lc54cq4h.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\em1iczwnt8-{0}-uxkzs5f5ds-uxkzs5f5ds.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\zkuu6267hi-{0}-qgp7rgxal2-qgp7rgxal2.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

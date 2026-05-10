@@ -1,12 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{9EACBE8C-7A8D-96DC-13F6-26584DDA0C09}|Juan-NET.Web\\Juan-NET.Web.csproj|d:\\project-work\\code academy\\mini projects\\juan - online store\\.net\\juan-net\\juan-net.web\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{9EACBE8C-7A8D-96DC-13F6-26584DDA0C09}|Juan-NET.Web\\Juan-NET.Web.csproj|solutionrelative:juan-net.web\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -14,21 +9,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": -1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Web\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "Juan-NET.Web\\Properties\\launchSettings.json",
-              "ToolTip": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Web\\Properties\\launchSettings.json",
-              "RelativeToolTip": "Juan-NET.Web\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA8AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-09T14:49:12.326Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:130:0:{75188d03-9892-4ae2-abf1-207126247ce5}"

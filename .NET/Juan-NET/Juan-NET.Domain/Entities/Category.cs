@@ -10,5 +10,7 @@ namespace Juan_NET.Domain.Entities
         public string Name { get; set; } = string.Empty;
 
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+
+        public ICollection<UserFavoriteCategory> FavoriteUsers { get; set; } = new List<UserFavoriteCategory>();
     }
 }

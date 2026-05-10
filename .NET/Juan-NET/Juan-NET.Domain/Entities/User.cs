@@ -62,5 +62,7 @@ namespace Juan_NET.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<UserAdminRole> AdminRoles { get; set; } = new List<UserAdminRole>();
+
+        public ICollection<UserFavoriteCategory> FavoriteCategories { get; set; } = new List<UserFavoriteCategory>();
     }
 }
