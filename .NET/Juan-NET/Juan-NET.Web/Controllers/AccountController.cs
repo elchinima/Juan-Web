@@ -11,13 +11,15 @@ namespace Juan_NET.Web.Controllers
         private readonly ImageStorageService _imageStorage;
         private readonly EmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly AdminAccessService _adminAccessService;
 
-        public AccountController(AppDbContext context, ImageStorageService imageStorage, EmailService emailService, IConfiguration configuration)
+        public AccountController(AppDbContext context, ImageStorageService imageStorage, EmailService emailService, IConfiguration configuration, AdminAccessService adminAccessService)
         {
             _context = context;
             _imageStorage = imageStorage;
             _emailService = emailService;
             _configuration = configuration;
+            _adminAccessService = adminAccessService;
         }
 
         public IActionResult Register()
@@ -51,6 +53,7 @@ namespace Juan_NET.Web.Controllers
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            await _adminAccessService.EnsureDeveloperRoleAssignmentAsync(user);
             await SignInAsync(user, false);
 
             return RedirectToAction(nameof(Profile));
@@ -78,6 +81,8 @@ namespace Juan_NET.Web.Controllers
                 ModelState.AddModelError(string.Empty, "Email or password is incorrect.");
                 return View(viewModel);
             }
+
+            await _adminAccessService.EnsureDeveloperRoleAssignmentAsync(user);
 
             if (user.IsTwoFactorEnabled)
             {
@@ -172,6 +177,7 @@ namespace Juan_NET.Web.Controllers
             }
 
             await _context.SaveChangesAsync();
+            await _adminAccessService.EnsureDeveloperRoleAssignmentAsync(user);
             await SignInAsync(user, true);
             return RedirectToAction(nameof(Profile));
         }

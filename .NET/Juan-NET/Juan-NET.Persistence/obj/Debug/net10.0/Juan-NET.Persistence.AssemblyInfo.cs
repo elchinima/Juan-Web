@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Juan-NET.Persistence")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9b186bd4a8d3ed010a2e993f2acad909a6b997a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9109bd1f2d7ce3e0c0732acba948af95140b54b6")]
 [assembly: System.Reflection.AssemblyProductAttribute("Juan-NET.Persistence")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Juan-NET.Persistence")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

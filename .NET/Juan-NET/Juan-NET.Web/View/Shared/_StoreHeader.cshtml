@@ -1,4 +1,8 @@
-﻿<header class="header-area">
+@inject AdminAccessService AdminAccessService
+@{
+    var canAccessAdmin = User.Identity?.IsAuthenticated == true && await AdminAccessService.HasPermissionAsync(User, AdminPermissionKeys.AdminAccess);
+}
+<header class="header-area">
     <div class="main-header d-none d-lg-block">
         <div class="header-main-area sticky">
             <div class="container">
@@ -52,7 +56,10 @@
                                                 <li><a asp-controller="Account" asp-action="Login">login</a></li>
                                                 <li><a asp-controller="Account" asp-action="Register">register</a></li>
                                             }
-                                            <li><a asp-controller="Admin" asp-action="Index">admin</a></li>
+                                            @if (canAccessAdmin)
+                                            {
+                                                <li><a asp-controller="Admin" asp-action="Index">admin</a></li>
+                                            }
                                         </ul>
                                     </li>
                                     <li>

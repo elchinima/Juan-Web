@@ -1,6 +1,6 @@
 (function () {
   var body = document.body;
-  var transitionLinks = document.querySelectorAll("[data-transition]");
+  var transitionLinks = document.querySelectorAll("a[href]");
   var menuToggle = document.querySelector("[data-menu-toggle]");
   var revealItems = document.querySelectorAll(".reveal");
   var countItems = document.querySelectorAll("[data-count]");
@@ -17,6 +17,18 @@
   var subscribeModal = document.querySelector("[data-subscribe-modal]");
   var openSubscribeModal = document.querySelectorAll("[data-open-subscribe-modal]");
   var closeSubscribeModal = document.querySelectorAll("[data-close-subscribe-modal]");
+  var roleModal = document.querySelector("[data-role-modal]");
+  var openRoleModal = document.querySelector("[data-open-role-modal]");
+  var closeRoleModal = document.querySelectorAll("[data-close-role-modal]");
+  var editRoleModal = document.querySelector("[data-edit-role-modal]");
+  var closeEditRoleModal = document.querySelectorAll("[data-close-edit-role-modal]");
+  var assignRoleModal = document.querySelector("[data-assign-role-modal]");
+  var openAssignRoleModal = document.querySelector("[data-open-assign-role-modal]");
+  var closeAssignRoleModal = document.querySelectorAll("[data-close-assign-role-modal]");
+  var roleSortList = document.querySelector("[data-role-sort-list]");
+  var roleOrderForm = document.querySelector("[data-role-order-form]");
+  var userRoleSearch = document.querySelector("[data-user-role-search]");
+  var userRoleOptions = document.querySelectorAll("[data-user-role-option]");
   var imageInput = document.querySelector("[data-image-input]");
   var imageName = document.querySelector("[data-image-name]");
   var sliderImageInput = document.querySelector("[data-slider-image-input]");
@@ -29,6 +41,9 @@
   var confirmMessage = document.querySelector("[data-confirm-message]");
   var confirmAccept = document.querySelector("[data-confirm-accept]");
   var confirmCancel = document.querySelectorAll("[data-confirm-cancel]");
+  var accessDeniedModal = document.querySelector("[data-access-denied-modal]");
+  var accessDeniedMessage = document.querySelector("[data-access-denied-message]");
+  var accessDeniedClose = document.querySelectorAll("[data-access-denied-close]");
   var pendingConfirm = null;
 
   window.addEventListener("load", function () {
@@ -43,20 +58,52 @@
     });
   });
 
+  window.addEventListener("pageshow", function () {
+    body.classList.remove("page-leave");
+    body.classList.add("page-ready");
+  });
+
   transitionLinks.forEach(function (link) {
     link.addEventListener("click", function (event) {
-      var target = link.getAttribute("href");
-      if (!target || target === "#" || link.target === "_blank" || event.metaKey || event.ctrlKey) {
+      if (!canPageTransition(link, event)) {
         return;
       }
       event.preventDefault();
       body.classList.remove("menu-open");
       body.classList.add("page-leave");
       setTimeout(function () {
-        window.location.href = target;
-      }, 260);
+        window.location.href = link.href;
+      }, 400);
     });
   });
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+
+    if (event.defaultPrevented || form.target === "_blank" || form.dataset.noTransition !== undefined) {
+      return;
+    }
+
+    body.classList.add("page-leave");
+  });
+
+  function canPageTransition(link, event) {
+    if (!link || !link.href || link.target === "_blank" || link.hasAttribute("download") || link.dataset.noTransition !== undefined) {
+      return false;
+    }
+
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.defaultPrevented) {
+      return false;
+    }
+
+    var url = new URL(link.href, window.location.href);
+
+    if (url.origin !== window.location.origin || url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
+      return false;
+    }
+
+    return true;
+  }
 
   if (menuToggle) {
     menuToggle.addEventListener("click", function () {
@@ -77,6 +124,18 @@
   }
 
   if (subscribeModal && subscribeModal.classList.contains("is-open")) {
+    body.classList.add("modal-open");
+  }
+
+  if (roleModal && roleModal.classList.contains("is-open")) {
+    body.classList.add("modal-open");
+  }
+
+  if (editRoleModal && editRoleModal.classList.contains("is-open")) {
+    body.classList.add("modal-open");
+  }
+
+  if (assignRoleModal && assignRoleModal.classList.contains("is-open")) {
     body.classList.add("modal-open");
   }
 
@@ -136,6 +195,69 @@
       body.classList.remove("modal-open");
     });
   });
+
+  if (openRoleModal && roleModal) {
+    openRoleModal.addEventListener("click", function () {
+      roleModal.classList.add("is-open");
+      body.classList.add("modal-open");
+    });
+  }
+
+  closeRoleModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      roleModal.classList.remove("is-open");
+      closeModalBodyIfClear();
+    });
+  });
+
+  closeEditRoleModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      editRoleModal.classList.remove("is-open");
+      closeModalBodyIfClear();
+    });
+  });
+
+  if (openAssignRoleModal && assignRoleModal) {
+    openAssignRoleModal.addEventListener("click", function () {
+      assignRoleModal.classList.add("is-open");
+      body.classList.add("modal-open");
+    });
+  }
+
+  closeAssignRoleModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      assignRoleModal.classList.remove("is-open");
+      closeModalBodyIfClear();
+    });
+  });
+
+  if (roleSortList) {
+    initRoleSorting();
+  }
+
+  if (roleOrderForm && roleSortList) {
+    roleOrderForm.addEventListener("submit", function () {
+      roleOrderForm.querySelectorAll("input[name='roleIds']").forEach(function (input) {
+        input.remove();
+      });
+      roleSortList.querySelectorAll("[data-role-id]").forEach(function (item) {
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "roleIds";
+        input.value = item.getAttribute("data-role-id");
+        roleOrderForm.appendChild(input);
+      });
+    });
+  }
+
+  if (userRoleSearch) {
+    userRoleSearch.addEventListener("input", function () {
+      var query = userRoleSearch.value.trim().toLowerCase();
+      userRoleOptions.forEach(function (option) {
+        option.hidden = query && option.getAttribute("data-search-text").indexOf(query) === -1;
+      });
+    });
+  }
 
   if (imageInput && imageName) {
     imageInput.addEventListener("change", function () {
@@ -206,6 +328,23 @@
 
   confirmCancel.forEach(function (item) {
     item.addEventListener("click", closeConfirm);
+  });
+
+  document.querySelectorAll("[data-access-denied]").forEach(function (item) {
+    item.addEventListener("click", function () {
+      var label = item.getAttribute("data-access-label") || "this page";
+      if (accessDeniedMessage) {
+        accessDeniedMessage.textContent = "You do not have access to " + label + ".";
+      }
+      if (accessDeniedModal) {
+        accessDeniedModal.classList.add("is-open");
+        body.classList.add("modal-open");
+      }
+    });
+  });
+
+  accessDeniedClose.forEach(function (item) {
+    item.addEventListener("click", closeAccessDenied);
   });
 
   document.addEventListener("click", function (event) {
@@ -307,6 +446,37 @@
     }
   }
 
+  function initRoleSorting() {
+    var draggedItem = null;
+
+    roleSortList.querySelectorAll("[data-role-id]").forEach(function (item) {
+      item.addEventListener("dragstart", function () {
+        if (item.getAttribute("draggable") !== "true") {
+          return;
+        }
+
+        draggedItem = item;
+        item.classList.add("is-dragging");
+      });
+
+      item.addEventListener("dragend", function () {
+        item.classList.remove("is-dragging");
+        draggedItem = null;
+      });
+
+      item.addEventListener("dragover", function (event) {
+        if (!draggedItem || item === draggedItem || item.getAttribute("draggable") !== "true") {
+          return;
+        }
+
+        event.preventDefault();
+        var rect = item.getBoundingClientRect();
+        var insertAfter = event.clientY > rect.top + rect.height / 2;
+        roleSortList.insertBefore(draggedItem, insertAfter ? item.nextSibling : item);
+      });
+    });
+  }
+
   function openConfirm(form, submitter, message) {
     if (!confirmModal) {
       form.dataset.confirmed = "true";
@@ -331,6 +501,20 @@
       confirmModal.classList.remove("is-open");
     }
 
+    if (!document.querySelector(".admin-modal.is-open")) {
+      body.classList.remove("modal-open");
+    }
+  }
+
+  function closeAccessDenied() {
+    if (accessDeniedModal) {
+      accessDeniedModal.classList.remove("is-open");
+    }
+
+    closeModalBodyIfClear();
+  }
+
+  function closeModalBodyIfClear() {
     if (!document.querySelector(".admin-modal.is-open")) {
       body.classList.remove("modal-open");
     }

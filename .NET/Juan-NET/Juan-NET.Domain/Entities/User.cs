@@ -60,5 +60,7 @@ namespace Juan_NET.Domain.Entities
         public DateTime? PasswordChangeTokenExpiresAt { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<UserAdminRole> AdminRoles { get; set; } = new List<UserAdminRole>();
     }
 }

@@ -16,11 +16,20 @@
 </head>
 <body>
 
-    <main>
-        @RenderBody()
-    </main>
+    <div class="page-loader" aria-hidden="true">
+        <div class="page-loader-mark">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
 
-    <footer class="footer-wrapper">
+    <div class="page-shell">
+        <main>
+            @RenderBody()
+        </main>
+
+        <footer class="footer-wrapper">
         <div class="footer-widget-area section-padding">
             <div class="container">
                 <div class="row mtn-40">
@@ -97,9 +106,9 @@
                 </div>
             </div>
         </div>
-    </footer>
+        </footer>
 
-    <div class="offcanvas-search-wrapper">
+        <div class="offcanvas-search-wrapper">
         <div class="offcanvas-search-inner">
             <div class="offcanvas-close"><i class="ion-android-close"></i></div>
             <div class="container">
@@ -111,9 +120,9 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 
-    <div class="offcanvas-minicart-wrapper">
+        <div class="offcanvas-minicart-wrapper">
         <div class="minicart-inner">
             <div class="offcanvas-overlay"></div>
             <div class="minicart-inner-content">
@@ -135,10 +144,11 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 
-    <div class="scroll-top not-visible">
-        <i class="fa fa-angle-up"></i>
+        <div class="scroll-top not-visible">
+            <i class="fa fa-angle-up"></i>
+        </div>
     </div>
 
     <script src="~/main assets/js/vendor.js"></script>

@@ -326,5 +326,62 @@
 		}, 1000);
 	});
 
+	function initPageTransitions() {
+		var body = document.body;
+
+		function showPage() {
+			body.classList.remove('page-leave');
+			body.classList.add('page-ready');
+		}
+
+		function canTransition(link, event) {
+			if (!link || !link.href || link.target === '_blank' || link.hasAttribute('download') || link.dataset.noTransition !== undefined) {
+				return false;
+			}
+
+			if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.defaultPrevented) {
+				return false;
+			}
+
+			var url = new URL(link.href, window.location.href);
+
+			if (url.origin !== window.location.origin || url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
+				return false;
+			}
+
+			return true;
+		}
+
+		window.addEventListener('load', showPage);
+		window.addEventListener('pageshow', showPage);
+
+		document.addEventListener('click', function (event) {
+			var link = event.target.closest('a');
+
+			if (!canTransition(link, event)) {
+				return;
+			}
+
+			event.preventDefault();
+			body.classList.add('page-leave');
+
+			setTimeout(function () {
+				window.location.href = link.href;
+			}, 420);
+		});
+
+		document.addEventListener('submit', function (event) {
+			var form = event.target;
+
+			if (event.defaultPrevented || form.target === '_blank' || form.dataset.noTransition !== undefined) {
+				return;
+			}
+
+			body.classList.add('page-leave');
+		});
+	}
+
+	initPageTransitions();
+
 
 }(jQuery));

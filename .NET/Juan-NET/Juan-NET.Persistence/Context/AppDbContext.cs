@@ -20,6 +20,12 @@
 
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
 
+        public DbSet<AdminRole> AdminRoles => Set<AdminRole>();
+
+        public DbSet<AdminRolePermission> AdminRolePermissions => Set<AdminRolePermission>();
+
+        public DbSet<UserAdminRole> UserAdminRoles => Set<UserAdminRole>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -53,6 +59,39 @@
             {
                 entity.HasIndex(user => user.Email).IsUnique();
                 entity.Property(user => user.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<AdminRole>(entity =>
+            {
+                entity.HasIndex(role => role.Name).IsUnique();
+                entity.Property(role => role.Color).HasDefaultValue("#e3a51e");
+                entity.Property(role => role.DisplayOrder).HasDefaultValue(0);
+                entity.Property(role => role.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<AdminRolePermission>(entity =>
+            {
+                entity.HasKey(permission => new { permission.AdminRoleId, permission.PermissionKey });
+
+                entity.HasOne(permission => permission.AdminRole)
+                    .WithMany(role => role.Permissions)
+                    .HasForeignKey(permission => permission.AdminRoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserAdminRole>(entity =>
+            {
+                entity.HasKey(userRole => new { userRole.UserId, userRole.AdminRoleId });
+
+                entity.HasOne(userRole => userRole.User)
+                    .WithMany(user => user.AdminRoles)
+                    .HasForeignKey(userRole => userRole.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(userRole => userRole.AdminRole)
+                    .WithMany(role => role.UserRoles)
+                    .HasForeignKey(userRole => userRole.AdminRoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Subscriber>(entity =>

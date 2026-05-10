@@ -1,0 +1,247 @@
+@model AdminRolesViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Roles";
+    ViewData["PageName"] = "roles";
+    ViewData["ActivePage"] = "Roles";
+    var isEditing = Model.EditingRoleId.HasValue;
+    var openCreateModal = !ViewData.ModelState.IsValid && !isEditing;
+    var manageableRoles = Model.Roles.Where(role => role.DisplayOrder > Model.CurrentUserHighestRoleOrder).ToList();
+}
+
+@section SidebarCard {
+    <span>Security</span>
+    <strong>@Model.Roles.Count Roles</strong>
+    <p>Admin panel roles, colors, users, and page access.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Security</p>
+        <h1>Roles</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Users">Users</a>
+        <button class="ghost-button" type="button" data-open-assign-role-modal>Add Users Role</button>
+        @if (isEditing)
+        {
+            <a class="primary-button" asp-controller="Admin" asp-action="Roles">New Role</a>
+        }
+        else
+        {
+            <button class="primary-button" type="button" data-open-role-modal>New Role</button>
+        }
+    </div>
+</header>
+
+@if (TempData["RoleMessage"] is string message)
+{
+    <div class="status good admin-message">@message</div>
+}
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Roles</p>
+            <h3>Role List</h3>
+        </div>
+        <form asp-controller="Admin" asp-action="ReorderRoles" method="post" data-role-order-form data-confirm="Save role order?">
+            <button class="primary-button compact-button" type="submit">Save Order</button>
+        </form>
+    </div>
+    <div class="role-list" data-role-sort-list>
+        @if (Model.Roles.Any())
+        {
+            @foreach (var role in Model.Roles)
+            {
+                var canManageRole = role.DisplayOrder > Model.CurrentUserHighestRoleOrder;
+                <div class="role-card @(canManageRole ? "" : "locked")" draggable="@canManageRole.ToString().ToLowerInvariant()" data-role-id="@role.Id">
+                    <button class="drag-handle" type="button" aria-label="Drag role" disabled="@(!canManageRole)">::</button>
+                    <div class="role-card-main">
+                        <span class="role-chip large" style="--role-color: @role.Color">@role.Name</span>
+                        <p>@role.Permissions.Count permissions / @role.UserRoles.Count users</p>
+                    </div>
+                    <div class="role-card-meta">
+                        <div class="role-permission-list">
+                            @foreach (var permission in role.Permissions.OrderBy(item => item.PermissionKey))
+                            {
+                                var permissionLabel = Model.AvailablePermissions.FirstOrDefault(item => item.Key == permission.PermissionKey)?.Label ?? permission.PermissionKey;
+                                <span>@permissionLabel</span>
+                            }
+                        </div>
+                        <div class="role-user-list">
+                            @foreach (var userRole in role.UserRoles.OrderBy(item => item.User.Email))
+                            {
+                                <span>@userRole.User.Email</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="role-card-actions">
+                        @if (canManageRole)
+                        {
+                            <a class="ghost-button compact-button" asp-controller="Admin" asp-action="Roles" asp-route-editId="@role.Id">Edit</a>
+                            <form asp-controller="Admin" asp-action="DeleteRole" method="post" data-confirm="Delete this role?">
+                                <input type="hidden" name="id" value="@role.Id" />
+                                <button class="danger-button compact-button" type="submit">Delete</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="ghost-button compact-button" type="button" disabled>Locked</button>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="role-card">
+                <div class="role-card-main">
+                    <span class="role-chip large" style="--role-color: #e3a51e">No roles</span>
+                    <p>Create the first admin role.</p>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<div class="admin-modal @(openCreateModal ? "is-open" : "")" data-role-modal>
+    <div class="admin-modal-backdrop" data-close-role-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Create</p>
+                <h3 id="role-modal-title">Add Role</h3>
+            </div>
+            <button class="modal-close" type="button" aria-label="Close modal" data-close-role-modal>&times;</button>
+        </div>
+        <form class="admin-form two-column" asp-controller="Admin" asp-action="AddRole" method="post" data-confirm="Save this role?">
+            <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
+            <label>
+                Role Name
+                <input asp-for="Role.Name" placeholder="Manager" />
+                <span asp-validation-for="Role.Name" class="status off"></span>
+            </label>
+            <label>
+                Role Color
+                <input asp-for="Role.Color" type="color" />
+                <span asp-validation-for="Role.Color" class="status off"></span>
+            </label>
+            <div class="role-picker form-wide">
+                <span>Permissions</span>
+                @foreach (var permission in Model.AvailablePermissions)
+                {
+                    var isChecked = Model.SelectedPermissionKeys.Contains(permission.Key, StringComparer.OrdinalIgnoreCase);
+                    <label>
+                        <span>
+                            <strong>@permission.Label</strong>
+                            @if (permission.Key == AdminPermissionKeys.AdminAccess)
+                            {
+                                <em>Required to enter the admin panel</em>
+                            }
+                        </span>
+                        <input type="checkbox" name="SelectedPermissionKeys" value="@permission.Key" checked="@isChecked" />
+                    </label>
+                }
+            </div>
+            <button class="primary-button full form-wide" type="submit">Save Role</button>
+        </form>
+    </section>
+</div>
+
+<div class="admin-modal @(isEditing ? "is-open" : "")" data-edit-role-modal>
+    <div class="admin-modal-backdrop" data-close-edit-role-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="edit-role-modal-title">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Edit</p>
+                <h3 id="edit-role-modal-title">Edit Role</h3>
+            </div>
+            <a class="modal-close" asp-controller="Admin" asp-action="Roles" aria-label="Close modal">&times;</a>
+        </div>
+        <form class="admin-form two-column" asp-controller="Admin" asp-action="EditRole" method="post" data-confirm="Save role changes?">
+            <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
+            <input type="hidden" asp-for="Role.Id" />
+            <label>
+                Role Name
+                <input asp-for="Role.Name" placeholder="Manager" />
+                <span asp-validation-for="Role.Name" class="status off"></span>
+            </label>
+            <label>
+                Role Color
+                <input asp-for="Role.Color" type="color" />
+                <span asp-validation-for="Role.Color" class="status off"></span>
+            </label>
+            <div class="role-picker form-wide">
+                <span>Permissions</span>
+                @foreach (var permission in Model.AvailablePermissions)
+                {
+                    var isChecked = Model.SelectedPermissionKeys.Contains(permission.Key, StringComparer.OrdinalIgnoreCase);
+                    <label>
+                        <span>
+                            <strong>@permission.Label</strong>
+                            @if (permission.Key == AdminPermissionKeys.AdminAccess)
+                            {
+                                <em>Required to enter the admin panel</em>
+                            }
+                        </span>
+                        <input type="checkbox" name="SelectedPermissionKeys" value="@permission.Key" checked="@isChecked" />
+                    </label>
+                }
+            </div>
+            <button class="primary-button full form-wide" type="submit">Save Changes</button>
+        </form>
+    </section>
+</div>
+
+<div class="admin-modal" data-assign-role-modal>
+    <div class="admin-modal-backdrop" data-close-assign-role-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="assign-role-modal-title">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Users</p>
+                <h3 id="assign-role-modal-title">Add Users Role</h3>
+            </div>
+            <button class="modal-close" type="button" aria-label="Close modal" data-close-assign-role-modal>&times;</button>
+        </div>
+        <form class="admin-form" asp-controller="Admin" asp-action="AssignRoleToUsers" method="post" data-confirm="Assign this role?">
+            <label>
+                Role
+                <select asp-for="AssignRoleId">
+                    @foreach (var role in manageableRoles)
+                    {
+                        <option value="@role.Id">@role.Name</option>
+                    }
+                </select>
+            </label>
+            <label>
+                Search Users
+                <input type="search" placeholder="Search name or email" data-user-role-search />
+            </label>
+            <div class="role-picker user-role-picker">
+                <span>Users</span>
+                @if (Model.Users.Any())
+                {
+                    @foreach (var user in Model.Users)
+                    {
+                        <label data-user-role-option data-search-text="@($"{user.FullName} {user.Email}".ToLowerInvariant())">
+                            <span>
+                                <strong>@user.FullName</strong>
+                                <em>@user.Email</em>
+                            </span>
+                            <input type="checkbox" name="SelectedUserIds" value="@user.Id" />
+                        </label>
+                    }
+                }
+                else
+                {
+                    <p class="muted-text">Users will appear here after registration.</p>
+                }
+            </div>
+            <button class="primary-button full" type="submit" disabled="@(!manageableRoles.Any())">Assign Role</button>
+        </form>
+    </section>
+</div>

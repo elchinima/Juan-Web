@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+@inject AdminAccessService AdminAccessService
+@{
+    var adminAccess = await AdminAccessService.GetUserAccessAsync(User);
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -8,6 +12,14 @@
     <link rel="stylesheet" href="~/admin assets/css/admin.css" />
 </head>
 <body data-page="@ViewData["PageName"]">
+    <div class="page-loader" aria-hidden="true">
+        <div class="page-loader-mark">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
     <div class="admin-shell">
         <aside class="sidebar">
             <a class="brand" asp-controller="Admin" asp-action="Index">
@@ -15,20 +27,24 @@
                 <span>Admin</span>
             </a>
             <nav class="side-nav" aria-label="Admin navigation">
-                <a class="@(ViewData["ActivePage"]?.ToString() == "Dashboard" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Index">Dashboard</a>
-                <a class="@(ViewData["ActivePage"]?.ToString() == "Products" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Products">Products</a>
-                <a class="@(ViewData["ActivePage"]?.ToString() == "Categories" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Categories">Categories</a>
-                <a class="@(ViewData["ActivePage"]?.ToString() == "Sliders" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Sliders">Sliders</a>
-                <a class="@(ViewData["ActivePage"]?.ToString() == "ContactMessages" ? "active" : "")"
-                   asp-controller="Admin" asp-action="ContactMessages">Messages</a>
-                <a class="@(ViewData["ActivePage"]?.ToString() == "Users" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Users">Users</a>
-                <a class="@(ViewData["ActivePage"]?.ToString() == "Subscribe" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Subscribe">Subscribe</a>
+                @foreach (var item in AdminPermissionCatalog.NavItems)
+                {
+                    var activePage = ViewData["ActivePage"]?.ToString();
+                    var isActive = activePage == item.Label || activePage == item.Action;
+
+                    if (adminAccess.HasPermission(item.Key))
+                    {
+                        <a class="@(isActive ? "active" : "")"
+                           asp-controller="Admin" asp-action="@item.Action">@item.Label</a>
+                    }
+                    else
+                    {
+                        <button class="@(isActive ? "active " : "")locked-nav" type="button" data-access-denied data-access-label="@item.Label">
+                            <span>@item.Label</span>
+                            <span class="lock-symbol">&#128274;</span>
+                        </button>
+                    }
+                }
             </nav>
             <div class="sidebar-card">
                 @RenderSection("SidebarCard", required: false)
@@ -53,6 +69,22 @@
             <div class="confirm-actions">
                 <button class="ghost-button" type="button" data-confirm-cancel>Cancel</button>
                 <button class="danger-button" type="button" data-confirm-accept>Confirm</button>
+            </div>
+        </section>
+    </div>
+    <div class="admin-modal access-denied-modal" data-access-denied-modal>
+        <div class="admin-modal-backdrop" data-access-denied-close></div>
+        <section class="admin-modal-panel confirm-modal-panel" role="dialog" aria-modal="true" aria-labelledby="access-denied-title">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Locked</p>
+                    <h3 id="access-denied-title">Access Denied</h3>
+                </div>
+                <button class="modal-close" type="button" aria-label="Close modal" data-access-denied-close>&times;</button>
+            </div>
+            <p data-access-denied-message>You do not have access to this page.</p>
+            <div class="confirm-actions">
+                <button class="primary-button" type="button" data-access-denied-close>OK</button>
             </div>
         </section>
     </div>

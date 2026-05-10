@@ -1,15 +1,15 @@
-@model List<User>
+@model AdminUsersViewModel
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Users";
     ViewData["PageName"] = "customers";
     ViewData["ActivePage"] = "Users";
-    var search = ViewBag.UserSearch as string ?? string.Empty;
+    var search = Model.Search ?? string.Empty;
 }
 
 @section SidebarCard {
     <span>Audience</span>
-    <strong>@Model.Count Users</strong>
+    <strong>@Model.Users.Count Users</strong>
     <p>Registered customers from the Users table.</p>
 }
 
@@ -22,7 +22,7 @@
         <h1>Customers</h1>
     </div>
     <div class="topbar-actions">
-        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+        <a class="ghost-button" asp-controller="Admin" asp-action="Roles">Roles</a>
         <a class="primary-button" asp-controller="Account" asp-action="Register">Register User</a>
     </div>
 </header>
@@ -47,16 +47,33 @@
             <span>ID</span>
             <span>Full Name</span>
             <span>Email</span>
+            <span>Roles</span>
             <span>Created</span>
         </div>
-        @if (Model.Any())
+        @if (Model.Users.Any())
         {
-            @foreach (var user in Model)
+            @foreach (var user in Model.Users)
             {
                 <div class="admin-table-row">
                     <em>#@user.Id</em>
                     <strong>@user.FullName</strong>
                     <span>@user.Email</span>
+                    <span class="role-chip-list">
+                        @if (user.AdminRoles.Any())
+                        {
+                            var highestRole = user.AdminRoles.OrderBy(item => item.AdminRole.DisplayOrder).ThenBy(item => item.AdminRole.Name).First();
+                            var extraRoleCount = user.AdminRoles.Count - 1;
+                            <span class="role-chip" style="--role-color: @highestRole.AdminRole.Color">@highestRole.AdminRole.Name</span>
+                            @if (extraRoleCount > 0)
+                            {
+                                <span class="role-chip extra-role-count">+@extraRoleCount</span>
+                            }
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </span>
                     <span>@user.CreatedAt.ToString("MMM dd, yyyy")</span>
                 </div>
             }
@@ -67,6 +84,7 @@
                 <em>#0</em>
                 <strong>No users yet</strong>
                 <span>Registration data will appear here.</span>
+                <span>-</span>
                 <span>-</span>
             </div>
         }
