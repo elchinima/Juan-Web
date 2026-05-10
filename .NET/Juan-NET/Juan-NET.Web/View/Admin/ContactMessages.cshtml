@@ -1,0 +1,72 @@
+@model List<ContactMessage>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Messages";
+    ViewData["PageName"] = "messages";
+    ViewData["ActivePage"] = "ContactMessages";
+    var search = ViewBag.ContactSearch as string ?? string.Empty;
+}
+
+@section SidebarCard {
+    <span>Contact</span>
+    <strong>@Model.Count Messages</strong>
+    <p>Customer messages submitted from Contact Us.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Inbox</p>
+        <h1>Messages</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+    </div>
+</header>
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Contact Us</p>
+            <h3>Customer Messages</h3>
+        </div>
+        <form class="admin-search-form" asp-controller="Admin" asp-action="ContactMessages" method="get">
+            <input name="search" value="@search" placeholder="Search name, email or message" />
+            <button class="primary-button" type="submit">Search</button>
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a class="ghost-button" asp-controller="Admin" asp-action="ContactMessages">Reset</a>
+            }
+        </form>
+    </div>
+
+    <div class="message-list">
+        @if (Model.Any())
+        {
+            @foreach (var message in Model)
+            {
+                <article class="message-card">
+                    <div>
+                        <strong>@message.Name</strong>
+                        <a href="mailto:@message.Email">@message.Email</a>
+                    </div>
+                    <p>@message.Message</p>
+                    <span>@message.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                </article>
+            }
+        }
+        else
+        {
+            <article class="message-card">
+                <div>
+                    <strong>No messages found</strong>
+                    <a asp-controller="Home" asp-action="Contact">Contact Us</a>
+                </div>
+                <p>@(string.IsNullOrWhiteSpace(search) ? "New Contact Us submissions will appear here." : "Try another search term.")</p>
+                <span>-</span>
+            </article>
+        }
+    </div>
+</section>

@@ -18,6 +18,8 @@
 
         public DbSet<Subscriber> Subscribers => Set<Subscriber>();
 
+        public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -57,6 +59,11 @@
             {
                 entity.HasIndex(subscriber => subscriber.Email).IsUnique();
                 entity.Property(subscriber => subscriber.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<ContactMessage>(entity =>
+            {
+                entity.Property(message => message.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
             });
         }
     }

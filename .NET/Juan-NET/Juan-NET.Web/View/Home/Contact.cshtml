@@ -1,24 +1,56 @@
-﻿@{
+@model ContactMessageViewModel
+@{
     ViewData["Title"] = "Contact";
 }
 
 @await Html.PartialAsync("_StoreHeader")
 
-<section class="contact-area section-padding">
+<section class="contact-hero">
     <div class="container">
-        <div class="section-title text-center">
-            <h2 class="title">Contact us</h2>
-            <p class="sub-title">We are ready to help with products, orders, and store questions.</p>
+        <div class="contact-hero-inner">
+            <p>Juan support</p>
+            <h1>Contact Us</h1>
+            <span>Questions about products, orders, or store details go straight to the admin panel.</span>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="contact-message">
-                    <form>
+    </div>
+</section>
+
+<section class="contact-area section-padding contact-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="contact-info-panel">
+                    <p class="contact-label">Store Desk</p>
+                    <h2>We usually answer within one business day.</h2>
+                    <ul>
+                        <li><strong>Email</strong><a href="mailto:support@juanstore.com">support@juanstore.com</a></li>
+                        <li><strong>Phone</strong><a href="tel:+00254254565">+ 00 254 254565</a></li>
+                        <li><strong>Address</strong><span>184 Main Rd E, St Albans VIC 3021</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="contact-message contact-form-panel">
+                    @if (TempData["ContactMessage"] is string contactMessage)
+                    {
+                        <div class="contact-alert">@contactMessage</div>
+                    }
+                    <form asp-controller="Home" asp-action="Contact" method="post">
+                        <div asp-validation-summary="ModelOnly" class="contact-error"></div>
                         <div class="row">
-                            <div class="col-md-6"><input type="text" placeholder="Name" /></div>
-                            <div class="col-md-6"><input type="email" placeholder="Email" /></div>
-                            <div class="col-12"><textarea placeholder="Message"></textarea></div>
-                            <div class="col-12"><button class="btn btn-sqr" type="button">Send message</button></div>
+                            <div class="col-md-6">
+                                <input asp-for="Name" placeholder="Name" />
+                                <span asp-validation-for="Name" class="contact-error"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="Email" type="email" placeholder="Email" />
+                                <span asp-validation-for="Email" class="contact-error"></span>
+                            </div>
+                            <div class="col-12">
+                                <textarea asp-for="Message" rows="7" placeholder="Message"></textarea>
+                                <span asp-validation-for="Message" class="contact-error"></span>
+                            </div>
+                            <div class="col-12"><button class="btn btn-sqr" type="submit">Send message</button></div>
                         </div>
                     </form>
                 </div>

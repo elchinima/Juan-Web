@@ -674,6 +674,50 @@ button {
   accent-color: var(--accent);
 }
 
+.message-list {
+  display: grid;
+  gap: 14px;
+}
+
+.message-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.message-card div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.message-card strong {
+  font-size: 18px;
+}
+
+.message-card a {
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.message-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.message-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .admin-modal {
   position: fixed;
   z-index: 50;

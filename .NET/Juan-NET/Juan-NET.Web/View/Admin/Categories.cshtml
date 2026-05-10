@@ -4,6 +4,7 @@
     ViewData["Title"] = "Categories";
     ViewData["PageName"] = "categories";
     ViewData["ActivePage"] = "Categories";
+    var search = Model.Search ?? string.Empty;
 }
 
 @section SidebarCard {
@@ -37,6 +38,14 @@
                 <p class="eyebrow">Categories</p>
                 <h3>Category List</h3>
             </div>
+            <form class="admin-search-form" asp-controller="Admin" asp-action="Categories" method="get">
+                <input name="search" value="@search" placeholder="Search category" />
+                <button class="primary-button" type="submit">Search</button>
+                @if (!string.IsNullOrWhiteSpace(search))
+                {
+                    <a class="ghost-button" asp-controller="Admin" asp-action="Categories">Reset</a>
+                }
+            </form>
         </div>
         <div class="admin-table categories-table">
             <div class="admin-table-head">
@@ -64,7 +73,7 @@
             {
                 <div class="admin-table-row">
                     <em>#0</em>
-                    <strong>No categories yet</strong>
+                    <strong>No categories found</strong>
                     <span>0</span>
                     <span>-</span>
                 </div>

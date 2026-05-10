@@ -26,16 +26,30 @@ namespace Juan_NET.Web.Controllers
             ViewBag.UserCount = await _context.Users.CountAsync();
             ViewBag.CategoryCount = await _context.Categories.CountAsync();
             ViewBag.SliderCount = await _context.Sliders.CountAsync();
+            ViewBag.ContactMessageCount = await _context.ContactMessages.CountAsync();
             return View();
         }
 
-        public async Task<IActionResult> Products()
+        public async Task<IActionResult> Products(string? search)
         {
+            var normalizedSearch = search?.Trim();
+            var productsQuery = _context.Products
+                .Include(product => product.ProductCategories)
+                .ThenInclude(productCategory => productCategory.Category)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(normalizedSearch))
+            {
+                productsQuery = productsQuery.Where(product =>
+                    product.Name.Contains(normalizedSearch) ||
+                    product.CategoryName.Contains(normalizedSearch) ||
+                    (product.Description != null && product.Description.Contains(normalizedSearch)));
+            }
+
             var viewModel = new AdminProductsViewModel
             {
-                Products = await _context.Products
-                    .Include(product => product.ProductCategories)
-                    .ThenInclude(productCategory => productCategory.Category)
+                Search = normalizedSearch,
+                Products = await productsQuery
                     .OrderByDescending(product => product.CreatedAt)
                     .ToListAsync(),
                 Categories = await _context.Categories.OrderBy(category => category.Name).ToListAsync()
@@ -176,9 +190,11 @@ namespace Juan_NET.Web.Controllers
             product.Description = productInput.Description;
             product.IsActive = productInput.IsActive;
             product.CategoryName = string.Join(", ", selectedCategories.Select(category => category.Name));
+            string? oldImageToDelete = null;
 
             if (viewModel.ImageFile is { Length: > 0 })
             {
+                oldImageToDelete = product.ImageUrl;
                 product.ImageUrl = await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "products");
             }
             else if (!string.IsNullOrWhiteSpace(productInput.ImageUrl))
@@ -194,6 +210,7 @@ namespace Juan_NET.Web.Controllers
             }
 
             await _context.SaveChangesAsync();
+            _imageStorage.DeleteUpload(oldImageToDelete);
             TempData["ProductMessage"] = "Product updated successfully.";
 
             return RedirectToAction(nameof(Products));
@@ -207,20 +224,32 @@ namespace Juan_NET.Web.Controllers
 
             if (product is not null)
             {
+                var imageUrl = product.ImageUrl;
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
+                _imageStorage.DeleteUpload(imageUrl);
                 TempData["ProductMessage"] = "Product deleted successfully.";
             }
 
             return RedirectToAction(nameof(Products));
         }
 
-        public async Task<IActionResult> Categories()
+        public async Task<IActionResult> Categories(string? search)
         {
+            var normalizedSearch = search?.Trim();
+            var categoriesQuery = _context.Categories
+                .Include(category => category.ProductCategories)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(normalizedSearch))
+            {
+                categoriesQuery = categoriesQuery.Where(category => category.Name.Contains(normalizedSearch));
+            }
+
             var viewModel = new AdminCategoriesViewModel
             {
-                Categories = await _context.Categories
-                    .Include(category => category.ProductCategories)
+                Search = normalizedSearch,
+                Categories = await categoriesQuery
                     .OrderBy(category => category.Name)
                     .ToListAsync()
             };
@@ -360,9 +389,11 @@ namespace Juan_NET.Web.Controllers
             slider.ButtonUrl = viewModel.Slider.ButtonUrl;
             slider.DisplayOrder = viewModel.Slider.DisplayOrder;
             slider.IsActive = viewModel.Slider.IsActive;
+            string? oldImageToDelete = null;
 
             if (viewModel.ImageFile is { Length: > 0 })
             {
+                oldImageToDelete = slider.ImageUrl;
                 slider.ImageUrl = await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "sliders");
             }
             else if (!string.IsNullOrWhiteSpace(viewModel.Slider.ImageUrl))
@@ -371,6 +402,7 @@ namespace Juan_NET.Web.Controllers
             }
 
             await _context.SaveChangesAsync();
+            _imageStorage.DeleteUpload(oldImageToDelete);
             TempData["SliderMessage"] = "Slider updated successfully.";
 
             return RedirectToAction(nameof(Sliders));
@@ -384,12 +416,32 @@ namespace Juan_NET.Web.Controllers
 
             if (slider is not null)
             {
+                var imageUrl = slider.ImageUrl;
                 _context.Sliders.Remove(slider);
                 await _context.SaveChangesAsync();
+                _imageStorage.DeleteUpload(imageUrl);
                 TempData["SliderMessage"] = "Slider deleted successfully.";
             }
 
             return RedirectToAction(nameof(Sliders));
+        }
+
+        public async Task<IActionResult> ContactMessages(string? search)
+        {
+            var normalizedSearch = search?.Trim();
+            var messagesQuery = _context.ContactMessages.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(normalizedSearch))
+            {
+                messagesQuery = messagesQuery.Where(message =>
+                    message.Name.Contains(normalizedSearch) ||
+                    message.Email.Contains(normalizedSearch) ||
+                    message.Message.Contains(normalizedSearch));
+            }
+
+            ViewBag.ContactSearch = normalizedSearch ?? string.Empty;
+
+            return View(await messagesQuery.OrderByDescending(message => message.CreatedAt).ToListAsync());
         }
 
         public async Task<IActionResult> Users(string? search)

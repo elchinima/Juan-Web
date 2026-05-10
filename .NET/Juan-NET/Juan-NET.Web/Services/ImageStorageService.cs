@@ -33,5 +33,25 @@ namespace Juan_NET.Web.Services
 
             return $"/uploads/{folder}/{fileName}";
         }
+
+        public void DeleteUpload(string? imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl) || !imageUrl.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var relativePath = imageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+            var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var filePath = Path.GetFullPath(Path.Combine(wwwrootPath, relativePath));
+            var uploadsPath = Path.GetFullPath(Path.Combine(wwwrootPath, "uploads"));
+
+            if (!filePath.StartsWith(uploadsPath, StringComparison.OrdinalIgnoreCase) || !File.Exists(filePath))
+            {
+                return;
+            }
+
+            File.Delete(filePath);
+        }
     }
 }

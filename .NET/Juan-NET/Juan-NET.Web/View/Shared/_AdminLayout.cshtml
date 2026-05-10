@@ -23,6 +23,8 @@
                    asp-controller="Admin" asp-action="Categories">Categories</a>
                 <a class="@(ViewData["ActivePage"]?.ToString() == "Sliders" ? "active" : "")"
                    asp-controller="Admin" asp-action="Sliders">Sliders</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "ContactMessages" ? "active" : "")"
+                   asp-controller="Admin" asp-action="ContactMessages">Messages</a>
                 <a class="@(ViewData["ActivePage"]?.ToString() == "Users" ? "active" : "")"
                    asp-controller="Admin" asp-action="Users">Users</a>
                 <a class="@(ViewData["ActivePage"]?.ToString() == "Subscribe" ? "active" : "")"

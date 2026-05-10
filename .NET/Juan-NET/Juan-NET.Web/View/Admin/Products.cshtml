@@ -8,6 +8,7 @@
     var selectedCategoryIds = Model.SelectedCategoryIds;
     var openEditProductModal = ViewData["OpenEditProductModal"] as bool? == true;
     var editProductPrice = Model.Product.Price.ToString(CultureInfo.InvariantCulture);
+    var search = Model.Search ?? string.Empty;
 }
 
 @section SidebarCard {
@@ -54,6 +55,14 @@
             <p class="eyebrow">Products</p>
             <h3>Catalog List</h3>
         </div>
+        <form class="admin-search-form" asp-controller="Admin" asp-action="Products" method="get">
+            <input name="search" value="@search" placeholder="Search product or category" />
+            <button class="primary-button" type="submit">Search</button>
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a class="ghost-button" asp-controller="Admin" asp-action="Products">Reset</a>
+            }
+        </form>
     </div>
     <div class="product-list">
         @if (Model.Products.Any())
@@ -86,12 +95,12 @@
         }
         else
         {
-            <div class="product-row">
-                <div class="product-thumb">JN</div>
-                <div><strong>No products yet</strong><span>Create the first item using the Add Product button.</span></div>
-                <em>$0.00</em>
-                <small class="status off">Empty</small>
-            </div>
+                <div class="product-row">
+                    <div class="product-thumb">JN</div>
+                    <div><strong>No products found</strong><span>@(string.IsNullOrWhiteSpace(search) ? "Create the first item using the Add Product button." : "Try another search term.")</span></div>
+                    <em>$0.00</em>
+                    <small class="status off">Empty</small>
+                </div>
         }
     </div>
 </section>

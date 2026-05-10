@@ -1,6 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseUrls("http://localhost:5219");
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ImageStorageService>();
@@ -23,6 +25,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        await context.Database.ExecuteSqlRawAsync("""
+            IF OBJECT_ID(N'[ContactMessages]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [ContactMessages] (
+                    [Id] int NOT NULL IDENTITY,
+                    [Name] nvarchar(120) NOT NULL,
+                    [Email] nvarchar(180) NOT NULL,
+                    [Message] nvarchar(1000) NOT NULL,
+                    [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+                    CONSTRAINT [PK_ContactMessages] PRIMARY KEY ([Id])
+                );
+            END
+            """);
+    }
+    catch (Exception exception)
+    {
+        Console.WriteLine($"ContactMessages table check failed: {exception.Message}");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

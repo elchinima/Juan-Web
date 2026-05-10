@@ -63,7 +63,30 @@ public class HomeController : Controller
 
     public IActionResult Contact()
     {
-        return View();
+        return View(new ContactMessageViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Contact(ContactMessageViewModel viewModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(viewModel);
+        }
+
+        _context.ContactMessages.Add(new ContactMessage
+        {
+            Name = viewModel.Name.Trim(),
+            Email = viewModel.Email.Trim(),
+            Message = viewModel.Message.Trim(),
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        TempData["ContactMessage"] = "Your message has been sent.";
+
+        return RedirectToAction(nameof(Contact));
     }
 
     [HttpPost]

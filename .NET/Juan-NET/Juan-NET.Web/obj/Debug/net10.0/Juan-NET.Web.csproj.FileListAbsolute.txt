@@ -70,7 +70,6 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Jua
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\g0gcr14xzg-{0}-68fh7bv7bd-68fh7bv7bd.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\cdby3cbgc1-{0}-1vk9wz8pw2-1vk9wz8pw2.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\yigzk4h0jq-{0}-qam996dp9n-qam996dp9n.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\em1iczwnt8-{0}-n2r7zdml9e-n2r7zdml9e.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\sovpzmtjog-{0}-mxnl8nxg7y-mxnl8nxg7y.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\jmbtllh4n7-{0}-210e9y64y9-210e9y64y9.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\tab9xjwnql-{0}-150znnupzf-150znnupzf.gz
@@ -123,7 +122,8 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\art
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-build-2\Juan-NET.Web.pdb
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\bin\Debug\net10.0\SixLabors.ImageSharp.dll
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\zkuu6267hi-{0}-scoi3e18a7-scoi3e18a7.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\gyi4rew5zq-{0}-iq34d97hlh-iq34d97hlh.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\tzkcqpjac4-{0}-z1st6rz3ke-z1st6rz3ke.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\mlmam3ig23-{0}-odnrnqk2ic-odnrnqk2ic.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\c0dlqfi59e-{0}-5gismn3f30-5gismn3f30.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\em1iczwnt8-{0}-fwmslosttp-fwmslosttp.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\gyi4rew5zq-{0}-df06f23tcb-df06f23tcb.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\mlmam3ig23-{0}-mibgo99c5a-mibgo99c5a.gz
