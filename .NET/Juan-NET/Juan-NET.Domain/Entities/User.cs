@@ -64,5 +64,9 @@ namespace Juan_NET.Domain.Entities
         public ICollection<UserAdminRole> AdminRoles { get; set; } = new List<UserAdminRole>();
 
         public ICollection<UserFavoriteCategory> FavoriteCategories { get; set; } = new List<UserFavoriteCategory>();
+
+        public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+
+        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
     }
 }

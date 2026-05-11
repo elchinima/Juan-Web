@@ -17,9 +17,32 @@
     <link href="~/main assets/css/style.css" rel="stylesheet" />
     <link href="~/main assets/css/account.css" rel="stylesheet" />
     <link href="~/main assets/css/home-admin.css" rel="stylesheet" />
+    <style>
+        .shop-list-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(15,18,25,.62)}
+        .shop-list-modal.is-open{display:flex}
+        .shop-list-panel{width:min(760px,100%);max-height:86vh;overflow:hidden;background:#fff;border-radius:8px;box-shadow:0 24px 80px rgba(15,18,25,.28)}
+        .shop-list-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid #eee}
+        .shop-list-head h3{margin:0;font-size:22px;color:#222}
+        .shop-list-tabs{display:flex;gap:8px;padding:16px 24px 0}
+        .shop-list-tab{border:1px solid #e3a51e;background:#fff;color:#222;padding:9px 16px;border-radius:6px;cursor:pointer}
+        .shop-list-tab.active{background:#e3a51e;color:#fff}
+        .shop-list-body{padding:18px 24px 24px;max-height:52vh;overflow:auto}
+        .shop-list-row{display:grid;grid-template-columns:74px 1fr auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid #f1f1f1}
+        .shop-list-row img{width:74px;height:74px;object-fit:cover;border-radius:8px;background:#f6f6f6}
+        .shop-list-row h4{margin:0 0 6px;font-size:16px;color:#222}
+        .shop-list-row p{margin:0;color:#777}
+        .shop-list-remove{border:0;background:#f5ece1;color:#a86807;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:22px;line-height:1}
+        .shop-list-empty{padding:34px 12px;text-align:center;color:#777}
+        .shop-list-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;background:#faf7f2;border-top:1px solid #eee}
+        .shop-list-total{font-size:18px;color:#222}
+        .shop-list-close{border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#555}
+        .shop-action-message{position:fixed;right:22px;bottom:22px;z-index:10000;background:#222;color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 14px 40px rgba(0,0,0,.22);opacity:0;transform:translateY(12px);transition:.2s}
+        .shop-action-message.is-visible{opacity:1;transform:translateY(0)}
+        @@media (max-width:575px){.shop-list-row{grid-template-columns:60px 1fr auto}.shop-list-row img{width:60px;height:60px}.shop-list-foot{display:block}.shop-list-total{margin-bottom:12px}}
+    </style>
     <script src="~/main assets/js/modernizr-2.8.3.min.js"></script>
 </head>
-<body>
+<body data-user-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")">
 
     <div class="page-loader" aria-hidden="true">
         <div class="page-loader-mark">
@@ -28,6 +51,7 @@
             <span></span>
         </div>
     </div>
+    <form id="shop-list-token-form" class="d-none">@Html.AntiForgeryToken()</form>
 
     <div class="page-shell">
         <main>
@@ -151,6 +175,26 @@
         </div>
         </div>
 
+        <div class="shop-list-modal" data-shop-list-modal>
+            <div class="shop-list-panel" role="dialog" aria-modal="true" aria-labelledby="shop-list-title">
+                <div class="shop-list-head">
+                    <h3 id="shop-list-title" data-shop-list-title>Basket</h3>
+                    <button type="button" class="shop-list-close" data-shop-list-close>&times;</button>
+                </div>
+                <div class="shop-list-tabs">
+                    <button type="button" class="shop-list-tab active" data-shop-list-tab="basket">Basket</button>
+                    <button type="button" class="shop-list-tab" data-shop-list-tab="wishlist">Wishlist</button>
+                </div>
+                <div class="shop-list-body" data-shop-list-body></div>
+                <div class="shop-list-foot">
+                    <div class="shop-list-total" data-shop-list-total>Total: $0.00</div>
+                    <a class="btn btn-hero" asp-controller="Products" asp-action="Index">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="shop-action-message" data-shop-action-message></div>
+
         <div class="scroll-top not-visible">
             <i class="fa fa-angle-up"></i>
         </div>
@@ -159,6 +203,318 @@
     <script src="~/main assets/js/vendor.js"></script>
     <script src="~/main assets/js/plugins.js"></script>
     <script src="~/main assets/js/active.js"></script>
+    <script>
+        (function () {
+            var isAuthenticated = document.body.dataset.userAuthenticated === "true";
+            var basketKey = "juan.basket";
+            var wishlistKey = "juan.wishlist";
+            var activeList = "basket";
+            var modal = document.querySelector("[data-shop-list-modal]");
+            var body = document.querySelector("[data-shop-list-body]");
+            var title = document.querySelector("[data-shop-list-title]");
+            var total = document.querySelector("[data-shop-list-total]");
+            var message = document.querySelector("[data-shop-action-message]");
+            var tokenInput = document.querySelector("#shop-list-token-form input[name='__RequestVerificationToken']");
+            var summary = { basketItems: readLocal(basketKey), wishlistItems: readLocal(wishlistKey) };
+
+            refreshState();
+            bindActions();
+
+            function bindActions() {
+                document.addEventListener("click", function (event) {
+                    var opener = event.target.closest("[data-open-shop-list]");
+                    if (opener) {
+                        event.preventDefault();
+                        openList(opener.dataset.openShopList);
+                        return;
+                    }
+
+                    var action = event.target.closest("[data-shop-action]");
+                    if (action) {
+                        event.preventDefault();
+                        var card = action.closest("[data-product-card]");
+                        if (card) {
+                            addFromCard(action.dataset.shopAction, card, 1);
+                        }
+                        return;
+                    }
+
+                    var remove = event.target.closest("[data-shop-remove]");
+                    if (remove) {
+                        event.preventDefault();
+                        removeItem(remove.dataset.shopRemove, parseInt(remove.dataset.productId, 10));
+                    }
+                });
+
+                document.querySelectorAll("[data-shop-list-tab]").forEach(function (tab) {
+                    tab.addEventListener("click", function () {
+                        openList(tab.dataset.shopListTab);
+                    });
+                });
+
+                document.querySelectorAll("[data-shop-list-close]").forEach(function (button) {
+                    button.addEventListener("click", closeList);
+                });
+
+                if (modal) {
+                    modal.addEventListener("click", function (event) {
+                        if (event.target === modal) {
+                            closeList();
+                        }
+                    });
+                }
+
+                document.addEventListener("submit", function (event) {
+                    var form = event.target.closest("[data-modal-basket-form]");
+                    if (!form) {
+                        return;
+                    }
+
+                    var productId = parseInt(form.querySelector("[name='productId']").value, 10);
+                    var quantity = parseInt(form.querySelector("[name='quantity']").value, 10) || 1;
+                    var card = document.querySelector("[data-product-card][data-product-id='" + productId + "']");
+                    if (card) {
+                        event.preventDefault();
+                        addFromCard("basket", card, quantity);
+                        if (window.jQuery && window.jQuery.fn.modal) {
+                            window.jQuery("#quick_view").modal("hide");
+                        }
+                    }
+                });
+            }
+
+            function addFromCard(type, card, quantity) {
+                var item = {
+                    productId: parseInt(card.dataset.productId, 10),
+                    name: card.dataset.productName || "",
+                    price: parsePrice(card.dataset.productPrice),
+                    imageUrl: card.dataset.productImage || "/main assets/img/product/product-1.jpg",
+                    quantity: Math.max(1, quantity || 1),
+                    stockCount: parseInt(card.dataset.productStock, 10) || 99
+                };
+
+                if (isAuthenticated) {
+                    post(type === "basket" ? "@Url.Action("AddBasket", "ShopList")" : "@Url.Action("AddWishlist", "ShopList")", { productId: item.productId, quantity: item.quantity })
+                        .then(applySummary)
+                        .then(function () { showMessage(type === "basket" ? "Added to basket" : "Added to wishlist"); });
+                    return;
+                }
+
+                if (type === "basket") {
+                    summary.basketItems = upsertBasket(summary.basketItems, item);
+                    writeLocal(basketKey, summary.basketItems);
+                    showMessage("Saved to local basket");
+                } else {
+                    summary.wishlistItems = upsertWishlist(summary.wishlistItems, item);
+                    writeLocal(wishlistKey, summary.wishlistItems);
+                    showMessage("Saved to local wishlist");
+                }
+
+                render();
+            }
+
+            function removeItem(type, productId) {
+                if (isAuthenticated) {
+                    post(type === "basket" ? "@Url.Action("RemoveBasket", "ShopList")" : "@Url.Action("RemoveWishlist", "ShopList")", { productId: productId })
+                        .then(applySummary);
+                    return;
+                }
+
+                if (type === "basket") {
+                    summary.basketItems = summary.basketItems.filter(function (item) { return item.productId !== productId; });
+                    writeLocal(basketKey, summary.basketItems);
+                } else {
+                    summary.wishlistItems = summary.wishlistItems.filter(function (item) { return item.productId !== productId; });
+                    writeLocal(wishlistKey, summary.wishlistItems);
+                }
+
+                render();
+            }
+
+            function refreshState() {
+                if (!isAuthenticated) {
+                    render();
+                    return;
+                }
+
+                syncLocal().then(function () {
+                    return fetch("@Url.Action("Summary", "ShopList")");
+                }).then(function (response) {
+                    return response.json();
+                }).then(applySummary);
+            }
+
+            function syncLocal() {
+                var localBasket = readLocal(basketKey);
+                var localWishlist = readLocal(wishlistKey);
+                if (!localBasket.length && !localWishlist.length) {
+                    return Promise.resolve();
+                }
+
+                return fetch("@Url.Action("Sync", "ShopList")", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": tokenInput ? tokenInput.value : ""
+                    },
+                    body: JSON.stringify({ basketItems: localBasket, wishlistItems: localWishlist })
+                }).then(function (response) {
+                    if (response.ok) {
+                        localStorage.removeItem(basketKey);
+                        localStorage.removeItem(wishlistKey);
+                    }
+                });
+            }
+
+            function post(url, data) {
+                var form = new URLSearchParams();
+                Object.keys(data).forEach(function (key) {
+                    form.append(key, data[key]);
+                });
+
+                return fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "RequestVerificationToken": tokenInput ? tokenInput.value : ""
+                    },
+                    body: form.toString()
+                }).then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Request failed");
+                    }
+
+                    return response.json();
+                });
+            }
+
+            function applySummary(data) {
+                summary = {
+                    basketItems: normalizeItems(data.basketItems),
+                    wishlistItems: normalizeItems(data.wishlistItems)
+                };
+                render();
+            }
+
+            function openList(type) {
+                activeList = type === "wishlist" ? "wishlist" : "basket";
+                render();
+                if (modal) {
+                    modal.classList.add("is-open");
+                }
+            }
+
+            function closeList() {
+                if (modal) {
+                    modal.classList.remove("is-open");
+                }
+            }
+
+            function render() {
+                var items = activeList === "basket" ? summary.basketItems : summary.wishlistItems;
+                document.querySelectorAll("[data-basket-count]").forEach(function (item) { item.textContent = countBasket(); });
+                document.querySelectorAll("[data-wishlist-count]").forEach(function (item) { item.textContent = summary.wishlistItems.length; });
+
+                if (!body) {
+                    return;
+                }
+
+                document.querySelectorAll("[data-shop-list-tab]").forEach(function (tab) {
+                    tab.classList.toggle("active", tab.dataset.shopListTab === activeList);
+                });
+
+                title.textContent = activeList === "basket" ? "Basket" : "Wishlist";
+                total.textContent = activeList === "basket" ? "Total: " + formatMoney(sumBasket()) : summary.wishlistItems.length + " saved item(s)";
+
+                if (!items.length) {
+                    body.innerHTML = "<div class=\"shop-list-empty\">No items yet.</div>";
+                    return;
+                }
+
+                body.innerHTML = items.map(function (item) {
+                    var qty = activeList === "basket" ? "Qty: " + item.quantity + " · " : "";
+                    return "<div class=\"shop-list-row\">" +
+                        "<img src=\"" + escapeHtml(item.imageUrl) + "\" alt=\"" + escapeHtml(item.name) + "\" />" +
+                        "<div><h4>" + escapeHtml(item.name) + "</h4><p>" + qty + formatMoney(item.price) + "</p></div>" +
+                        "<button class=\"shop-list-remove\" type=\"button\" data-shop-remove=\"" + activeList + "\" data-product-id=\"" + item.productId + "\">&times;</button>" +
+                        "</div>";
+                }).join("");
+            }
+
+            function readLocal(key) {
+                try {
+                    return normalizeItems(JSON.parse(localStorage.getItem(key) || "[]"));
+                } catch {
+                    return [];
+                }
+            }
+
+            function writeLocal(key, items) {
+                localStorage.setItem(key, JSON.stringify(items));
+            }
+
+            function normalizeItems(items) {
+                return Array.isArray(items) ? items.map(function (item) {
+                    return {
+                        productId: parseInt(item.productId || item.ProductId, 10),
+                        name: item.name || item.Name || "",
+                        imageUrl: item.imageUrl || item.ImageUrl || "/main assets/img/product/product-1.jpg",
+                        price: Number(item.price || item.Price || 0),
+                        quantity: Math.max(1, parseInt(item.quantity || item.Quantity || 1, 10)),
+                        stockCount: parseInt(item.stockCount || item.StockCount || 99, 10)
+                    };
+                }).filter(function (item) { return item.productId > 0; }) : [];
+            }
+
+            function upsertBasket(items, item) {
+                var existing = items.find(function (saved) { return saved.productId === item.productId; });
+                if (existing) {
+                    existing.quantity = Math.min(existing.stockCount || 99, existing.quantity + item.quantity);
+                    return items;
+                }
+
+                return [item].concat(items);
+            }
+
+            function upsertWishlist(items, item) {
+                return items.some(function (saved) { return saved.productId === item.productId; }) ? items : [item].concat(items);
+            }
+
+            function countBasket() {
+                return summary.basketItems.reduce(function (sum, item) { return sum + item.quantity; }, 0);
+            }
+
+            function sumBasket() {
+                return summary.basketItems.reduce(function (sum, item) { return sum + item.quantity * item.price; }, 0);
+            }
+
+            function parsePrice(value) {
+                return Number(String(value || "0").replace(/[^0-9.]/g, "")) || 0;
+            }
+
+            function formatMoney(value) {
+                return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value || 0);
+            }
+
+            function escapeHtml(value) {
+                return String(value || "").replace(/[&<>"']/g, function (match) {
+                    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[match];
+                });
+            }
+
+            function showMessage(text) {
+                if (!message) {
+                    return;
+                }
+
+                message.textContent = text;
+                message.classList.add("is-visible");
+                window.setTimeout(function () {
+                    message.classList.remove("is-visible");
+                }, 1800);
+            }
+        })();
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

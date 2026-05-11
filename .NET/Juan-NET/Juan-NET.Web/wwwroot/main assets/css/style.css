@@ -3619,6 +3619,29 @@ fieldset {
 .contact-message form textarea {
   height: 150px; }
 
+.contact-action-card {
+  display: block;
+  border: 1px solid #e5e5e5;
+  background-color: #ffffff;
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease; }
+  .contact-action-card:hover {
+    border-color: #e3a51e;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); }
+  .contact-action-card .contact-label {
+    color: #e3a51e;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase; }
+  .contact-action-card h2 {
+    color: #333333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px; }
+  .contact-action-card span {
+    color: #666666; }
+
 /*------ contact form area start -------*/
 /*------ contact info area start -------*/
 .contact-info {

@@ -1,6 +1,9 @@
 @inject AdminAccessService AdminAccessService
 @{
     var canAccessAdmin = User.Identity?.IsAuthenticated == true && await AdminAccessService.HasPermissionAsync(User, AdminPermissionKeys.AdminAccess);
+    var rawUserName = User.Identity?.Name ?? string.Empty;
+    var displayUserName = rawUserName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? rawUserName;
+    displayUserName = displayUserName.Length > 10 ? $"{displayUserName[..10]}..." : displayUserName;
 }
 <header class="header-area">
     <div class="main-header d-none d-lg-block">
@@ -35,7 +38,7 @@
                                     <li class="user-hover">
                                         @if (User.Identity?.IsAuthenticated == true)
                                         {
-                                            <a asp-controller="Account" asp-action="Profile" class="header-user-name">@User.Identity.Name</a>
+                                            <a asp-controller="Account" asp-action="Profile" class="header-user-name" title="@rawUserName">@displayUserName</a>
                                         }
                                         else
                                         {
@@ -63,7 +66,10 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="#" class="minicart-btn"><i class="ion-bag"></i><div class="notification">0</div></a>
+                                        <a href="#" data-open-shop-list="wishlist" title="Wishlist"><i class="ion-android-favorite-outline"></i><div class="notification" data-wishlist-count>0</div></a>
+                                    </li>
+                                    <li>
+                                        <a href="#" data-open-shop-list="basket" title="Basket"><i class="ion-bag"></i><div class="notification" data-basket-count>0</div></a>
                                     </li>
                                 </ul>
                             </div>
@@ -85,14 +91,15 @@
                             <a asp-controller="Account" asp-action="@(User.Identity?.IsAuthenticated == true ? "Profile" : "Login")">
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
-                                    <span class="mobile-user-name">@User.Identity.Name</span>
+                                    <span class="mobile-user-name" title="@rawUserName">@displayUserName</span>
                                 }
                                 else
                                 {
                                     <i class="ion-log-in"></i>
                                 }
                             </a>
-                            <a asp-controller="Products" asp-action="Index"><i class="ion-bag"></i></a>
+                            <a href="#" data-open-shop-list="wishlist"><i class="ion-android-favorite-outline"></i></a>
+                            <a href="#" data-open-shop-list="basket"><i class="ion-bag"></i></a>
                         </div>
                     </div>
                 </div>

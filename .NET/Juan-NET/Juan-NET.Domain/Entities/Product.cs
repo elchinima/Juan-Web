@@ -29,5 +29,9 @@ namespace Juan_NET.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+
+        public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+
+        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
     }
 }

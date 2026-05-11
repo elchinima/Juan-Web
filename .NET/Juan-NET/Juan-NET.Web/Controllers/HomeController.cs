@@ -72,6 +72,7 @@ public class HomeController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewBag.OpenComplaintModal = true;
             return View(viewModel);
         }
 
@@ -93,9 +94,9 @@ public class HomeController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(int productId, string quantity)
     {
-        if (!int.TryParse(quantity, out var parsedQuantity) || parsedQuantity < 2 || parsedQuantity % 2 != 0)
+        if (!int.TryParse(quantity, out var parsedQuantity) || parsedQuantity < 1 || parsedQuantity > 99)
         {
-            TempData["CartMessage"] = "Quantity must be an even whole number.";
+            TempData["CartMessage"] = "Quantity must be a whole number from 1 to 99.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -115,7 +116,31 @@ public class HomeController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        TempData["CartMessage"] = "Product quantity is valid.";
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(userId, out var id))
+        {
+            var cartItem = await _context.BasketItems.FindAsync(id, productId);
+            var quantityToAdd = Math.Clamp(parsedQuantity, 1, Math.Min(product.StockCount, 99));
+
+            if (cartItem is null)
+            {
+                _context.BasketItems.Add(new BasketItem
+                {
+                    UserId = id,
+                    ProductId = productId,
+                    Quantity = quantityToAdd,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            else
+            {
+                cartItem.Quantity = Math.Clamp(cartItem.Quantity + quantityToAdd, 1, Math.Min(product.StockCount, 99));
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        TempData["CartMessage"] = "Product added to basket.";
         return RedirectToAction(nameof(Index));
     }
 

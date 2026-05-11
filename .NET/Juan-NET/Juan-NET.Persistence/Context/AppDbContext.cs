@@ -28,6 +28,10 @@
 
         public DbSet<UserFavoriteCategory> UserFavoriteCategories => Set<UserFavoriteCategory>();
 
+        public DbSet<BasketItem> BasketItems => Set<BasketItem>();
+
+        public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
+
         public DbSet<SiteFooterSettings> SiteFooterSettings => Set<SiteFooterSettings>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -111,6 +115,38 @@
                 entity.HasOne(favorite => favorite.Category)
                     .WithMany(category => category.FavoriteUsers)
                     .HasForeignKey(favorite => favorite.CategoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<BasketItem>(entity =>
+            {
+                entity.HasKey(item => new { item.UserId, item.ProductId });
+                entity.Property(item => item.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(item => item.User)
+                    .WithMany(user => user.BasketItems)
+                    .HasForeignKey(item => item.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.Product)
+                    .WithMany(product => product.BasketItems)
+                    .HasForeignKey(item => item.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<WishlistItem>(entity =>
+            {
+                entity.HasKey(item => new { item.UserId, item.ProductId });
+                entity.Property(item => item.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(item => item.User)
+                    .WithMany(user => user.WishlistItems)
+                    .HasForeignKey(item => item.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.Product)
+                    .WithMany(product => product.WishlistItems)
+                    .HasForeignKey(item => item.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

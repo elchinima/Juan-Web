@@ -35,29 +35,67 @@
                     {
                         <div class="contact-alert">@contactMessage</div>
                     }
-                    <form asp-controller="Home" asp-action="Contact" method="post">
-                        <div asp-validation-summary="ModelOnly" class="contact-error"></div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <input asp-for="Name" placeholder="Name" />
-                                <span asp-validation-for="Name" class="contact-error"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <input asp-for="Email" type="email" placeholder="Email" />
-                                <span asp-validation-for="Email" class="contact-error"></span>
-                            </div>
-                            <div class="col-12">
-                                <textarea asp-for="Message" rows="7" placeholder="Message"></textarea>
-                                <span asp-validation-for="Message" class="contact-error"></span>
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-sqr" type="submit">Technical support complaint</button>
-                                <button class="btn btn-sqr" type="button">Technical support</button>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-30">
+                            <button class="contact-action-card text-left h-100 w-100" type="button" data-toggle="modal" data-target="#supportComplaintModal">
+                                <p class="contact-label">Complaint</p>
+                                <h2>Technical support complaint</h2>
+                                <span>Send a message to the technical support queue.</span>
+                            </button>
                         </div>
-                    </form>
+                        <div class="col-md-6 mb-30">
+                            <button class="contact-action-card text-left h-100 w-100" type="button">
+                                <p class="contact-label">Support</p>
+                                <h2>Technical support</h2>
+                                <span>Support window will be added later.</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<div class="modal" id="supportComplaintModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Technical support complaint</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form asp-controller="Home" asp-action="Contact" method="post">
+                <div class="modal-body contact-message">
+                    <div asp-validation-summary="ModelOnly" class="contact-error"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input asp-for="Name" placeholder="Name" />
+                            <span asp-validation-for="Name" class="contact-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <input asp-for="Email" type="email" placeholder="Email" />
+                            <span asp-validation-for="Email" class="contact-error"></span>
+                        </div>
+                        <div class="col-12">
+                            <textarea asp-for="Message" rows="7" placeholder="Message"></textarea>
+                            <span asp-validation-for="Message" class="contact-error"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sqr" type="submit">Send complaint</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (@(ViewBag.OpenComplaintModal == true ? "true" : "false") && window.jQuery && window.jQuery.fn.modal) {
+                window.jQuery("#supportComplaintModal").modal("show");
+            }
+        });
+    </script>
+}

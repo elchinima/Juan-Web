@@ -33,6 +33,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await AdminAccessService.EnsureRoleInfrastructureAsync(context);
     await FavoriteCategoryInfrastructureService.EnsureInfrastructureAsync(context);
+    await ShopListInfrastructureService.EnsureInfrastructureAsync(context);
     await SiteSettingsInfrastructureService.EnsureInfrastructureAsync(context);
 }
 

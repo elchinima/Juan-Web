@@ -280,27 +280,40 @@
 	$('.qtybtn').on('click', function () {
 		var $button = $(this);
 		var $input = $button.parent().find('input');
-		var oldValue = parseInt($input.val(), 10) || 2;
+		var oldValue = parseInt($input.val(), 10) || 1;
+		var maxValue = parseInt($input.attr('data-max-quantity'), 10) || 99;
+		if (oldValue < 1) {
+			oldValue = 1;
+		}
 		if ($button.hasClass('inc')) {
-			var newVal = oldValue + 2;
+			var newVal = oldValue + 1;
 		} else {
-			if (oldValue > 2) {
-				var newVal = oldValue - 2;
+			if (oldValue > 1) {
+				var newVal = oldValue - 1;
 			} else {
-				newVal = 2;
+				newVal = 1;
 			}
+		}
+		if (newVal > maxValue) {
+			newVal = maxValue;
 		}
 		$input.val(newVal);
 	});
 	$('.pro-qty input').on('input', function () {
 		this.value = this.value.replace(/\D/g, '');
+		var maxValue = parseInt(this.getAttribute('data-max-quantity'), 10) || 99;
+		var value = parseInt(this.value, 10);
+		if (value > maxValue) {
+			this.value = maxValue;
+		}
 	});
 	$('.pro-qty input').on('change', function () {
 		var value = parseInt(this.value, 10);
-		if (!value || value < 2) {
-			this.value = 2;
-		} else if (value % 2 !== 0) {
-			this.value = value + 1;
+		var maxValue = parseInt(this.getAttribute('data-max-quantity'), 10) || 99;
+		if (!value || value < 1) {
+			this.value = 1;
+		} else if (value > maxValue) {
+			this.value = maxValue;
 		}
 	});
 
