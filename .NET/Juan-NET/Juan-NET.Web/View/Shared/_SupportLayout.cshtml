@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Juan Support</title>
+    <link rel="shortcut icon" href="~/admin assets/img/logo.png" type="image/png" />
+    <link rel="stylesheet" href="~/admin assets/css/admin.css" />
+</head>
+<body data-page="@ViewData["PageName"]">
+    <div class="page-loader" aria-hidden="true">
+        <div class="page-loader-mark">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <div class="admin-shell support-shell">
+        <aside class="sidebar support-sidebar">
+            <a class="brand" asp-controller="Support" asp-action="Index">
+                <img src="~/admin assets/img/logo.png" alt="Juan" />
+                <span>Support</span>
+            </a>
+            <nav class="side-nav" aria-label="Support navigation">
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Dashboard" ? "active" : "")" asp-controller="Support" asp-action="Index">Dashboard</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "Reports" ? "active" : "")" asp-controller="Support" asp-action="Reports">Reports</a>
+            </nav>
+            <div class="sidebar-card">
+                @RenderSection("SidebarCard", required: false)
+            </div>
+        </aside>
+
+        <main class="main-panel">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/admin assets/js/admin.js"></script>
+    <script src="~/admin assets/js/support.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

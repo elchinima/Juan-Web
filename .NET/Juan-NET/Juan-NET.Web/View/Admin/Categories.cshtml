@@ -22,6 +22,7 @@
         <h1>Categories</h1>
     </div>
     <div class="topbar-actions">
+        <button class="primary-button" type="button" data-open-category-modal>Add Category</button>
         <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
     </div>
 </header>
@@ -31,62 +32,64 @@
     <div class="status good admin-message">@message</div>
 }
 
-<section class="content-grid wide-left">
-    <article class="panel reveal">
-        <div class="panel-head">
-            <div>
-                <p class="eyebrow">Categories</p>
-                <h3>Category List</h3>
-            </div>
-            <form class="admin-search-form" asp-controller="Admin" asp-action="Categories" method="get">
-                <input name="search" value="@search" placeholder="Search category" />
-                <button class="primary-button" type="submit">Search</button>
-                @if (!string.IsNullOrWhiteSpace(search))
-                {
-                    <a class="ghost-button" asp-controller="Admin" asp-action="Categories">Reset</a>
-                }
-            </form>
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Categories</p>
+            <h3>Category List</h3>
         </div>
-        <div class="admin-table categories-table">
-            <div class="admin-table-head">
-                <span>ID</span>
-                <span>Name</span>
-                <span>Products</span>
-                <span>Action</span>
-            </div>
-            @if (Model.Categories.Any())
+        <form class="admin-search-form" asp-controller="Admin" asp-action="Categories" method="get">
+            <input name="search" value="@search" placeholder="Search category" />
+            <button class="primary-button" type="submit">Search</button>
+            @if (!string.IsNullOrWhiteSpace(search))
             {
-                @foreach (var category in Model.Categories)
-                {
-                    <div class="admin-table-row">
-                        <em>#@category.Id</em>
-                        <strong>@category.Name</strong>
-                        <span>@category.ProductCategories.Count</span>
-                        <form asp-controller="Admin" asp-action="DeleteCategory" method="post" data-confirm="Delete this category?">
-                            <input type="hidden" name="id" value="@category.Id" />
-                            <button class="danger-button" type="submit">Delete</button>
-                        </form>
-                    </div>
-                }
+                <a class="ghost-button" asp-controller="Admin" asp-action="Categories">Reset</a>
             }
-            else
+        </form>
+    </div>
+    <div class="admin-table categories-table">
+        <div class="admin-table-head">
+            <span>ID</span>
+            <span>Name</span>
+            <span>Products</span>
+            <span>Action</span>
+        </div>
+        @if (Model.Categories.Any())
+        {
+            @foreach (var category in Model.Categories)
             {
                 <div class="admin-table-row">
-                    <em>#0</em>
-                    <strong>No categories found</strong>
-                    <span>0</span>
-                    <span>-</span>
+                    <em>#@category.Id</em>
+                    <strong>@category.Name</strong>
+                    <span>@category.ProductCategories.Count</span>
+                    <form asp-controller="Admin" asp-action="DeleteCategory" method="post" data-confirm="Delete this category?">
+                        <input type="hidden" name="id" value="@category.Id" />
+                        <button class="danger-button" type="submit">Delete</button>
+                    </form>
                 </div>
             }
-        </div>
-    </article>
+        }
+        else
+        {
+            <div class="admin-table-row">
+                <em>#0</em>
+                <strong>No categories found</strong>
+                <span>0</span>
+                <span>-</span>
+            </div>
+        }
+    </div>
+</section>
 
-    <article class="panel reveal">
+<div class="admin-modal @(!ViewData.ModelState.IsValid ? "is-open" : "")" data-category-modal>
+    <div class="admin-modal-backdrop" data-close-category-modal></div>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="category-modal-title">
         <div class="panel-head">
             <div>
                 <p class="eyebrow">Create</p>
-                <h3>Add Category</h3>
+                <h3 id="category-modal-title">Add Category</h3>
             </div>
+            <button class="modal-close" type="button" aria-label="Close modal" data-close-category-modal>&times;</button>
         </div>
         <form class="admin-form" asp-controller="Admin" asp-action="AddCategory" method="post" data-confirm="Save this category?">
             <div asp-validation-summary="ModelOnly" class="status off"></div>
@@ -97,5 +100,5 @@
             </label>
             <button class="primary-button full" type="submit">Save Category</button>
         </form>
-    </article>
-</section>
+    </section>
+</div>

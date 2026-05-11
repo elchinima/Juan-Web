@@ -1,0 +1,109 @@
+@model AdminFooterSettingsViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Footer";
+    ViewData["PageName"] = "footer-settings";
+    ViewData["ActivePage"] = "Footer";
+}
+
+@section SidebarCard {
+    <span>Site</span>
+    <strong>Footer</strong>
+    <p>Contact details and footer links.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Site</p>
+        <h1>Footer</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+    </div>
+</header>
+
+@if (TempData["FooterSettingsMessage"] is string message)
+{
+    <div class="status good admin-message">@message</div>
+}
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Footer</p>
+            <h3>Footer Settings</h3>
+        </div>
+    </div>
+    <form class="admin-form two-column" asp-controller="Admin" asp-action="FooterSettings" method="post" data-confirm="Save footer changes?">
+        <div asp-validation-summary="ModelOnly" class="status off form-wide"></div>
+        <label class="form-wide">
+            Address
+            <input asp-for="Address" />
+            <span asp-validation-for="Address" class="status off"></span>
+        </label>
+        <label>
+            Email
+            <input asp-for="Email" />
+            <span asp-validation-for="Email" class="status off"></span>
+        </label>
+        <label>
+            Phone
+            <input asp-for="Phone" />
+            <span asp-validation-for="Phone" class="status off"></span>
+        </label>
+        <label>
+            All Products Link
+            <input asp-for="AllProductsUrl" />
+            <span asp-validation-for="AllProductsUrl" class="status off"></span>
+        </label>
+        <label>
+            Categories Link
+            <input asp-for="CategoriesUrl" />
+            <span asp-validation-for="CategoriesUrl" class="status off"></span>
+        </label>
+        <label>
+            Home Link
+            <input asp-for="HomeUrl" />
+            <span asp-validation-for="HomeUrl" class="status off"></span>
+        </label>
+        <label>
+            About Link
+            <input asp-for="AboutUrl" />
+            <span asp-validation-for="AboutUrl" class="status off"></span>
+        </label>
+        <label>
+            Contact Link
+            <input asp-for="ContactUrl" />
+            <span asp-validation-for="ContactUrl" class="status off"></span>
+        </label>
+        <label>
+            Privacy Link
+            <input asp-for="PrivacyUrl" />
+            <span asp-validation-for="PrivacyUrl" class="status off"></span>
+        </label>
+        <label>
+            Facebook Link
+            <input asp-for="FacebookUrl" />
+            <span asp-validation-for="FacebookUrl" class="status off"></span>
+        </label>
+        <label>
+            Twitter Link
+            <input asp-for="TwitterUrl" />
+            <span asp-validation-for="TwitterUrl" class="status off"></span>
+        </label>
+        <label>
+            Linkedin Link
+            <input asp-for="LinkedinUrl" />
+            <span asp-validation-for="LinkedinUrl" class="status off"></span>
+        </label>
+        <label>
+            Instagram Link
+            <input asp-for="InstagramUrl" />
+            <span asp-validation-for="InstagramUrl" class="status off"></span>
+        </label>
+        <button class="primary-button full form-wide" type="submit">Save Footer</button>
+    </form>
+</section>

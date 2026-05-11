@@ -31,7 +31,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await AdminAccessService.EnsureRoleInfrastructureAsync(context);
     await FavoriteCategoryInfrastructureService.EnsureInfrastructureAsync(context);
+    await SiteSettingsInfrastructureService.EnsureInfrastructureAsync(context);
 }
 
 if (app.Environment.IsDevelopment())

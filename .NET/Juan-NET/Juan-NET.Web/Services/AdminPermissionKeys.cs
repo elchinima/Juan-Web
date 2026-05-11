@@ -7,8 +7,10 @@ namespace Juan_NET.Web.Services
         public const string Categories = "Admin.Categories";
         public const string Sliders = "Admin.Sliders";
         public const string ContactMessages = "Admin.ContactMessages";
+        public const string DeleteMessages = "Admin.DeleteMessages";
         public const string Users = "Admin.Users";
         public const string Subscribe = "Admin.Subscribe";
         public const string Roles = "Admin.Roles";
+        public const string FooterSettings = "Admin.FooterSettings";
     }
 }

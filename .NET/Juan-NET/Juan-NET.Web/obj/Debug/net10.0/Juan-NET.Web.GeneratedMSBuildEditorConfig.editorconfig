@@ -54,6 +54,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxDb250YWN0TWVzc2FnZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/FooterSettings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxGb290ZXJTZXR0aW5ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Admin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xBZG1pblxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -104,6 +108,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Shared/_StoreHeader.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xTaGFyZWRcX1N0b3JlSGVhZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Shared/_SupportLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTaGFyZWRcX1N1cHBvcnRMYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Support/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTdXBwb3J0XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Support/Reports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTdXBwb3J0XFJlcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/_ViewImports.cshtml]

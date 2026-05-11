@@ -1,0 +1,135 @@
+@model SupportDashboardViewModel
+@{
+    Layout = "_SupportLayout";
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageName"] = "support-dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+
+    var dailyProgress = Math.Min(100, Model.TodayReports * 100 / Model.DailyReportTarget);
+    var bonusProgress = Math.Min(100, Model.TodayReports * 100 / Model.DailyBonusReportTarget);
+}
+
+@section SidebarCard {
+    <span>Live Shift</span>
+    <strong data-support-timer>00:00:00</strong>
+    <p>Timer starts when this panel is opened.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Technical Support</p>
+        <h1>Dashboard</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="primary-button" asp-controller="Support" asp-action="Reports">Open Reports</a>
+    </div>
+</header>
+
+<section class="hero-panel support-hero reveal">
+    <div>
+        <p class="eyebrow">Daily Plan</p>
+        <h2>@Model.DailyReportTarget reports and @Model.WorkHourTarget work hours.</h2>
+        <p>Bonus plan unlocks at @Model.DailyBonusReportTarget reports and @Model.BonusWorkHourTarget work hours in the same support shift.</p>
+    </div>
+    <div class="hero-metric">
+        <span>Shift Time</span>
+        <strong data-support-timer>00:00:00</strong>
+        <small>Live from page opening</small>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card reveal">
+        <span>Today Reports</span>
+        <strong data-count="@Model.TodayReports">0</strong>
+        <p>@dailyProgress% of daily plan</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Bonus Progress</span>
+        <strong>@bonusProgress%</strong>
+        <p>@Model.DailyBonusReportTarget report target</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Week Reports</span>
+        <strong data-count="@Model.WeekReports">0</strong>
+        <p>Simulated weekly workload</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Open Reports</span>
+        <strong data-count="@Model.OpenReports">0</strong>
+        <p>@Model.ResolvedReports resolved today</p>
+    </article>
+</section>
+
+<section class="content-grid wide-left">
+    <article class="panel reveal">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">This Week</p>
+                <h3>Reports by Day</h3>
+            </div>
+            <a asp-controller="Support" asp-action="Reports">Reports</a>
+        </div>
+        <div class="support-week-chart" aria-label="Weekly support report chart">
+            @foreach (var item in Model.WeekStats)
+            {
+                var height = Math.Min(100, item.Reports * 100 / Model.DailyBonusReportTarget);
+                <span style="--value: @height%" data-label="@item.Day" data-count-label="@item.Reports"></span>
+            }
+        </div>
+    </article>
+
+    <article class="panel reveal">
+        <div class="panel-head">
+            <div>
+                <p class="eyebrow">Progress</p>
+                <h3>Plan Tracking</h3>
+            </div>
+        </div>
+        <div class="support-progress-list">
+            <div>
+                <span>Daily reports</span>
+                <strong>@Model.TodayReports / @Model.DailyReportTarget</strong>
+                <i style="--progress: @dailyProgress%"></i>
+            </div>
+            <div>
+                <span>Bonus reports</span>
+                <strong>@Model.TodayReports / @Model.DailyBonusReportTarget</strong>
+                <i style="--progress: @bonusProgress%"></i>
+            </div>
+            <div>
+                <span>Daily hours</span>
+                <strong data-support-hours data-target="@Model.WorkHourTarget">0 / @Model.WorkHourTarget</strong>
+                <i data-support-hour-bar data-target="@Model.WorkHourTarget" style="--progress: 0%"></i>
+            </div>
+            <div>
+                <span>Bonus hours</span>
+                <strong data-support-hours data-target="@Model.BonusWorkHourTarget">0 / @Model.BonusWorkHourTarget</strong>
+                <i data-support-hour-bar data-target="@Model.BonusWorkHourTarget" style="--progress: 0%"></i>
+            </div>
+        </div>
+    </article>
+</section>
+
+<section class="panel reveal support-recent-panel">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Simulation</p>
+            <h3>Incoming Reports</h3>
+        </div>
+        <a asp-controller="Support" asp-action="Reports">View All</a>
+    </div>
+    <div class="table-list support-report-list">
+        @foreach (var report in Model.RecentReports)
+        {
+            <div class="table-row support-report-row">
+                <span>@report.Code</span>
+                <strong>@report.Subject</strong>
+                <em class="status-pill">@report.Status</em>
+            </div>
+        }
+    </div>
+</section>

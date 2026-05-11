@@ -28,6 +28,8 @@
 
         public DbSet<UserFavoriteCategory> UserFavoriteCategories => Set<UserFavoriteCategory>();
 
+        public DbSet<SiteFooterSettings> SiteFooterSettings => Set<SiteFooterSettings>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -121,6 +123,12 @@
             modelBuilder.Entity<ContactMessage>(entity =>
             {
                 entity.Property(message => message.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(message => message.Status).HasDefaultValue("New");
+            });
+
+            modelBuilder.Entity<SiteFooterSettings>(entity =>
+            {
+                entity.HasData(new SiteFooterSettings { Id = 1 });
             });
         }
     }

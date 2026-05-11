@@ -16,5 +16,16 @@ namespace Juan_NET.Domain.Entities
         public string Message { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Required, MaxLength(40)]
+        public string Status { get; set; } = "New";
+
+        [MaxLength(180)]
+        public string? StatusChangedByEmail { get; set; }
+
+        public DateTime? StatusChangedAt { get; set; }
+
+        [MaxLength(100)]
+        public string? AdminNote { get; set; }
     }
 }

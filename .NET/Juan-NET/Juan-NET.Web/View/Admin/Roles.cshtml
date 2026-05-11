@@ -72,12 +72,6 @@
                                 <span>@permissionLabel</span>
                             }
                         </div>
-                        <div class="role-user-list">
-                            @foreach (var userRole in role.UserRoles.OrderBy(item => item.User.Email))
-                            {
-                                <span>@userRole.User.Email</span>
-                            }
-                        </div>
                     </div>
                     <div class="role-card-actions">
                         @if (canManageRole)

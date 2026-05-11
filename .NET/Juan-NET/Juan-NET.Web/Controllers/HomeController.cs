@@ -91,6 +91,36 @@ public class HomeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddToCart(int productId, string quantity)
+    {
+        if (!int.TryParse(quantity, out var parsedQuantity) || parsedQuantity < 2 || parsedQuantity % 2 != 0)
+        {
+            TempData["CartMessage"] = "Quantity must be an even whole number.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var product = await _context.Products
+            .Where(product => product.IsActive)
+            .FirstOrDefaultAsync(product => product.Id == productId);
+
+        if (product is null)
+        {
+            TempData["CartMessage"] = "Product was not found.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        if (parsedQuantity > product.StockCount)
+        {
+            TempData["CartMessage"] = "Quantity cannot be greater than stock.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["CartMessage"] = "Product quantity is valid.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> SubscribeEmail(string email)
     {
         if (!string.IsNullOrWhiteSpace(email) && !await _context.Subscribers.AnyAsync(subscriber => subscriber.Email == email))

@@ -9,9 +9,11 @@ namespace Juan_NET.Web.Services
             new(AdminPermissionKeys.Categories, "Categories", "Categories", true),
             new(AdminPermissionKeys.Sliders, "Sliders", "Sliders", true),
             new(AdminPermissionKeys.ContactMessages, "Messages", "ContactMessages", true),
+            new(AdminPermissionKeys.DeleteMessages, "Delete Messages", "ContactMessages", false),
             new(AdminPermissionKeys.Users, "Users", "Users", true),
             new(AdminPermissionKeys.Subscribe, "Subscribe", "Subscribe", true),
-            new(AdminPermissionKeys.Roles, "Roles", "Roles", true)
+            new(AdminPermissionKeys.Roles, "Roles", "Roles", true),
+            new(AdminPermissionKeys.FooterSettings, "Footer", "FooterSettings", true)
         ];
 
         public static IReadOnlyList<AdminPermissionItem> NavItems { get; } =

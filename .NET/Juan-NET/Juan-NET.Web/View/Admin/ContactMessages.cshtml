@@ -5,6 +5,8 @@
     ViewData["PageName"] = "messages";
     ViewData["ActivePage"] = "ContactMessages";
     var search = ViewBag.ContactSearch as string ?? string.Empty;
+    var canDeleteMessages = ViewBag.CanDeleteMessages as bool? ?? false;
+    var statuses = new[] { "New", "In Progress", "Resolved", "Closed" };
 }
 
 @section SidebarCard {
@@ -25,6 +27,11 @@
         <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
     </div>
 </header>
+
+@if (TempData["ContactMessageAdminMessage"] is string adminMessage)
+{
+    <div class="status good admin-message">@adminMessage</div>
+}
 
 <section class="panel reveal">
     <div class="panel-head">
@@ -53,7 +60,44 @@
                         <a href="mailto:@message.Email">@message.Email</a>
                     </div>
                     <p>@message.Message</p>
-                    <span>@message.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                    <div class="message-meta">
+                        <span>Created: @message.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                        <span>Status: @message.Status</span>
+                        @if (!string.IsNullOrWhiteSpace(message.StatusChangedByEmail) && message.StatusChangedAt.HasValue)
+                        {
+                            <span>Changed by @message.StatusChangedByEmail at @message.StatusChangedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(message.AdminNote))
+                        {
+                            <span>Note: @message.AdminNote</span>
+                        }
+                    </div>
+                    <form class="message-admin-form" asp-controller="Admin" asp-action="UpdateContactMessage" method="post">
+                        <input type="hidden" name="id" value="@message.Id" />
+                        <input type="hidden" name="search" value="@search" />
+                        <label>
+                            Status
+                            <select name="status">
+                                @foreach (var status in statuses)
+                                {
+                                    <option value="@status" selected="@(message.Status == status)">@status</option>
+                                }
+                            </select>
+                        </label>
+                        <label>
+                            Note
+                            <input name="adminNote" value="@message.AdminNote" maxlength="100" />
+                        </label>
+                        <button class="primary-button compact-button" type="submit">Save</button>
+                    </form>
+                    @if (canDeleteMessages)
+                    {
+                        <form asp-controller="Admin" asp-action="DeleteContactMessage" method="post" data-confirm="Delete this message?">
+                            <input type="hidden" name="id" value="@message.Id" />
+                            <input type="hidden" name="search" value="@search" />
+                            <button class="danger-button compact-button" type="submit">Delete</button>
+                        </form>
+                    }
                 </article>
             }
         }

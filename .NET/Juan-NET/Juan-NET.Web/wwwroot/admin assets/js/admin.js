@@ -17,6 +17,9 @@
   var subscribeModal = document.querySelector("[data-subscribe-modal]");
   var openSubscribeModal = document.querySelectorAll("[data-open-subscribe-modal]");
   var closeSubscribeModal = document.querySelectorAll("[data-close-subscribe-modal]");
+  var categoryModal = document.querySelector("[data-category-modal]");
+  var openCategoryModal = document.querySelector("[data-open-category-modal]");
+  var closeCategoryModal = document.querySelectorAll("[data-close-category-modal]");
   var roleModal = document.querySelector("[data-role-modal]");
   var openRoleModal = document.querySelector("[data-open-role-modal]");
   var closeRoleModal = document.querySelectorAll("[data-close-role-modal]");
@@ -127,6 +130,10 @@
     body.classList.add("modal-open");
   }
 
+  if (categoryModal && categoryModal.classList.contains("is-open")) {
+    body.classList.add("modal-open");
+  }
+
   if (roleModal && roleModal.classList.contains("is-open")) {
     body.classList.add("modal-open");
   }
@@ -193,6 +200,20 @@
     item.addEventListener("click", function () {
       subscribeModal.classList.remove("is-open");
       body.classList.remove("modal-open");
+    });
+  });
+
+  if (openCategoryModal && categoryModal) {
+    openCategoryModal.addEventListener("click", function () {
+      categoryModal.classList.add("is-open");
+      body.classList.add("modal-open");
+    });
+  }
+
+  closeCategoryModal.forEach(function (item) {
+    item.addEventListener("click", function () {
+      categoryModal.classList.remove("is-open");
+      closeModalBodyIfClear();
     });
   });
 

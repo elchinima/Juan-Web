@@ -455,8 +455,61 @@ namespace Juan_NET.Web.Controllers
             }
 
             ViewBag.ContactSearch = normalizedSearch ?? string.Empty;
+            ViewBag.CanDeleteMessages = await HasCurrentUserPermissionAsync(AdminPermissionKeys.DeleteMessages);
 
             return View(await messagesQuery.OrderByDescending(message => message.CreatedAt).ToListAsync());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminPermission(AdminPermissionKeys.ContactMessages)]
+        public async Task<IActionResult> UpdateContactMessage(int id, string status, string? adminNote, string? search)
+        {
+            var allowedStatuses = new[] { "New", "In Progress", "Resolved", "Closed" };
+            status = allowedStatuses.Contains(status) ? status : "New";
+            adminNote = adminNote?.Trim();
+
+            if (adminNote?.Length > 100)
+            {
+                adminNote = adminNote[..100];
+            }
+
+            var message = await _context.ContactMessages.FindAsync(id);
+
+            if (message is not null)
+            {
+                var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name ?? "Unknown";
+
+                if (!string.Equals(message.Status, status, StringComparison.Ordinal))
+                {
+                    message.Status = status;
+                    message.StatusChangedByEmail = currentUserEmail;
+                    message.StatusChangedAt = DateTime.UtcNow;
+                }
+
+                message.AdminNote = string.IsNullOrWhiteSpace(adminNote) ? null : adminNote;
+                await _context.SaveChangesAsync();
+                TempData["ContactMessageAdminMessage"] = "Message updated successfully.";
+            }
+
+            return RedirectToAction(nameof(ContactMessages), new { search });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminPermission(AdminPermissionKeys.DeleteMessages)]
+        public async Task<IActionResult> DeleteContactMessage(int id, string? search)
+        {
+            var message = await _context.ContactMessages.FindAsync(id);
+
+            if (message is not null)
+            {
+                _context.ContactMessages.Remove(message);
+                await _context.SaveChangesAsync();
+                TempData["ContactMessageAdminMessage"] = "Message deleted successfully.";
+            }
+
+            return RedirectToAction(nameof(ContactMessages), new { search });
         }
 
         [AdminPermission(AdminPermissionKeys.Users)]
@@ -486,6 +539,43 @@ namespace Juan_NET.Web.Controllers
         public async Task<IActionResult> Subscribe(string? userSearch)
         {
             return View(await CreateSubscribeViewModelAsync(new AdminSubscribeViewModel { UserSearch = userSearch }));
+        }
+
+        [AdminPermission(AdminPermissionKeys.FooterSettings)]
+        public async Task<IActionResult> FooterSettings()
+        {
+            return View(MapFooterSettings(await GetFooterSettingsAsync()));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminPermission(AdminPermissionKeys.FooterSettings)]
+        public async Task<IActionResult> FooterSettings(AdminFooterSettingsViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var settings = await GetFooterSettingsAsync();
+            settings.Address = viewModel.Address.Trim();
+            settings.Email = viewModel.Email.Trim();
+            settings.Phone = viewModel.Phone.Trim();
+            settings.AllProductsUrl = NormalizeFooterUrl(viewModel.AllProductsUrl);
+            settings.CategoriesUrl = NormalizeFooterUrl(viewModel.CategoriesUrl);
+            settings.HomeUrl = NormalizeFooterUrl(viewModel.HomeUrl);
+            settings.AboutUrl = NormalizeFooterUrl(viewModel.AboutUrl);
+            settings.ContactUrl = NormalizeFooterUrl(viewModel.ContactUrl);
+            settings.PrivacyUrl = NormalizeFooterUrl(viewModel.PrivacyUrl);
+            settings.FacebookUrl = NormalizeFooterUrl(viewModel.FacebookUrl);
+            settings.TwitterUrl = NormalizeFooterUrl(viewModel.TwitterUrl);
+            settings.LinkedinUrl = NormalizeFooterUrl(viewModel.LinkedinUrl);
+            settings.InstagramUrl = NormalizeFooterUrl(viewModel.InstagramUrl);
+
+            await _context.SaveChangesAsync();
+            TempData["FooterSettingsMessage"] = "Footer settings updated successfully.";
+
+            return RedirectToAction(nameof(FooterSettings));
         }
 
         [HttpPost]
@@ -869,6 +959,64 @@ namespace Juan_NET.Web.Controllers
         private IQueryable<string> GetSubscribeRecipientsQuery()
         {
             return _context.Subscribers.Select(subscriber => subscriber.Email).Distinct();
+        }
+
+        private async Task<bool> HasCurrentUserPermissionAsync(string permissionKey)
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdValue, out var userId))
+            {
+                return false;
+            }
+
+            var permissionKeys = await _context.UserAdminRoles
+                .Where(userRole => userRole.UserId == userId)
+                .SelectMany(userRole => userRole.AdminRole.Permissions)
+                .Select(permission => permission.PermissionKey)
+                .ToListAsync();
+
+            return new AdminAccessResult { Permissions = permissionKeys.ToHashSet(StringComparer.OrdinalIgnoreCase) }.HasPermission(permissionKey);
+        }
+
+        private async Task<SiteFooterSettings> GetFooterSettingsAsync()
+        {
+            var settings = await _context.SiteFooterSettings.FirstOrDefaultAsync(item => item.Id == 1);
+
+            if (settings is not null)
+            {
+                return settings;
+            }
+
+            settings = new SiteFooterSettings { Id = 1 };
+            _context.SiteFooterSettings.Add(settings);
+            await _context.SaveChangesAsync();
+            return settings;
+        }
+
+        private static AdminFooterSettingsViewModel MapFooterSettings(SiteFooterSettings settings)
+        {
+            return new AdminFooterSettingsViewModel
+            {
+                Address = settings.Address,
+                Email = settings.Email,
+                Phone = settings.Phone,
+                AllProductsUrl = settings.AllProductsUrl,
+                CategoriesUrl = settings.CategoriesUrl,
+                HomeUrl = settings.HomeUrl,
+                AboutUrl = settings.AboutUrl,
+                ContactUrl = settings.ContactUrl,
+                PrivacyUrl = settings.PrivacyUrl,
+                FacebookUrl = settings.FacebookUrl,
+                TwitterUrl = settings.TwitterUrl,
+                LinkedinUrl = settings.LinkedinUrl,
+                InstagramUrl = settings.InstagramUrl
+            };
+        }
+
+        private static string NormalizeFooterUrl(string? url)
+        {
+            return string.IsNullOrWhiteSpace(url) ? "#" : url.Trim();
         }
     }
 }
