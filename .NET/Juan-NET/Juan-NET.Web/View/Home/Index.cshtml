@@ -100,9 +100,9 @@
                                 </div>
                                 <p>@categories</p>
                                 <div class="product-action-link">
-                                    <a href="#" data-shop-action="wishlist" data-toggle="tooltip" title="Wishlist"><i class="ion-android-favorite-outline"></i></a>
-                                    <a href="#" data-shop-action="basket" data-toggle="tooltip" title="Add To Cart"><i class="ion-bag"></i></a>
-                                    <a href="#" data-product-quick-view data-toggle="tooltip" title="Quick View"><i class="ion-ios-eye-outline"></i></a>
+                                    <a href="#" data-shop-action="wishlist" data-no-transition data-toggle="tooltip" title="Wishlist"><i class="fa fa-heart-o"></i></a>
+                                    <a href="#" data-shop-action="basket" data-no-transition data-toggle="tooltip" title="Add To Cart"><i class="fa fa-shopping-bag"></i></a>
+                                    <a href="#" data-product-quick-view data-no-transition data-toggle="tooltip" title="Quick View"><i class="fa fa-eye"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -183,7 +183,7 @@
                                 <p data-modal-product-description>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
                                 <p><strong>Category:</strong> <span data-modal-product-categories>-</span></p>
                                 <p><strong>Stock:</strong> <span data-modal-product-stock>-</span></p>
-                                <form asp-controller="Home" asp-action="AddToCart" method="post" class="quantity-cart-box d-flex align-items-center mb-20" data-modal-basket-form>
+                                <form asp-controller="Home" asp-action="AddToCart" method="post" class="quantity-cart-box d-flex align-items-center mb-20" data-modal-basket-form data-no-transition>
                                     <input type="hidden" name="productId" value="" data-modal-product-id />
                                     <div class="quantity">
                                         <div class="pro-qty">

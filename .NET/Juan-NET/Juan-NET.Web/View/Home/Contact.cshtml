@@ -1,6 +1,9 @@
 @model ContactMessageViewModel
+@inject AppDbContext DbContext
 @{
     ViewData["Title"] = "Contact";
+    var footerSettings = await DbContext.SiteFooterSettings.AsNoTracking().FirstOrDefaultAsync(item => item.Id == 1) ?? new SiteFooterSettings();
+    var footerPhoneHref = new string(footerSettings.Phone.Where(item => char.IsDigit(item) || item == '+').ToArray());
 }
 
 @await Html.PartialAsync("_StoreHeader")
@@ -23,9 +26,9 @@
                     <p class="contact-label">Store Desk</p>
                     <h2>We usually answer within one business day.</h2>
                     <ul>
-                        <li><strong>Email</strong><a href="mailto:support@juanstore.com">support@juanstore.com</a></li>
-                        <li><strong>Phone</strong><a href="tel:+00254254565">+ 00 254 254565</a></li>
-                        <li><strong>Address</strong><span>184 Main Rd E, St Albans VIC 3021</span></li>
+                        <li><strong>Email</strong><a href="mailto:@footerSettings.Email">@footerSettings.Email</a></li>
+                        <li><strong>Phone</strong><a href="tel:@footerPhoneHref">@footerSettings.Phone</a></li>
+                        <li><strong>Address</strong><span>@footerSettings.Address</span></li>
                     </ul>
                 </div>
             </div>

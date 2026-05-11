@@ -38,6 +38,17 @@
         .shop-list-close{border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#555}
         .shop-action-message{position:fixed;right:22px;bottom:22px;z-index:10000;background:#222;color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 14px 40px rgba(0,0,0,.22);opacity:0;transform:translateY(12px);transition:.2s}
         .shop-action-message.is-visible{opacity:1;transform:translateY(0)}
+        .header-configure-wrapper{display:flex;justify-content:flex-end}
+        .header-configure-area{padding-right:0}
+        .header-configure-area>.nav{align-items:center;justify-content:flex-end!important;flex-wrap:nowrap;gap:6px}
+        .header-configure-area>.nav>li{margin-left:0}
+        .header-configure-area>.nav>li>a:not(.header-user-name){display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;font-size:20px;border-radius:50%;color:#222}
+        .header-configure-area>.nav>li>a:not(.header-user-name):hover,.header-configure-area>.nav>li>a.is-active{color:#e3a51e;background:#fff7e7}
+        .header-configure-area>.nav>li>a .notification{top:-2px;right:-2px}
+        .header-user-name{display:block;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px!important;font-weight:700;letter-spacing:0;color:#222}
+        .mobile-menu-toggler a[data-open-shop-list]{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px}
+        .mobile-menu-toggler a[data-open-shop-list] .notification{position:absolute;top:0;right:0;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;font-size:10px;color:#fff;background:#e3a51e}
+        .product-action-link a.is-active{color:#fff;background-color:#e3a51e}
         @@media (max-width:575px){.shop-list-row{grid-template-columns:60px 1fr auto}.shop-list-row img{width:60px;height:60px}.shop-list-foot{display:block}.shop-list-total{margin-bottom:12px}}
     </style>
     <script src="~/main assets/js/modernizr-2.8.3.min.js"></script>
@@ -293,10 +304,16 @@
                     stockCount: parseInt(card.dataset.productStock, 10) || 99
                 };
 
+                if (type === "wishlist" && hasItem(summary.wishlistItems, item.productId)) {
+                    removeItem("wishlist", item.productId, "Removed from wishlist");
+                    return;
+                }
+
                 if (isAuthenticated) {
                     post(type === "basket" ? "@Url.Action("AddBasket", "ShopList")" : "@Url.Action("AddWishlist", "ShopList")", { productId: item.productId, quantity: item.quantity })
                         .then(applySummary)
-                        .then(function () { showMessage(type === "basket" ? "Added to basket" : "Added to wishlist"); });
+                        .then(function () { showMessage(type === "basket" ? "Added to basket" : "Added to wishlist"); })
+                        .catch(function () { showMessage("Request failed"); });
                     return;
                 }
 
@@ -313,10 +330,16 @@
                 render();
             }
 
-            function removeItem(type, productId) {
+            function removeItem(type, productId, successMessage) {
                 if (isAuthenticated) {
                     post(type === "basket" ? "@Url.Action("RemoveBasket", "ShopList")" : "@Url.Action("RemoveWishlist", "ShopList")", { productId: productId })
-                        .then(applySummary);
+                        .then(applySummary)
+                        .then(function () {
+                            if (successMessage) {
+                                showMessage(successMessage);
+                            }
+                        })
+                        .catch(function () { showMessage("Request failed"); });
                     return;
                 }
 
@@ -329,6 +352,9 @@
                 }
 
                 render();
+                if (successMessage) {
+                    showMessage(successMessage);
+                }
             }
 
             function refreshState() {
@@ -414,6 +440,7 @@
                 var items = activeList === "basket" ? summary.basketItems : summary.wishlistItems;
                 document.querySelectorAll("[data-basket-count]").forEach(function (item) { item.textContent = countBasket(); });
                 document.querySelectorAll("[data-wishlist-count]").forEach(function (item) { item.textContent = summary.wishlistItems.length; });
+                renderProductStates();
 
                 if (!body) {
                     return;
@@ -478,6 +505,47 @@
 
             function upsertWishlist(items, item) {
                 return items.some(function (saved) { return saved.productId === item.productId; }) ? items : [item].concat(items);
+            }
+
+            function hasItem(items, productId) {
+                return items.some(function (item) { return item.productId === productId; });
+            }
+
+            function renderProductStates() {
+                document.querySelectorAll("[data-product-card]").forEach(function (card) {
+                    var productId = parseInt(card.dataset.productId, 10);
+                    var wishlistLink = card.querySelector("[data-shop-action='wishlist']");
+                    var basketLink = card.querySelector("[data-shop-action='basket']");
+                    var inWishlist = hasItem(summary.wishlistItems, productId);
+                    var inBasket = hasItem(summary.basketItems, productId);
+
+                    setActionState(wishlistLink, inWishlist, inWishlist ? "fa fa-heart" : "fa fa-heart-o", inWishlist ? "Remove from Wishlist" : "Wishlist");
+                    setActionState(basketLink, inBasket, "fa fa-shopping-bag", inBasket ? "Add One More" : "Add To Cart");
+                });
+
+                document.querySelectorAll("[data-open-shop-list='wishlist']").forEach(function (link) {
+                    link.classList.toggle("is-active", summary.wishlistItems.length > 0);
+                });
+
+                document.querySelectorAll("[data-open-shop-list='basket']").forEach(function (link) {
+                    link.classList.toggle("is-active", summary.basketItems.length > 0);
+                });
+            }
+
+            function setActionState(link, active, iconClass, titleText) {
+                if (!link) {
+                    return;
+                }
+
+                link.classList.toggle("is-active", active);
+                link.setAttribute("title", titleText);
+                link.setAttribute("aria-label", titleText);
+                link.setAttribute("data-original-title", titleText);
+
+                var icon = link.querySelector("i");
+                if (icon) {
+                    icon.className = iconClass;
+                }
             }
 
             function countBasket() {

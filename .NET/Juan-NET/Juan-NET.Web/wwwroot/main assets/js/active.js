@@ -363,6 +363,12 @@
 				return false;
 			}
 
+			var rawHref = link.getAttribute('href');
+
+			if (!rawHref || rawHref === '#' || rawHref.toLowerCase().indexOf('javascript:') === 0 || link.matches('[data-open-shop-list], [data-shop-action], [data-product-quick-view]')) {
+				return false;
+			}
+
 			if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.defaultPrevented) {
 				return false;
 			}
