@@ -1,0 +1,38 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Delivery Information";
+}
+
+@await Html.PartialAsync("_ProfileHeader")
+
+<section class="profile-page">
+    <div class="container">
+        <section class="profile-card">
+            <span class="auth-kicker">Delivery</span>
+            <h2>Delivery Information</h2>
+            <form asp-controller="Account" asp-action="UpdateDeliveryInformation" method="post" class="auth-form">
+                <label>
+                    Recipient full name
+                    <input asp-for="DeliveryRecipientFullName" />
+                    <span asp-validation-for="DeliveryRecipientFullName" class="status off"></span>
+                </label>
+                <label>
+                    Address 1
+                    <input asp-for="DeliveryAddressLine1" />
+                    <span asp-validation-for="DeliveryAddressLine1" class="status off"></span>
+                </label>
+                <label>
+                    Address 2
+                    <input asp-for="DeliveryAddressLine2" />
+                    <span asp-validation-for="DeliveryAddressLine2" class="status off"></span>
+                </label>
+                <label>
+                    FIN
+                    <input asp-for="DeliveryFin" maxlength="7" />
+                    <span asp-validation-for="DeliveryFin" class="status off"></span>
+                </label>
+                <button class="auth-submit" type="submit">Save delivery information</button>
+            </form>
+        </section>
+    </div>
+</section>

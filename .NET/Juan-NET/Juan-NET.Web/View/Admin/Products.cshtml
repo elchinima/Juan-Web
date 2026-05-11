@@ -73,7 +73,16 @@
                     <div class="product-thumb">@product.Name[..Math.Min(product.Name.Length, 2)].ToUpper()</div>
                     <div><strong>@product.Name</strong><span>@string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name))</span></div>
                     <em>@product.Price.ToString("C")</em>
-                    <small class="status @(product.IsActive ? (product.StockCount <= 5 ? "warn" : "good") : "off")">@(product.IsActive ? (product.StockCount <= 5 ? "Low Stock" : "In Stock") : "Draft")</small>
+                    <small class="status @(product.StockCount < 1 ? "off" : (product.IsActive ? (product.StockCount <= 5 ? "warn" : "good") : "off"))">
+                        @if (product.StockCount < 1)
+                        {
+                            <text>Out of stock</text>
+                        }
+                        else
+                        {
+                            <text>@(product.IsActive ? (product.StockCount <= 5 ? "Low Stock" : "In Stock") : "Draft")</text>
+                        }
+                    </small>
                     <button class="ghost-button compact-button" type="button"
                             data-open-edit-product-modal
                             data-product-id="@product.Id"

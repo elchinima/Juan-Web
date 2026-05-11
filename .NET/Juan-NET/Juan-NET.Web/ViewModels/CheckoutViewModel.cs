@@ -10,6 +10,14 @@ namespace Juan_NET.Web.ViewModels
 
         public bool IsStripeConfigured { get; set; }
 
+        public bool HasDeliveryInformation { get; set; }
+
+        public string? PromoCode { get; set; }
+
         public decimal Total => Items.Sum(item => item.Total);
+
+        public decimal DeliveryTotal => Items.Sum(item => Math.Round(item.Total * 0.10m, 2, MidpointRounding.AwayFromZero));
+
+        public decimal PayableTotal => Total + DeliveryTotal;
     }
 }

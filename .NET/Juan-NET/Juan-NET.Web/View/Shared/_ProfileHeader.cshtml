@@ -1,0 +1,37 @@
+@{
+    var rawUserName = User.Identity?.Name ?? string.Empty;
+    var displayUserName = rawUserName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? rawUserName;
+    displayUserName = displayUserName.Length > 14 ? $"{displayUserName[..14]}..." : displayUserName;
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+}
+
+<header class="profile-header">
+    <div class="container">
+        <div class="profile-navbar">
+            <a class="profile-brand" asp-controller="Home" asp-action="Index">
+                <img src="~/main assets/img/logo/logo.png" alt="Juan" />
+            </a>
+            <nav class="profile-nav" aria-label="Profile navigation">
+                <a class="@(currentAction == "Profile" ? "active" : "")" asp-controller="Account" asp-action="Profile">Profile</a>
+                <a class="@(currentAction == "Security" ? "active" : "")" asp-controller="Account" asp-action="Security">Security</a>
+                <a class="@(currentAction == "DeliveryInformation" || currentAction == "Addresses" ? "active" : "")" asp-controller="Account" asp-action="DeliveryInformation">Delivery Information</a>
+                <a class="@(currentAction == "Orders" ? "active" : "")" asp-controller="Account" asp-action="Orders">Orders</a>
+            </nav>
+            <div class="profile-nav-actions">
+                <a asp-controller="Products" asp-action="Index" title="Shop"><i class="fa fa-shopping-bag"></i></a>
+                <a href="#" data-open-shop-list="wishlist" data-no-transition title="Wishlist">
+                    <i class="fa fa-heart-o"></i>
+                    <span data-wishlist-count>0</span>
+                </a>
+                <a href="#" data-open-shop-list="basket" data-no-transition title="Basket">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span data-basket-count>0</span>
+                </a>
+                <span class="profile-nav-user" title="@rawUserName">@displayUserName</span>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>

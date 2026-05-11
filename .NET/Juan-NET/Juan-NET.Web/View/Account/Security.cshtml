@@ -1,0 +1,52 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Security";
+}
+
+@await Html.PartialAsync("_ProfileHeader")
+
+<section class="profile-page">
+    <div class="container">
+        @if (TempData["ProfileMessage"] is string message)
+        {
+            <div class="auth-alert">@message</div>
+        }
+
+        <div class="profile-grid">
+            <section class="profile-card">
+                <h2>Two-factor authentication</h2>
+                <p class="profile-muted">When enabled, login requires a six-digit code sent to your email.</p>
+                <form asp-controller="Account" asp-action="ToggleTwoFactor" method="post" class="profile-toggle">
+                    <label>
+                        <input type="checkbox" name="isTwoFactorEnabled" value="true" checked="@Model.IsTwoFactorEnabled" />
+                        Email 2FA
+                    </label>
+                    <button class="profile-secondary" type="submit">Save security</button>
+                </form>
+            </section>
+
+            <section class="profile-card">
+                <h2>Change password</h2>
+                <p class="profile-muted">A confirmation link will be sent to your email before the new password is applied.</p>
+                <form asp-controller="Account" asp-action="RequestPasswordChange" method="post" class="auth-form">
+                    <label>
+                        Current password
+                        <input asp-for="ChangePassword.CurrentPassword" placeholder="Current password" />
+                        <span asp-validation-for="ChangePassword.CurrentPassword" class="text-danger"></span>
+                    </label>
+                    <label>
+                        New password
+                        <input asp-for="ChangePassword.NewPassword" placeholder="New password" />
+                        <span asp-validation-for="ChangePassword.NewPassword" class="text-danger"></span>
+                    </label>
+                    <label>
+                        Confirm new password
+                        <input asp-for="ChangePassword.ConfirmNewPassword" placeholder="Repeat password" />
+                        <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="text-danger"></span>
+                    </label>
+                    <button class="auth-submit" type="submit">Send confirmation</button>
+                </form>
+            </section>
+        </div>
+    </div>
+</section>

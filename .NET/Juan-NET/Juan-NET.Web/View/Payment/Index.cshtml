@@ -39,13 +39,15 @@
                         <div class="payment-items">
                             @foreach (var item in Model.Items)
                             {
+                                var delivery = Math.Round(item.Total * 0.10m, 2, MidpointRounding.AwayFromZero);
                                 <div class="payment-item">
                                     <img src="@item.ImageUrl" alt="@item.Name" />
                                     <div>
                                         <h4>@item.Name</h4>
                                         <p>Qty: @item.Quantity</p>
+                                        <p>Delivery: @delivery.ToString("C")</p>
                                     </div>
-                                    <strong>@item.Total.ToString("C")</strong>
+                                    <strong>@((item.Total + delivery).ToString("C"))</strong>
                                 </div>
                             }
                         </div>
@@ -60,15 +62,34 @@
                         <strong>@Model.Total.ToString("C")</strong>
                     </div>
                     <div class="payment-total-row">
+                        <span>Delivery</span>
+                        <strong>@Model.DeliveryTotal.ToString("C")</strong>
+                    </div>
+                    <div class="payment-total-row payment-grand-total">
+                        <span>Total</span>
+                        <strong>@Model.PayableTotal.ToString("C")</strong>
+                    </div>
+                    <div class="payment-total-row">
                         <span>Currency</span>
                         <strong>@Model.Currency.ToUpperInvariant()</strong>
                     </div>
+                    @if (!Model.HasDeliveryInformation)
+                    {
+                        <div class="alert alert-warning">
+                            Add delivery information before checkout.
+                            <a asp-controller="Account" asp-action="DeliveryInformation">Open Delivery Information</a>
+                        </div>
+                    }
                     @if (!Model.IsStripeConfigured)
                     {
                         <div class="alert alert-warning">Add Stripe PublishableKey and SecretKey in appsettings first.</div>
                     }
                     <form id="stripe-checkout-form" asp-controller="Payment" asp-action="CreateCheckoutSession" method="post">
-                        <button class="btn btn-hero w-100" type="submit" disabled="@(!Model.Items.Any() || !Model.IsStripeConfigured)">
+                        <label class="promo-code-label">
+                            Promo code
+                            <input asp-for="PromoCode" autocomplete="off" placeholder="Optional" />
+                        </label>
+                        <button class="btn btn-hero w-100" type="submit" disabled="@(!Model.Items.Any() || !Model.IsStripeConfigured || !Model.HasDeliveryInformation)">
                             Pay with Stripe
                         </button>
                     </form>
@@ -89,6 +110,9 @@
     .payment-item p{margin:0;color:#777}
     .payment-total-card{position:sticky;top:104px}
     .payment-total-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0;color:#222}
+    .payment-grand-total{font-size:18px}
+    .promo-code-label{display:block;margin:18px 0 14px;color:#222;font-weight:600}
+    .promo-code-label input{display:block;width:100%;height:44px;border:1px solid #e5e5e5;border-radius:6px;padding:0 12px;margin-top:8px;font-weight:400}
     .payment-note{margin:14px 0 0;color:#777;font-size:14px}
     @@media (max-width:575px){.payment-item{grid-template-columns:64px 1fr}.payment-item strong{grid-column:2}.payment-item img{width:64px;height:64px}}
 </style>
@@ -115,11 +139,14 @@
                     method: "POST",
                     headers: {
                         "RequestVerificationToken": form.querySelector("input[name='__RequestVerificationToken']").value
-                    }
+                    },
+                    body: new FormData(form)
                 })
                     .then(function (response) {
                         if (!response.ok) {
-                            throw new Error("Stripe checkout session was not created.");
+                            return response.json().then(function (data) {
+                                throw new Error(data.message || "Stripe checkout session was not created.");
+                            });
                         }
 
                         return response.json();
@@ -127,13 +154,13 @@
                     .then(function (data) {
                         return Stripe("@Model.PublishableKey").redirectToCheckout({ sessionId: data.sessionId });
                     })
-                    .catch(function () {
+                    .catch(function (error) {
                         if (button) {
                             button.disabled = false;
                             button.textContent = "Pay with Stripe";
                         }
 
-                        alert("Payment could not be started. Check Stripe settings and try again.");
+                        alert(error.message || "Payment could not be started. Check Stripe settings and try again.");
                     });
             });
         })();

@@ -21,6 +21,18 @@ namespace Juan_NET.Domain.Entities
         [MaxLength(300)]
         public string? ProfileImageUrl { get; set; }
 
+        [MaxLength(80)]
+        public string? DeliveryRecipientFullName { get; set; }
+
+        [MaxLength(180)]
+        public string? DeliveryAddressLine1 { get; set; }
+
+        [MaxLength(180)]
+        public string? DeliveryAddressLine2 { get; set; }
+
+        [MaxLength(7)]
+        public string? DeliveryFin { get; set; }
+
         [MaxLength(60)]
         public string? ExternalProvider { get; set; }
 
@@ -68,5 +80,7 @@ namespace Juan_NET.Domain.Entities
         public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
 
         public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
+
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

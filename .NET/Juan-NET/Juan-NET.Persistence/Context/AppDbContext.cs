@@ -34,6 +34,10 @@
 
         public DbSet<SiteFooterSettings> SiteFooterSettings => Set<SiteFooterSettings>();
 
+        public DbSet<Order> Orders => Set<Order>();
+
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -67,6 +71,38 @@
             {
                 entity.HasIndex(user => user.Email).IsUnique();
                 entity.Property(user => user.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.Property(order => order.Subtotal).HasColumnType("decimal(18,2)");
+                entity.Property(order => order.DeliveryTotal).HasColumnType("decimal(18,2)");
+                entity.Property(order => order.DiscountTotal).HasColumnType("decimal(18,2)");
+                entity.Property(order => order.Total).HasColumnType("decimal(18,2)");
+                entity.Property(order => order.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(order => order.StripeSessionId).IsUnique().HasFilter("[StripeSessionId] IS NOT NULL");
+
+                entity.HasOne(order => order.User)
+                    .WithMany(user => user.Orders)
+                    .HasForeignKey(order => order.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<OrderItem>(entity =>
+            {
+                entity.Property(item => item.UnitPrice).HasColumnType("decimal(18,2)");
+                entity.Property(item => item.UnitDeliveryPrice).HasColumnType("decimal(18,2)");
+                entity.Property(item => item.LineTotal).HasColumnType("decimal(18,2)");
+
+                entity.HasOne(item => item.Order)
+                    .WithMany(order => order.Items)
+                    .HasForeignKey(item => item.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(item => item.Product)
+                    .WithMany(product => product.OrderItems)
+                    .HasForeignKey(item => item.ProductId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<AdminRole>(entity =>

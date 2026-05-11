@@ -81,7 +81,8 @@
                         var imageUrl = string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/main assets/img/product/product-1.jpg") : product.ImageUrl;
                         var categories = string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name));
                         var description = string.IsNullOrWhiteSpace(product.Description) ? "No description available." : product.Description;
-                        <div class="product-item mb-50"
+                        var isOutOfStock = product.StockCount < 1;
+                        <div class="product-item mb-50 @(isOutOfStock ? "is-out-of-stock" : "")"
                              data-product-card
                              data-product-id="@product.Id"
                              data-product-name="@product.Name"
@@ -89,9 +90,14 @@
                              data-product-image="@imageUrl"
                              data-product-description="@description"
                              data-product-categories="@categories"
-                             data-product-stock="@product.StockCount">
+                             data-product-stock="@product.StockCount"
+                             data-product-out-of-stock="@isOutOfStock.ToString().ToLowerInvariant()">
                             <div class="product-thumb">
                                 <a href="#" data-product-quick-view><img src="@imageUrl" alt="@product.Name" /></a>
+                                @if (isOutOfStock)
+                                {
+                                    <span class="product-stock-badge">Out of stock</span>
+                                }
                             </div>
                             <div class="product-content">
                                 <h5 class="product-name"><a href="#" data-product-quick-view>@product.Name</a></h5>
@@ -99,11 +105,14 @@
                                     <span class="price-regular">@product.Price.ToString("C")</span>
                                 </div>
                                 <p>@categories</p>
-                                <div class="product-action-link">
-                                    <a href="#" data-shop-action="wishlist" data-no-transition data-toggle="tooltip" title="Wishlist"><i class="fa fa-heart-o"></i></a>
-                                    <a href="#" data-shop-action="basket" data-no-transition data-toggle="tooltip" title="Add To Cart"><i class="fa fa-shopping-bag"></i></a>
-                                    <a href="#" data-product-quick-view data-no-transition data-toggle="tooltip" title="Quick View"><i class="fa fa-eye"></i></a>
-                                </div>
+                                @if (!isOutOfStock)
+                                {
+                                    <div class="product-action-link">
+                                        <a href="#" data-shop-action="wishlist" data-no-transition data-toggle="tooltip" title="Wishlist"><i class="fa fa-heart-o"></i></a>
+                                        <a href="#" data-shop-action="basket" data-no-transition data-toggle="tooltip" title="Add To Cart"><i class="fa fa-shopping-bag"></i></a>
+                                        <a href="#" data-product-quick-view data-no-transition data-toggle="tooltip" title="Quick View"><i class="fa fa-eye"></i></a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }
@@ -209,6 +218,11 @@
 
             cards.forEach(function (card) {
                 card.addEventListener("click", function (event) {
+                    if (card.dataset.productOutOfStock === "true") {
+                        event.preventDefault();
+                        return;
+                    }
+
                     var ignoredAction = event.target.closest(".product-action-link a:not([data-product-quick-view])");
 
                     if (ignoredAction) {

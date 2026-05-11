@@ -413,6 +413,67 @@ namespace Juan_NET.Web.Controllers
         }
 
         [Authorize]
+        public async Task<IActionResult> Security()
+        {
+            var user = await GetCurrentUserAsync();
+            return user is null ? RedirectToAction(nameof(Login)) : View(CreateProfileViewModel(user));
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Addresses()
+        {
+            return RedirectToAction(nameof(DeliveryInformation));
+        }
+
+        [Authorize]
+        public async Task<IActionResult> DeliveryInformation()
+        {
+            var user = await GetCurrentUserAsync();
+            return user is null ? RedirectToAction(nameof(Login)) : View(CreateProfileViewModel(user));
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Orders()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user is null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var orders = await _context.Orders
+                .Where(order => order.UserId == user.Id)
+                .OrderByDescending(order => order.CreatedAt)
+                .Select(order => new ProfileOrderViewModel
+                {
+                    Id = order.Id,
+                    CreatedAt = order.CreatedAt,
+                    Status = order.Status,
+                    Currency = order.Currency,
+                    Subtotal = order.Subtotal,
+                    DeliveryTotal = order.DeliveryTotal,
+                    DiscountTotal = order.DiscountTotal,
+                    Total = order.Total,
+                    PromoCode = order.PromoCode,
+                    Items = order.Items
+                        .OrderBy(item => item.Id)
+                        .Select(item => new ProfileOrderItemViewModel
+                        {
+                            ProductName = item.ProductName,
+                            ImageUrl = item.ProductImageUrl ?? "/main assets/img/product/product-1.jpg",
+                            Quantity = item.Quantity,
+                            UnitPrice = item.UnitPrice,
+                            UnitDeliveryPrice = item.UnitDeliveryPrice,
+                            LineTotal = item.LineTotal
+                        })
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return View(CreateProfileViewModel(user, orders: orders));
+        }
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProfile(ProfileViewModel viewModel)
@@ -420,7 +481,11 @@ namespace Juan_NET.Web.Controllers
             ModelState.Remove(nameof(ProfileViewModel.Users));
             ModelState.Remove(nameof(ProfileViewModel.ImageFile));
             ModelState.Remove(nameof(ProfileViewModel.Email));
-            ModelState.Remove(nameof(ProfileViewModel.ChangePassword));
+            RemoveModelStateEntries(nameof(ProfileViewModel.ChangePassword));
+            ModelState.Remove(nameof(ProfileViewModel.DeliveryRecipientFullName));
+            ModelState.Remove(nameof(ProfileViewModel.DeliveryAddressLine1));
+            ModelState.Remove(nameof(ProfileViewModel.DeliveryAddressLine2));
+            ModelState.Remove(nameof(ProfileViewModel.DeliveryFin));
 
             var user = await GetCurrentUserAsync();
 
@@ -445,6 +510,45 @@ namespace Juan_NET.Web.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDeliveryInformation(ProfileViewModel viewModel)
+        {
+            ModelState.Remove(nameof(ProfileViewModel.Users));
+            ModelState.Remove(nameof(ProfileViewModel.ImageFile));
+            ModelState.Remove(nameof(ProfileViewModel.Email));
+            ModelState.Remove(nameof(ProfileViewModel.FullName));
+            RemoveModelStateEntries(nameof(ProfileViewModel.ChangePassword));
+
+            var user = await GetCurrentUserAsync();
+
+            if (user is null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var invalidViewModel = CreateProfileViewModel(user);
+                invalidViewModel.DeliveryRecipientFullName = viewModel.DeliveryRecipientFullName;
+                invalidViewModel.DeliveryAddressLine1 = viewModel.DeliveryAddressLine1;
+                invalidViewModel.DeliveryAddressLine2 = viewModel.DeliveryAddressLine2;
+                invalidViewModel.DeliveryFin = viewModel.DeliveryFin;
+                return View("DeliveryInformation", invalidViewModel);
+            }
+
+            user.DeliveryRecipientFullName = viewModel.DeliveryRecipientFullName.Trim();
+            user.DeliveryAddressLine1 = viewModel.DeliveryAddressLine1.Trim();
+            user.DeliveryAddressLine2 = string.IsNullOrWhiteSpace(viewModel.DeliveryAddressLine2) ? null : viewModel.DeliveryAddressLine2.Trim();
+            user.DeliveryFin = viewModel.DeliveryFin.Trim().ToUpperInvariant();
+
+            await _context.SaveChangesAsync();
+            TempData["ProfileMessage"] = "Delivery information saved successfully.";
+
+            return RedirectToAction(nameof(DeliveryInformation));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleTwoFactor(bool isTwoFactorEnabled)
         {
             var user = await GetCurrentUserAsync();
@@ -458,7 +562,7 @@ namespace Juan_NET.Web.Controllers
             await _context.SaveChangesAsync();
             TempData["ProfileMessage"] = user.IsTwoFactorEnabled ? "Two-factor authentication enabled." : "Two-factor authentication disabled.";
 
-            return RedirectToAction(nameof(Profile));
+            return RedirectToAction(nameof(Security));
         }
 
         [Authorize]
@@ -479,7 +583,7 @@ namespace Juan_NET.Web.Controllers
             if (!ModelState.IsValid || !VerifySecret(viewModel.ChangePassword.CurrentPassword, user.PasswordHash, user.PasswordSalt))
             {
                 ModelState.AddModelError($"{nameof(ProfileViewModel.ChangePassword)}.{nameof(ChangePasswordViewModel.CurrentPassword)}", "Current password is incorrect.");
-                return View("Profile", CreateProfileViewModel(user, viewModel.ChangePassword));
+                return View("Security", CreateProfileViewModel(user, viewModel.ChangePassword));
             }
 
             var (passwordHash, passwordSalt) = HashSecret(viewModel.ChangePassword.NewPassword);
@@ -496,7 +600,7 @@ namespace Juan_NET.Web.Controllers
             await _emailService.SendAsync(user.Email, "Juan password change confirmation", $"<p>Confirm your password change here:</p><p><a href=\"{link}\">Confirm password change</a></p>");
             TempData["ProfileMessage"] = "A confirmation link has been sent to your email.";
 
-            return RedirectToAction(nameof(Profile));
+            return RedirectToAction(nameof(Security));
         }
 
         public async Task<IActionResult> ConfirmPasswordChange(string email, string token)
@@ -612,8 +716,10 @@ namespace Juan_NET.Web.Controllers
             await _emailService.SendAsync(user.Email, "Juan verification code", $"<p>Your Juan login code is <strong>{code}</strong>.</p><p>It expires in 10 minutes.</p>");
         }
 
-        private static ProfileViewModel CreateProfileViewModel(User user, ChangePasswordViewModel? changePassword = null)
+        private static ProfileViewModel CreateProfileViewModel(User user, ChangePasswordViewModel? changePassword = null, List<ProfileOrderViewModel>? orders = null)
         {
+            var hasDeliveryInformation = HasDeliveryInformation(user);
+
             return new ProfileViewModel
             {
                 UserId = user.Id,
@@ -621,8 +727,30 @@ namespace Juan_NET.Web.Controllers
                 Email = user.Email,
                 ProfileImageUrl = user.ProfileImageUrl,
                 IsTwoFactorEnabled = user.IsTwoFactorEnabled,
-                ChangePassword = changePassword ?? new ChangePasswordViewModel()
+                DeliveryRecipientFullName = user.DeliveryRecipientFullName ?? string.Empty,
+                DeliveryAddressLine1 = user.DeliveryAddressLine1 ?? string.Empty,
+                DeliveryAddressLine2 = user.DeliveryAddressLine2,
+                DeliveryFin = user.DeliveryFin ?? string.Empty,
+                HasDeliveryInformation = hasDeliveryInformation,
+                ChangePassword = changePassword ?? new ChangePasswordViewModel(),
+                Orders = orders ?? new List<ProfileOrderViewModel>()
             };
+        }
+
+        private static bool HasDeliveryInformation(User user)
+        {
+            return !string.IsNullOrWhiteSpace(user.DeliveryRecipientFullName) &&
+                !string.IsNullOrWhiteSpace(user.DeliveryAddressLine1) &&
+                !string.IsNullOrWhiteSpace(user.DeliveryFin) &&
+                user.DeliveryFin.Trim().Length == 7;
+        }
+
+        private void RemoveModelStateEntries(string prefix)
+        {
+            foreach (var key in ModelState.Keys.Where(key => key == prefix || key.StartsWith($"{prefix}.", StringComparison.Ordinal)).ToList())
+            {
+                ModelState.Remove(key);
+            }
         }
 
         private static (string Hash, string Salt) HashSecret(string value)

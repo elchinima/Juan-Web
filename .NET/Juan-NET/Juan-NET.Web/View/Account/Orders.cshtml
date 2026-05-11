@@ -1,0 +1,80 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Orders";
+}
+
+@await Html.PartialAsync("_ProfileHeader")
+
+<section class="profile-page">
+    <div class="container">
+        <section class="profile-card @(Model.Orders.Any() ? "" : "profile-empty-card")">
+            <span class="auth-kicker">History</span>
+            <h2>Orders</h2>
+            @if (!Model.Orders.Any())
+            {
+                <p class="profile-muted">Your orders will appear here after checkout.</p>
+                <a class="auth-submit" asp-controller="Products" asp-action="Index">Start shopping</a>
+            }
+            else
+            {
+                <div class="profile-orders">
+                    @foreach (var order in Model.Orders)
+                    {
+                        <article class="profile-order">
+                            <div class="profile-order-head">
+                                <div>
+                                    <strong>Order #@order.Id</strong>
+                                    <span>@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                                </div>
+                                <span>@order.Status</span>
+                            </div>
+                            <div class="profile-order-items">
+                                @foreach (var item in order.Items)
+                                {
+                                    <div class="profile-order-item">
+                                        <img src="@item.ImageUrl" alt="@item.ProductName" />
+                                        <div>
+                                            <h3>@item.ProductName</h3>
+                                            <p>Qty: @item.Quantity</p>
+                                            <p>Delivery: @item.UnitDeliveryPrice.ToString("C") each</p>
+                                        </div>
+                                        <strong>@item.LineTotal.ToString("C")</strong>
+                                    </div>
+                                }
+                            </div>
+                            <div class="profile-order-total">
+                                <span>Subtotal: @order.Subtotal.ToString("C")</span>
+                                <span>Delivery: @order.DeliveryTotal.ToString("C")</span>
+                                @if (order.DiscountTotal > 0)
+                                {
+                                    <span>Discount: -@order.DiscountTotal.ToString("C")</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(order.PromoCode))
+                                {
+                                    <span>Promo: @order.PromoCode</span>
+                                }
+                                <strong>Total: @order.Total.ToString("C") @order.Currency.ToUpperInvariant()</strong>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</section>
+
+<style>
+    .profile-orders{display:grid;gap:18px}
+    .profile-order{border:1px solid #eee;border-radius:8px;padding:18px;text-align:left}
+    .profile-order-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:1px solid #f1f1f1;padding-bottom:14px;margin-bottom:14px}
+    .profile-order-head strong{display:block;color:#222}
+    .profile-order-head span{color:#777;font-size:14px}
+    .profile-order-items{display:grid;gap:12px}
+    .profile-order-item{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center}
+    .profile-order-item img{width:64px;height:64px;object-fit:cover;border-radius:8px;background:#f6f6f6}
+    .profile-order-item h3{font-size:15px;margin:0 0 6px;color:#222}
+    .profile-order-item p{margin:0;color:#777;font-size:14px}
+    .profile-order-total{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid #f1f1f1;color:#555}
+    .profile-order-total strong{color:#222}
+    @@media (max-width:575px){.profile-order-head{display:block}.profile-order-item{grid-template-columns:56px 1fr}.profile-order-item strong{grid-column:2}.profile-order-total{display:grid;justify-content:stretch}}
+</style>

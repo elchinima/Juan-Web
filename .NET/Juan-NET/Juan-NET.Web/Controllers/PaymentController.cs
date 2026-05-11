@@ -29,7 +29,8 @@ namespace Juan_NET.Web.Controllers
                 Items = await BuildBasketAsync(userId.Value),
                 PublishableKey = _stripeSettings.PublishableKey,
                 Currency = _stripeSettings.Currency,
-                IsStripeConfigured = _stripeSettings.IsConfigured
+                IsStripeConfigured = _stripeSettings.IsConfigured,
+                HasDeliveryInformation = await HasDeliveryInformationAsync(userId.Value)
             };
 
             return View(viewModel);
@@ -37,12 +38,23 @@ namespace Juan_NET.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCheckoutSession()
+        public async Task<IActionResult> CreateCheckoutSession(string? promoCode)
         {
             var userId = GetUserId();
             if (userId is null)
             {
                 return Unauthorized(new { message = "Please sign in before checkout." });
+            }
+
+            var user = await _context.Users.FindAsync(userId.Value);
+            if (user is null)
+            {
+                return Unauthorized(new { message = "Please sign in before checkout." });
+            }
+
+            if (!HasDeliveryInformation(user))
+            {
+                return BadRequest(new { message = "Add delivery information before checkout." });
             }
 
             if (!_stripeSettings.IsConfigured)
@@ -62,6 +74,13 @@ namespace Juan_NET.Web.Controllers
             }
 
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+            var normalizedPromoCode = string.IsNullOrWhiteSpace(promoCode) ? null : promoCode.Trim();
+            var promotionCodeId = await FindPromotionCodeIdAsync(normalizedPromoCode);
+
+            if (!string.IsNullOrWhiteSpace(normalizedPromoCode) && string.IsNullOrWhiteSpace(promotionCodeId))
+            {
+                return BadRequest(new { message = "Promo code was not found." });
+            }
 
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var sessionOptions = new SessionCreateOptions
@@ -70,28 +89,46 @@ namespace Juan_NET.Web.Controllers
                 SuccessUrl = $"{baseUrl}{Url.Action(nameof(Success), "Payment")}?session_id={{CHECKOUT_SESSION_ID}}",
                 CancelUrl = $"{baseUrl}{Url.Action(nameof(Cancel), "Payment")}",
                 ClientReferenceId = userId.Value.ToString(CultureInfo.InvariantCulture),
-                CustomerEmail = await _context.Users
-                    .Where(user => user.Id == userId.Value)
-                    .Select(user => user.Email)
-                    .FirstOrDefaultAsync(),
+                CustomerEmail = user.Email,
+                AllowPromotionCodes = string.IsNullOrWhiteSpace(promotionCodeId),
                 Metadata = new Dictionary<string, string>
                 {
                     ["userId"] = userId.Value.ToString(CultureInfo.InvariantCulture),
-                    ["basket"] = string.Join(",", basketItems.Select(item => $"{item.ProductId}:{Math.Min(item.Quantity, item.Product.StockCount)}"))
+                    ["basket"] = string.Join(",", basketItems.Select(item => $"{item.ProductId}:{Math.Min(item.Quantity, item.Product.StockCount)}")),
+                    ["promoCode"] = normalizedPromoCode ?? string.Empty
                 },
-                LineItems = basketItems.Select(item => new SessionLineItemOptions
+                Discounts = string.IsNullOrWhiteSpace(promotionCodeId)
+                    ? null
+                    : new List<SessionDiscountOptions> { new() { PromotionCode = promotionCodeId } },
+                LineItems = basketItems.SelectMany(item => new[]
                 {
-                    Quantity = Math.Min(item.Quantity, item.Product.StockCount),
-                    PriceData = new SessionLineItemPriceDataOptions
+                    new SessionLineItemOptions
                     {
-                        Currency = NormalizeCurrency(_stripeSettings.Currency),
-                        UnitAmount = ToStripeAmount(item.Product.Price),
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        Quantity = Math.Min(item.Quantity, item.Product.StockCount),
+                        PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Name = item.Product.Name,
-                            Images = string.IsNullOrWhiteSpace(item.Product.ImageUrl)
-                                ? null
-                                : new List<string> { BuildAbsoluteUrl(item.Product.ImageUrl) }
+                            Currency = NormalizeCurrency(_stripeSettings.Currency),
+                            UnitAmount = ToStripeAmount(item.Product.Price),
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = item.Product.Name,
+                                Images = string.IsNullOrWhiteSpace(item.Product.ImageUrl)
+                                    ? null
+                                    : new List<string> { BuildAbsoluteUrl(item.Product.ImageUrl) }
+                            }
+                        }
+                    },
+                    new SessionLineItemOptions
+                    {
+                        Quantity = Math.Min(item.Quantity, item.Product.StockCount),
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = NormalizeCurrency(_stripeSettings.Currency),
+                            UnitAmount = ToStripeAmount(GetDeliveryPrice(item.Product.Price)),
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"Delivery - {item.Product.Name}"
+                            }
                         }
                     }
                 }).ToList()
@@ -171,19 +208,111 @@ namespace Juan_NET.Web.Controllers
                 return;
             }
 
+            if (!string.IsNullOrWhiteSpace(session.Id) && await _context.Orders.AnyAsync(order => order.StripeSessionId == session.Id))
+            {
+                return;
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null || !HasDeliveryInformation(user))
+            {
+                return;
+            }
+
             var basketItems = await _context.BasketItems
                 .Include(item => item.Product)
                 .Where(item => item.UserId == userId && paidItems.Keys.Contains(item.ProductId))
                 .ToListAsync();
 
+            if (!basketItems.Any())
+            {
+                return;
+            }
+
+            var order = new Order
+            {
+                UserId = userId,
+                RecipientFullName = user.DeliveryRecipientFullName!.Trim(),
+                AddressLine1 = user.DeliveryAddressLine1!.Trim(),
+                AddressLine2 = string.IsNullOrWhiteSpace(user.DeliveryAddressLine2) ? null : user.DeliveryAddressLine2.Trim(),
+                Fin = user.DeliveryFin!.Trim().ToUpperInvariant(),
+                StripeSessionId = session.Id,
+                PromoCode = session.Metadata is not null && session.Metadata.TryGetValue("promoCode", out var promoCode) && !string.IsNullOrWhiteSpace(promoCode) ? promoCode : null,
+                Currency = NormalizeCurrency(session.Currency ?? _stripeSettings.Currency),
+                Status = "Paid",
+                DiscountTotal = ToDecimalAmount(session.TotalDetails?.AmountDiscount),
+                CreatedAt = DateTime.UtcNow
+            };
+
             foreach (var item in basketItems)
             {
                 var paidQuantity = paidItems[item.ProductId];
-                item.Product.StockCount = Math.Max(0, item.Product.StockCount - Math.Min(item.Quantity, paidQuantity));
+                var quantity = Math.Min(item.Quantity, paidQuantity);
+                var unitDeliveryPrice = GetDeliveryPrice(item.Product.Price);
+                var lineTotal = (item.Product.Price + unitDeliveryPrice) * quantity;
+
+                order.Items.Add(new OrderItem
+                {
+                    ProductId = item.ProductId,
+                    ProductName = item.Product.Name,
+                    ProductImageUrl = item.Product.ImageUrl,
+                    UnitPrice = item.Product.Price,
+                    UnitDeliveryPrice = unitDeliveryPrice,
+                    Quantity = quantity,
+                    LineTotal = lineTotal
+                });
+
+                order.Subtotal += item.Product.Price * quantity;
+                order.DeliveryTotal += unitDeliveryPrice * quantity;
+                item.Product.StockCount = Math.Max(0, item.Product.StockCount - quantity);
                 _context.BasketItems.Remove(item);
             }
 
+            order.Total = Math.Max(0, order.Subtotal + order.DeliveryTotal - order.DiscountTotal);
+            _context.Orders.Add(order);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<string?> FindPromotionCodeIdAsync(string? promoCode)
+        {
+            if (string.IsNullOrWhiteSpace(promoCode))
+            {
+                return null;
+            }
+
+            var service = new PromotionCodeService();
+            var result = await service.ListAsync(new PromotionCodeListOptions
+            {
+                Code = promoCode,
+                Active = true,
+                Limit = 1
+            });
+
+            return result.Data.FirstOrDefault()?.Id;
+        }
+
+        private async Task<bool> HasDeliveryInformationAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            return user is not null && HasDeliveryInformation(user);
+        }
+
+        private static bool HasDeliveryInformation(User user)
+        {
+            return !string.IsNullOrWhiteSpace(user.DeliveryRecipientFullName) &&
+                !string.IsNullOrWhiteSpace(user.DeliveryAddressLine1) &&
+                !string.IsNullOrWhiteSpace(user.DeliveryFin) &&
+                user.DeliveryFin.Trim().Length == 7;
+        }
+
+        private static decimal GetDeliveryPrice(decimal productPrice)
+        {
+            return Math.Round(productPrice * 0.10m, 2, MidpointRounding.AwayFromZero);
+        }
+
+        private static decimal ToDecimalAmount(long? amount)
+        {
+            return amount is null ? 0m : amount.Value / 100m;
         }
 
         private static Dictionary<int, int> ParseBasketMetadata(Dictionary<string, string>? metadata)

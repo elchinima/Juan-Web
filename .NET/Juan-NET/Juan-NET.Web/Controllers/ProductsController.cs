@@ -13,16 +13,30 @@ namespace Juan_NET.Web.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var products = await _context.Products
+            const int pageSize = 10;
+            page = Math.Max(1, page);
+
+            var productsQuery = _context.Products
                 .Include(product => product.ProductCategories)
                 .ThenInclude(productCategory => productCategory.Category)
                 .Where(product => product.IsActive)
-                .OrderByDescending(product => product.CreatedAt)
+                .OrderByDescending(product => product.CreatedAt);
+
+            var totalProducts = await productsQuery.CountAsync();
+            var products = await productsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return View(products);
+            return View(new ProductsIndexViewModel
+            {
+                Products = products,
+                CurrentPage = page,
+                HasPreviousPage = page > 1,
+                HasNextPage = page * pageSize < totalProducts
+            });
         }
     }
 }

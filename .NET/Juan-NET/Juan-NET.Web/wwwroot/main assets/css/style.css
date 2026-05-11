@@ -1797,6 +1797,29 @@ fieldset {
 .our-product .product-action-link a {
   bottom: 16px; }
 
+.product-item.is-out-of-stock {
+  opacity: .62;
+  filter: grayscale(1);
+  cursor: not-allowed; }
+
+.product-item.is-out-of-stock .product-thumb {
+  position: relative; }
+
+.product-stock-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #222222;
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap; }
+
 .product-name {
   font-size: 18px;
   font-weight: 400;
