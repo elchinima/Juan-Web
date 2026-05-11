@@ -1,0 +1,141 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Payment";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<div class="breadcrumb-area bg-img" data-bg="/main assets/img/banner/breadcrumb-banner.jpg">
+    <div class="container">
+        <div class="breadcrumb-wrap text-center">
+            <h2 class="breadcrumb-title">Payment</h2>
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Payment</li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<section class="checkout-page-wrapper section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-payment-card">
+                    <h3>Order summary</h3>
+                    @if (TempData["PaymentMessage"] is string message)
+                    {
+                        <div class="alert alert-warning">@message</div>
+                    }
+                    @if (!Model.Items.Any())
+                    {
+                        <p>Your basket is empty.</p>
+                        <a class="btn btn-hero" asp-controller="Products" asp-action="Index">Continue Shopping</a>
+                    }
+                    else
+                    {
+                        <div class="payment-items">
+                            @foreach (var item in Model.Items)
+                            {
+                                <div class="payment-item">
+                                    <img src="@item.ImageUrl" alt="@item.Name" />
+                                    <div>
+                                        <h4>@item.Name</h4>
+                                        <p>Qty: @item.Quantity</p>
+                                    </div>
+                                    <strong>@item.Total.ToString("C")</strong>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="checkout-payment-card payment-total-card">
+                    <h3>Total</h3>
+                    <div class="payment-total-row">
+                        <span>Subtotal</span>
+                        <strong>@Model.Total.ToString("C")</strong>
+                    </div>
+                    <div class="payment-total-row">
+                        <span>Currency</span>
+                        <strong>@Model.Currency.ToUpperInvariant()</strong>
+                    </div>
+                    @if (!Model.IsStripeConfigured)
+                    {
+                        <div class="alert alert-warning">Add Stripe PublishableKey and SecretKey in appsettings first.</div>
+                    }
+                    <form id="stripe-checkout-form" asp-controller="Payment" asp-action="CreateCheckoutSession" method="post">
+                        <button class="btn btn-hero w-100" type="submit" disabled="@(!Model.Items.Any() || !Model.IsStripeConfigured)">
+                            Pay with Stripe
+                        </button>
+                    </form>
+                    <p class="payment-note">You will be redirected to Stripe Checkout.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .checkout-payment-card{background:#fff;border:1px solid #eee;border-radius:8px;padding:26px;margin-bottom:24px}
+    .checkout-payment-card h3{font-size:22px;margin:0 0 20px;color:#222}
+    .payment-items{border-top:1px solid #f0f0f0}
+    .payment-item{display:grid;grid-template-columns:78px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid #f0f0f0}
+    .payment-item img{width:78px;height:78px;object-fit:cover;border-radius:8px;background:#f6f6f6}
+    .payment-item h4{font-size:16px;margin:0 0 6px;color:#222}
+    .payment-item p{margin:0;color:#777}
+    .payment-total-card{position:sticky;top:104px}
+    .payment-total-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0;color:#222}
+    .payment-note{margin:14px 0 0;color:#777;font-size:14px}
+    @@media (max-width:575px){.payment-item{grid-template-columns:64px 1fr}.payment-item strong{grid-column:2}.payment-item img{width:64px;height:64px}}
+</style>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        (function () {
+            var form = document.getElementById("stripe-checkout-form");
+            if (!form) {
+                return;
+            }
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                var button = form.querySelector("button[type='submit']");
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = "Redirecting...";
+                }
+
+                fetch(form.action, {
+                    method: "POST",
+                    headers: {
+                        "RequestVerificationToken": form.querySelector("input[name='__RequestVerificationToken']").value
+                    }
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("Stripe checkout session was not created.");
+                        }
+
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        return Stripe("@Model.PublishableKey").redirectToCheckout({ sessionId: data.sessionId });
+                    })
+                    .catch(function () {
+                        if (button) {
+                            button.disabled = false;
+                            button.textContent = "Pay with Stripe";
+                        }
+
+                        alert("Payment could not be started. Check Stripe settings and try again.");
+                    });
+            });
+        })();
+    </script>
+}

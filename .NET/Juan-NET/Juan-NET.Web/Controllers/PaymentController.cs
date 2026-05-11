@@ -1,0 +1,236 @@
+using Stripe;
+using Stripe.Checkout;
+
+namespace Juan_NET.Web.Controllers
+{
+    [Authorize]
+    public class PaymentController : Controller
+    {
+        private readonly AppDbContext _context;
+        private readonly StripeSettings _stripeSettings;
+
+        public PaymentController(AppDbContext context, IConfiguration configuration)
+        {
+            _context = context;
+            _stripeSettings = configuration.GetSection("Stripe").Get<StripeSettings>() ?? new StripeSettings();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var userId = GetUserId();
+            if (userId is null)
+            {
+                return Challenge();
+            }
+
+            var viewModel = new CheckoutViewModel
+            {
+                Items = await BuildBasketAsync(userId.Value),
+                PublishableKey = _stripeSettings.PublishableKey,
+                Currency = _stripeSettings.Currency,
+                IsStripeConfigured = _stripeSettings.IsConfigured
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCheckoutSession()
+        {
+            var userId = GetUserId();
+            if (userId is null)
+            {
+                return Unauthorized(new { message = "Please sign in before checkout." });
+            }
+
+            if (!_stripeSettings.IsConfigured)
+            {
+                return BadRequest(new { message = "Stripe keys are not configured." });
+            }
+
+            var basketItems = await _context.BasketItems
+                .Include(item => item.Product)
+                .Where(item => item.UserId == userId.Value && item.Product.IsActive && item.Product.StockCount > 0)
+                .OrderByDescending(item => item.CreatedAt)
+                .ToListAsync();
+
+            if (!basketItems.Any())
+            {
+                return BadRequest(new { message = "Basket is empty." });
+            }
+
+            StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var sessionOptions = new SessionCreateOptions
+            {
+                Mode = "payment",
+                SuccessUrl = $"{baseUrl}{Url.Action(nameof(Success), "Payment")}?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{baseUrl}{Url.Action(nameof(Cancel), "Payment")}",
+                ClientReferenceId = userId.Value.ToString(CultureInfo.InvariantCulture),
+                CustomerEmail = await _context.Users
+                    .Where(user => user.Id == userId.Value)
+                    .Select(user => user.Email)
+                    .FirstOrDefaultAsync(),
+                Metadata = new Dictionary<string, string>
+                {
+                    ["userId"] = userId.Value.ToString(CultureInfo.InvariantCulture),
+                    ["basket"] = string.Join(",", basketItems.Select(item => $"{item.ProductId}:{Math.Min(item.Quantity, item.Product.StockCount)}"))
+                },
+                LineItems = basketItems.Select(item => new SessionLineItemOptions
+                {
+                    Quantity = Math.Min(item.Quantity, item.Product.StockCount),
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = NormalizeCurrency(_stripeSettings.Currency),
+                        UnitAmount = ToStripeAmount(item.Product.Price),
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = item.Product.Name,
+                            Images = string.IsNullOrWhiteSpace(item.Product.ImageUrl)
+                                ? null
+                                : new List<string> { BuildAbsoluteUrl(item.Product.ImageUrl) }
+                        }
+                    }
+                }).ToList()
+            };
+
+            var session = await new SessionService().CreateAsync(sessionOptions);
+            return Json(new { sessionId = session.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Success(string? session_id)
+        {
+            if (string.IsNullOrWhiteSpace(session_id))
+            {
+                TempData["PaymentMessage"] = "Payment session was not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!_stripeSettings.IsConfigured)
+            {
+                TempData["PaymentMessage"] = "Stripe keys are not configured.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+            var session = await new SessionService().GetAsync(session_id);
+
+            if (!string.Equals(session.PaymentStatus, "paid", StringComparison.OrdinalIgnoreCase))
+            {
+                ViewBag.PaymentStatus = session.PaymentStatus;
+                ViewBag.SessionId = session.Id;
+                return View();
+            }
+
+            var userId = GetUserId();
+            if (userId is not null &&
+                string.Equals(session.ClientReferenceId, userId.Value.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal))
+            {
+                await CompletePaidBasketAsync(userId.Value, session);
+            }
+
+            ViewBag.PaymentStatus = session.PaymentStatus;
+            ViewBag.SessionId = session.Id;
+            ViewBag.AmountTotal = session.AmountTotal is null ? null : session.AmountTotal / 100m;
+            ViewBag.Currency = session.Currency?.ToUpperInvariant();
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Cancel()
+        {
+            return View();
+        }
+
+        private async Task<List<ShopListItemViewModel>> BuildBasketAsync(int userId)
+        {
+            return await _context.BasketItems
+                .Where(item => item.UserId == userId && item.Product.IsActive)
+                .OrderByDescending(item => item.CreatedAt)
+                .Select(item => new ShopListItemViewModel
+                {
+                    ProductId = item.ProductId,
+                    Name = item.Product.Name,
+                    ImageUrl = item.Product.ImageUrl ?? "/main assets/img/product/product-1.jpg",
+                    Price = item.Product.Price,
+                    Quantity = item.Quantity,
+                    StockCount = item.Product.StockCount
+                })
+                .ToListAsync();
+        }
+
+        private async Task CompletePaidBasketAsync(int userId, Session session)
+        {
+            var paidItems = ParseBasketMetadata(session.Metadata);
+            if (!paidItems.Any())
+            {
+                return;
+            }
+
+            var basketItems = await _context.BasketItems
+                .Include(item => item.Product)
+                .Where(item => item.UserId == userId && paidItems.Keys.Contains(item.ProductId))
+                .ToListAsync();
+
+            foreach (var item in basketItems)
+            {
+                var paidQuantity = paidItems[item.ProductId];
+                item.Product.StockCount = Math.Max(0, item.Product.StockCount - Math.Min(item.Quantity, paidQuantity));
+                _context.BasketItems.Remove(item);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private static Dictionary<int, int> ParseBasketMetadata(Dictionary<string, string>? metadata)
+        {
+            if (metadata is null || !metadata.TryGetValue("basket", out var value))
+            {
+                return new Dictionary<int, int>();
+            }
+
+            return value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => item.Split(':', StringSplitOptions.RemoveEmptyEntries))
+                .Where(parts => parts.Length == 2 &&
+                    int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out _) &&
+                    int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+                .Select(parts => new
+                {
+                    ProductId = int.Parse(parts[0], CultureInfo.InvariantCulture),
+                    Quantity = int.Parse(parts[1], CultureInfo.InvariantCulture)
+                })
+                .Where(item => item.ProductId > 0 && item.Quantity > 0)
+                .ToDictionary(item => item.ProductId, item => item.Quantity);
+        }
+
+        private string BuildAbsoluteUrl(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUrl))
+            {
+                return absoluteUrl.ToString();
+            }
+
+            return $"{Request.Scheme}://{Request.Host}{Url.Content(url.StartsWith('/') ? $"~{url}" : $"~/{url}")}";
+        }
+
+        private static string NormalizeCurrency(string currency)
+        {
+            return string.IsNullOrWhiteSpace(currency) ? "usd" : currency.Trim().ToLowerInvariant();
+        }
+
+        private static long ToStripeAmount(decimal amount)
+        {
+            return (long)Math.Round(amount * 100m, MidpointRounding.AwayFromZero);
+        }
+
+        private int? GetUserId()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userId, out var id) ? id : null;
+        }
+    }
+}

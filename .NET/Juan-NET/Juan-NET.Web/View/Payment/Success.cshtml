@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Payment Success";
+    var paymentStatus = ViewBag.PaymentStatus as string ?? "paid";
+    var sessionId = ViewBag.SessionId as string ?? string.Empty;
+    var shortSessionId = sessionId.Length > 18 ? $"{sessionId[..14]}..." : sessionId;
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="payment-result-shell payment-success-shell">
+    <div class="container">
+        <div class="payment-result-card payment-result-card-success">
+            <div class="payment-result-glow"></div>
+            <div class="payment-result-icon" aria-hidden="true">
+                <span class="checkmark-stem"></span>
+                <span class="checkmark-kick"></span>
+            </div>
+
+            <p class="payment-result-kicker">Stripe checkout complete</p>
+            <h1>Payment received</h1>
+            <p class="payment-result-copy">Thanks for shopping with Juan. Your basket has been cleared and your order is ready for the next step.</p>
+
+            <div class="payment-receipt-grid">
+                <div class="payment-receipt-item">
+                    <span>Status</span>
+                    <strong>@paymentStatus</strong>
+                </div>
+                @if (ViewBag.AmountTotal is decimal amountTotal)
+                {
+                    <div class="payment-receipt-item payment-receipt-total">
+                        <span>Paid</span>
+                        <strong>@amountTotal.ToString("C") @ViewBag.Currency</strong>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(sessionId))
+                {
+                    <div class="payment-receipt-item">
+                        <span>Session</span>
+                        <strong title="@sessionId">@shortSessionId</strong>
+                    </div>
+                }
+            </div>
+
+            <div class="payment-result-actions">
+                <a class="btn btn-hero" asp-controller="Products" asp-action="Index">Continue Shopping</a>
+                <a class="payment-secondary-link" asp-controller="Home" asp-action="Index">Back Home</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .payment-result-shell{position:relative;min-height:560px;display:flex;align-items:center;overflow:hidden;padding:82px 0;background:linear-gradient(135deg,#fffaf1 0%,#f8f8f8 48%,#f1f5f2 100%)}
+    .payment-result-shell:before{content:"";position:absolute;inset:auto -12% -42% auto;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(227,165,30,.2),rgba(227,165,30,0) 66%);animation:floatGlow 7s ease-in-out infinite}
+    .payment-result-shell:after{content:"";position:absolute;inset:12% auto auto -12%;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(54,117,83,.12),rgba(54,117,83,0) 64%);animation:floatGlow 8s ease-in-out infinite reverse}
+    .payment-result-card{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:44px 46px 40px;text-align:center;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.92);border-radius:8px;box-shadow:0 26px 70px rgba(31,34,41,.13);backdrop-filter:blur(12px);animation:cardIn .55s ease-out both}
+    .payment-result-glow{position:absolute;inset:0;border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9);pointer-events:none}
+    .payment-result-icon{position:relative;width:88px;height:88px;margin:0 auto 22px;border-radius:50%;background:linear-gradient(135deg,#45b36b,#258653);box-shadow:0 18px 34px rgba(37,134,83,.25);animation:iconPop .58s .16s cubic-bezier(.2,1.35,.35,1) both}
+    .payment-result-icon:before{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.46);border-radius:50%}
+    .checkmark-stem,.checkmark-kick{position:absolute;display:block;height:6px;border-radius:999px;background:#fff;transform-origin:left center}
+    .checkmark-kick{width:24px;left:26px;top:48px;transform:rotate(45deg) scaleX(0);animation:drawCheck .22s .58s ease-out forwards}
+    .checkmark-stem{width:42px;left:40px;top:58px;transform:rotate(-45deg) scaleX(0);animation:drawCheck .32s .76s ease-out forwards}
+    .payment-result-kicker{margin:0 0 8px;color:#b68418;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .payment-result-card h1{margin:0 0 12px;color:#222;font-size:44px;line-height:1.1;font-weight:800}
+    .payment-result-copy{max-width:560px;margin:0 auto 28px;color:#6f7480;font-size:17px;line-height:1.7}
+    .payment-receipt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 30px}
+    .payment-receipt-item{padding:16px 14px;background:#fbf8f1;border:1px solid #efe4cc;border-radius:8px;text-align:left}
+    .payment-receipt-item span{display:block;margin-bottom:6px;color:#8b8170;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .payment-receipt-item strong{display:block;color:#222;font-size:16px;word-break:break-word;text-transform:capitalize}
+    .payment-receipt-total{background:#222;border-color:#222}
+    .payment-receipt-total span,.payment-receipt-total strong{color:#fff}
+    .payment-result-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+    .payment-result-actions .btn-hero{min-width:210px;border-radius:6px;box-shadow:0 14px 26px rgba(227,165,30,.24)}
+    .payment-secondary-link{color:#555;font-weight:700;text-decoration:none}
+    .payment-secondary-link:hover{color:#e3a51e}
+    @@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @@keyframes iconPop{from{opacity:0;transform:scale(.72)}to{opacity:1;transform:scale(1)}}
+    @@keyframes drawCheck{to{transform:rotate(var(--angle,0deg)) scaleX(1)}}
+    .checkmark-kick{--angle:45deg}
+    .checkmark-stem{--angle:-45deg}
+    @@keyframes floatGlow{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(22px,-18px,0)}}
+    @@media (max-width:767px){.payment-result-shell{padding:58px 0;min-height:520px}.payment-result-card{padding:34px 22px}.payment-result-card h1{font-size:34px}.payment-receipt-grid{grid-template-columns:1fr}.payment-receipt-item{text-align:center}}
+</style>

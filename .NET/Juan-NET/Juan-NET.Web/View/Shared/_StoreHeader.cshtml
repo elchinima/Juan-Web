@@ -4,6 +4,8 @@
     var rawUserName = User.Identity?.Name ?? string.Empty;
     var displayUserName = rawUserName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? rawUserName;
     displayUserName = displayUserName.Length > 10 ? $"{displayUserName[..10]}..." : displayUserName;
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
 }
 <header class="header-area">
     <div class="main-header d-none d-lg-block">
@@ -22,10 +24,10 @@
                             <div class="main-menu">
                                 <nav class="desktop-menu">
                                     <ul>
-                                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                                        <li><a asp-controller="Products" asp-action="Index">Shop</a></li>
-                                        <li><a asp-controller="Categories" asp-action="Index">Categories</a></li>
-                                        <li><a asp-controller="Home" asp-action="Contact">Contact us</a></li>
+                                        <li class="@(currentController == "Home" && currentAction == "Index" ? "active" : "")"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                        <li class="@(currentController == "Products" ? "active" : "")"><a asp-controller="Products" asp-action="Index">Shop</a></li>
+                                        <li class="@(currentController == "Categories" ? "active" : "")"><a asp-controller="Categories" asp-action="Index">Categories</a></li>
+                                        <li class="@(currentController == "Home" && currentAction == "Contact" ? "active" : "")"><a asp-controller="Home" asp-action="Contact">Contact us</a></li>
                                     </ul>
                                 </nav>
                             </div>

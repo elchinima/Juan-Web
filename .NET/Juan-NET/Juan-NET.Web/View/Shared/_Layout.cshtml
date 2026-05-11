@@ -34,7 +34,9 @@
         .shop-list-remove{border:0;background:#f5ece1;color:#a86807;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:22px;line-height:1}
         .shop-list-empty{padding:34px 12px;text-align:center;color:#777}
         .shop-list-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;background:#faf7f2;border-top:1px solid #eee}
+        .shop-list-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
         .shop-list-total{font-size:18px;color:#222}
+        .shop-list-checkout.is-disabled{pointer-events:none;opacity:.55}
         .shop-list-close{border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#555}
         .shop-action-message{position:fixed;right:22px;bottom:22px;z-index:10000;background:#222;color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 14px 40px rgba(0,0,0,.22);opacity:0;transform:translateY(12px);transition:.2s}
         .shop-action-message.is-visible{opacity:1;transform:translateY(0)}
@@ -49,7 +51,7 @@
         .mobile-menu-toggler a[data-open-shop-list]{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px}
         .mobile-menu-toggler a[data-open-shop-list] .notification{position:absolute;top:0;right:0;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;font-size:10px;color:#fff;background:#e3a51e}
         .product-action-link a.is-active{color:#fff;background-color:#e3a51e}
-        @@media (max-width:575px){.shop-list-row{grid-template-columns:60px 1fr auto}.shop-list-row img{width:60px;height:60px}.shop-list-foot{display:block}.shop-list-total{margin-bottom:12px}}
+        @@media (max-width:575px){.shop-list-row{grid-template-columns:60px 1fr auto}.shop-list-row img{width:60px;height:60px}.shop-list-foot{display:block}.shop-list-total{margin-bottom:12px}.shop-list-actions{justify-content:flex-start}}
     </style>
     <script src="~/main assets/js/modernizr-2.8.3.min.js"></script>
 </head>
@@ -199,7 +201,10 @@
                 <div class="shop-list-body" data-shop-list-body></div>
                 <div class="shop-list-foot">
                     <div class="shop-list-total" data-shop-list-total>Total: $0.00</div>
-                    <a class="btn btn-hero" asp-controller="Products" asp-action="Index">Continue Shopping</a>
+                    <div class="shop-list-actions">
+                        <a class="btn btn-hero shop-list-checkout" asp-controller="Payment" asp-action="Index" data-shop-list-checkout>Checkout</a>
+                        <a class="btn btn-hero" asp-controller="Products" asp-action="Index">Continue Shopping</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -224,6 +229,7 @@
             var body = document.querySelector("[data-shop-list-body]");
             var title = document.querySelector("[data-shop-list-title]");
             var total = document.querySelector("[data-shop-list-total]");
+            var checkoutLink = document.querySelector("[data-shop-list-checkout]");
             var message = document.querySelector("[data-shop-action-message]");
             var tokenInput = document.querySelector("#shop-list-token-form input[name='__RequestVerificationToken']");
             var summary = { basketItems: readLocal(basketKey), wishlistItems: readLocal(wishlistKey) };
@@ -452,6 +458,12 @@
 
                 title.textContent = activeList === "basket" ? "Basket" : "Wishlist";
                 total.textContent = activeList === "basket" ? "Total: " + formatMoney(sumBasket()) : summary.wishlistItems.length + " saved item(s)";
+                if (checkoutLink) {
+                    var canCheckout = activeList === "basket" && countBasket() > 0;
+                    checkoutLink.classList.toggle("is-disabled", !canCheckout);
+                    checkoutLink.setAttribute("aria-disabled", canCheckout ? "false" : "true");
+                    checkoutLink.style.display = activeList === "basket" ? "inline-block" : "none";
+                }
 
                 if (!items.length) {
                     body.innerHTML = "<div class=\"shop-list-empty\">No items yet.</div>";

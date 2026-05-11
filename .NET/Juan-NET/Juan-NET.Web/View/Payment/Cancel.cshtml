@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Payment Canceled";
+}
+
+@await Html.PartialAsync("_StoreHeader")
+
+<section class="payment-result-shell payment-cancel-shell">
+    <div class="container">
+        <div class="payment-result-card payment-result-card-cancel">
+            <div class="payment-cancel-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+            </div>
+            <p class="payment-result-kicker">Checkout paused</p>
+            <h1>Payment canceled</h1>
+            <p class="payment-result-copy">No charge was made. Your basket is still waiting, so you can review it and try again whenever you are ready.</p>
+            <div class="payment-result-actions">
+                <a class="btn btn-hero" asp-controller="Payment" asp-action="Index">Back to Payment</a>
+                <a class="payment-secondary-link" asp-controller="Products" asp-action="Index">Keep Shopping</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .payment-result-shell{position:relative;min-height:520px;display:flex;align-items:center;overflow:hidden;padding:82px 0;background:linear-gradient(135deg,#fffaf1 0%,#f8f8f8 52%,#f4efea 100%)}
+    .payment-result-shell:before{content:"";position:absolute;right:-160px;bottom:-260px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(227,165,30,.2),rgba(227,165,30,0) 66%);animation:floatGlow 7s ease-in-out infinite}
+    .payment-result-card{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:44px 46px 40px;text-align:center;background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.92);border-radius:8px;box-shadow:0 26px 70px rgba(31,34,41,.13);backdrop-filter:blur(12px);animation:cardIn .55s ease-out both}
+    .payment-cancel-icon{position:relative;width:82px;height:82px;margin:0 auto 22px;border-radius:50%;background:linear-gradient(135deg,#f0c45f,#d79b22);box-shadow:0 18px 34px rgba(215,155,34,.23);animation:iconPop .58s .16s cubic-bezier(.2,1.35,.35,1) both}
+    .payment-cancel-icon:before{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.5);border-radius:50%}
+    .payment-cancel-icon span{position:absolute;left:25px;top:39px;width:32px;height:5px;border-radius:999px;background:#fff;transform:rotate(45deg) scaleX(0);animation:cancelLine .24s .55s ease-out forwards}
+    .payment-cancel-icon span:last-child{transform:rotate(-45deg) scaleX(0);animation-delay:.7s}
+    .payment-result-kicker{margin:0 0 8px;color:#b68418;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .payment-result-card h1{margin:0 0 12px;color:#222;font-size:42px;line-height:1.1;font-weight:800}
+    .payment-result-copy{max-width:520px;margin:0 auto 28px;color:#6f7480;font-size:17px;line-height:1.7}
+    .payment-result-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+    .payment-result-actions .btn-hero{min-width:190px;border-radius:6px;box-shadow:0 14px 26px rgba(227,165,30,.24)}
+    .payment-secondary-link{color:#555;font-weight:700;text-decoration:none}
+    .payment-secondary-link:hover{color:#e3a51e}
+    @@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @@keyframes iconPop{from{opacity:0;transform:scale(.72)}to{opacity:1;transform:scale(1)}}
+    @@keyframes cancelLine{to{transform:rotate(var(--angle,45deg)) scaleX(1)}}
+    .payment-cancel-icon span:first-child{--angle:45deg}
+    .payment-cancel-icon span:last-child{--angle:-45deg}
+    @@keyframes floatGlow{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(22px,-18px,0)}}
+    @@media (max-width:767px){.payment-result-shell{padding:58px 0;min-height:500px}.payment-result-card{padding:34px 22px}.payment-result-card h1{font-size:34px}}
+</style>
