@@ -47,11 +47,11 @@
                             </button>
                         </div>
                         <div class="col-md-6 mb-30">
-                            <button class="contact-action-card text-left h-100 w-100" type="button">
+                            <a class="contact-action-card text-left h-100 w-100" asp-controller="Home" asp-action="SupportChat">
                                 <p class="contact-label">Support</p>
                                 <h2>Technical support</h2>
-                                <span>Support window will be added later.</span>
-                            </button>
+                                <span>Open the simulated technical support chat.</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -60,15 +60,19 @@
     </div>
 </section>
 
-<div class="modal" id="supportComplaintModal">
+<div class="modal contact-complaint-modal" id="supportComplaintModal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Technical support complaint</h5>
+                <div>
+                    <p class="contact-label">Complaint</p>
+                    <h5 class="modal-title">Technical support complaint</h5>
+                </div>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <form asp-controller="Home" asp-action="Contact" method="post">
                 <div class="modal-body contact-message">
+                    <p class="complaint-modal-text">Describe the problem and the support team will review it from the admin messages panel.</p>
                     <div asp-validation-summary="ModelOnly" class="contact-error"></div>
                     <div class="row">
                         <div class="col-md-6">

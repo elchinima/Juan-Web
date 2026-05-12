@@ -1,0 +1,84 @@
+@model IReadOnlyList<ProfileOrderViewModel>
+@{
+    Layout = null;
+    ViewData["Title"] = "My Orders";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Juan</title>
+    <link rel="shortcut icon" href="~/admin assets/img/logo.png" type="image/png" />
+    <link href="~/main assets/css/vendor.css" rel="stylesheet" />
+    <link href="~/main assets/css/style.css" rel="stylesheet" />
+    <link href="~/main assets/css/home-admin.css" rel="stylesheet" />
+</head>
+<body class="support-chat-body">
+    <section class="support-chat-page support-orders-page">
+        <nav class="support-chat-nav" aria-label="Technical support chat navigation">
+            <a asp-controller="Home" asp-action="Index">Home</a>
+            <a asp-controller="Home" asp-action="SupportChat">Communication</a>
+            <a asp-controller="Home" asp-action="SupportChatHistory">History</a>
+            <a class="active" asp-controller="Home" asp-action="SupportChatOrders">My Orders</a>
+        </nav>
+
+        <section class="support-orders-panel">
+            <p class="contact-label">Orders</p>
+            <h1>My Orders</h1>
+            @if (!Model.Any())
+            {
+                <div class="support-orders-empty">
+                    <p>Your orders will appear here after checkout.</p>
+                    <a asp-controller="Products" asp-action="Index">Start shopping</a>
+                </div>
+            }
+            else
+            {
+                <div class="support-orders-list">
+                    @foreach (var order in Model)
+                    {
+                        <article class="support-order-card">
+                            <div class="support-order-head">
+                                <div>
+                                    <strong>Order #@order.Id</strong>
+                                    <span>@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                                </div>
+                                <em>@order.Status</em>
+                            </div>
+                            <div class="support-order-items">
+                                @foreach (var item in order.Items)
+                                {
+                                    <div class="support-order-item">
+                                        <img src="@item.ImageUrl" alt="@item.ProductName" />
+                                        <div>
+                                            <h2>@item.ProductName</h2>
+                                            <p>Qty: @item.Quantity</p>
+                                            <p>Delivery: @item.UnitDeliveryPrice.ToString("C") each</p>
+                                        </div>
+                                        <strong>@item.LineTotal.ToString("C")</strong>
+                                    </div>
+                                }
+                            </div>
+                            <div class="support-order-total">
+                                <span>Subtotal: @order.Subtotal.ToString("C")</span>
+                                <span>Delivery: @order.DeliveryTotal.ToString("C")</span>
+                                @if (order.DiscountTotal > 0)
+                                {
+                                    <span>Discount: -@order.DiscountTotal.ToString("C")</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(order.PromoCode))
+                                {
+                                    <span>Promo: @order.PromoCode</span>
+                                }
+                                <strong>Total: @order.Total.ToString("C") @order.Currency.ToUpperInvariant()</strong>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </section>
+</body>
+</html>

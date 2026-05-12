@@ -16,6 +16,10 @@
 
         public DbSet<User> Users => Set<User>();
 
+        public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+
+        public DbSet<UserSecurityToken> UserSecurityTokens => Set<UserSecurityToken>();
+
         public DbSet<Subscriber> Subscribers => Set<Subscriber>();
 
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
@@ -71,6 +75,24 @@
             {
                 entity.HasIndex(user => user.Email).IsUnique();
                 entity.Property(user => user.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<UserAddress>(entity =>
+            {
+                entity.Property(address => address.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(address => address.User)
+                    .WithMany(user => user.Addresses)
+                    .HasForeignKey(address => address.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserSecurityToken>(entity =>
+            {
+                entity.HasOne(token => token.User)
+                    .WithMany(user => user.SecurityTokens)
+                    .HasForeignKey(token => token.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Order>(entity =>

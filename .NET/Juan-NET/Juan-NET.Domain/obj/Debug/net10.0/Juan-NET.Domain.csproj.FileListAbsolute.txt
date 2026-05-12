@@ -13,3 +13,12 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Jua
 C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Domain.deps.json
 C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Domain.dll
 C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Domain.pdb
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Domain.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Domain.dll
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Domain.pdb

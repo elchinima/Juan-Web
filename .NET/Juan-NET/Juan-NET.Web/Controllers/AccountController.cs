@@ -74,7 +74,9 @@ namespace Juan_NET.Web.Controllers
             }
 
             var email = viewModel.Email.Trim().ToLowerInvariant();
-            var user = await _context.Users.FirstOrDefaultAsync(item => item.Email == email);
+            var user = await _context.Users
+                .Include(item => item.SecurityTokens)
+                .FirstOrDefaultAsync(item => item.Email == email);
 
             if (user is null || !VerifySecret(viewModel.Password, user.PasswordHash, user.PasswordSalt))
             {
@@ -84,7 +86,7 @@ namespace Juan_NET.Web.Controllers
 
             await _adminAccessService.EnsureDeveloperRoleAssignmentAsync(user);
 
-            if (user.IsTwoFactorEnabled)
+            if (GetSecurityToken(user)?.IsTwoFactorEnabled == true)
             {
                 await SendTwoFactorCodeAsync(user);
                 return RedirectToAction(nameof(TwoFactor), new { userId = user.Id, rememberMe = viewModel.RememberMe });
@@ -314,22 +316,26 @@ namespace Juan_NET.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TwoFactor(TwoFactorViewModel viewModel)
         {
-            var user = await _context.Users.FindAsync(viewModel.UserId);
+            var user = await _context.Users
+                .Include(item => item.SecurityTokens)
+                .FirstOrDefaultAsync(item => item.Id == viewModel.UserId);
 
             if (user is null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
-            if (!ModelState.IsValid || user.TwoFactorCodeExpiresAt < DateTime.UtcNow || !VerifySecret(viewModel.Code, user.TwoFactorCodeHash, user.TwoFactorCodeSalt))
+            var securityToken = GetSecurityToken(user);
+
+            if (!ModelState.IsValid || securityToken is null || securityToken.TwoFactorCodeExpiresAt < DateTime.UtcNow || !VerifySecret(viewModel.Code, securityToken.TwoFactorCodeHash, securityToken.TwoFactorCodeSalt))
             {
                 ModelState.AddModelError(nameof(TwoFactorViewModel.Code), "The verification code is invalid or expired.");
                 return View(viewModel);
             }
 
-            user.TwoFactorCodeHash = null;
-            user.TwoFactorCodeSalt = null;
-            user.TwoFactorCodeExpiresAt = null;
+            securityToken.TwoFactorCodeHash = null;
+            securityToken.TwoFactorCodeSalt = null;
+            securityToken.TwoFactorCodeExpiresAt = null;
             await _context.SaveChangesAsync();
             await SignInAsync(user, viewModel.RememberMe);
 
@@ -351,15 +357,18 @@ namespace Juan_NET.Web.Controllers
             }
 
             var email = viewModel.Email.Trim().ToLowerInvariant();
-            var user = await _context.Users.FirstOrDefaultAsync(item => item.Email == email);
+            var user = await _context.Users
+                .Include(item => item.SecurityTokens)
+                .FirstOrDefaultAsync(item => item.Email == email);
 
             if (user is not null)
             {
                 var token = CreateUrlToken();
                 var (hash, salt) = HashSecret(token);
-                user.PasswordResetTokenHash = hash;
-                user.PasswordResetTokenSalt = salt;
-                user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddHours(1);
+                var securityToken = GetOrCreateSecurityToken(user);
+                securityToken.PasswordResetTokenHash = hash;
+                securityToken.PasswordResetTokenSalt = salt;
+                securityToken.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddHours(1);
                 await _context.SaveChangesAsync();
 
                 var link = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme);
@@ -385,9 +394,12 @@ namespace Juan_NET.Web.Controllers
             }
 
             var email = viewModel.Email.Trim().ToLowerInvariant();
-            var user = await _context.Users.FirstOrDefaultAsync(item => item.Email == email);
+            var user = await _context.Users
+                .Include(item => item.SecurityTokens)
+                .FirstOrDefaultAsync(item => item.Email == email);
+            var securityToken = user is null ? null : GetSecurityToken(user);
 
-            if (user is null || user.PasswordResetTokenExpiresAt < DateTime.UtcNow || !VerifySecret(viewModel.Token, user.PasswordResetTokenHash, user.PasswordResetTokenSalt))
+            if (user is null || securityToken is null || securityToken.PasswordResetTokenExpiresAt < DateTime.UtcNow || !VerifySecret(viewModel.Token, securityToken.PasswordResetTokenHash, securityToken.PasswordResetTokenSalt))
             {
                 ModelState.AddModelError(string.Empty, "Password reset link is invalid or expired.");
                 return View(viewModel);
@@ -396,9 +408,9 @@ namespace Juan_NET.Web.Controllers
             var (hash, salt) = HashSecret(viewModel.Password);
             user.PasswordHash = hash;
             user.PasswordSalt = salt;
-            user.PasswordResetTokenHash = null;
-            user.PasswordResetTokenSalt = null;
-            user.PasswordResetTokenExpiresAt = null;
+            securityToken.PasswordResetTokenHash = null;
+            securityToken.PasswordResetTokenSalt = null;
+            securityToken.PasswordResetTokenExpiresAt = null;
             await _context.SaveChangesAsync();
 
             TempData["AuthMessage"] = "Password changed. You can sign in now.";
@@ -535,10 +547,17 @@ namespace Juan_NET.Web.Controllers
                 return View("DeliveryInformation", invalidViewModel);
             }
 
-            user.DeliveryRecipientFullName = viewModel.DeliveryRecipientFullName.Trim();
-            user.DeliveryAddressLine1 = viewModel.DeliveryAddressLine1.Trim();
-            user.DeliveryAddressLine2 = string.IsNullOrWhiteSpace(viewModel.DeliveryAddressLine2) ? null : viewModel.DeliveryAddressLine2.Trim();
-            user.DeliveryFin = viewModel.DeliveryFin.Trim().ToUpperInvariant();
+            var address = GetDefaultAddress(user);
+            if (address is null)
+            {
+                address = new UserAddress { UserId = user.Id, IsDefault = true };
+                user.Addresses.Add(address);
+            }
+
+            address.RecipientFullName = viewModel.DeliveryRecipientFullName.Trim();
+            address.AddressLine1 = viewModel.DeliveryAddressLine1.Trim();
+            address.AddressLine2 = string.IsNullOrWhiteSpace(viewModel.DeliveryAddressLine2) ? null : viewModel.DeliveryAddressLine2.Trim();
+            address.Fin = viewModel.DeliveryFin.Trim().ToUpperInvariant();
 
             await _context.SaveChangesAsync();
             TempData["ProfileMessage"] = "Delivery information saved successfully.";
@@ -558,9 +577,10 @@ namespace Juan_NET.Web.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            user.IsTwoFactorEnabled = isTwoFactorEnabled;
+            var securityToken = GetOrCreateSecurityToken(user);
+            securityToken.IsTwoFactorEnabled = isTwoFactorEnabled;
             await _context.SaveChangesAsync();
-            TempData["ProfileMessage"] = user.IsTwoFactorEnabled ? "Two-factor authentication enabled." : "Two-factor authentication disabled.";
+            TempData["ProfileMessage"] = securityToken.IsTwoFactorEnabled ? "Two-factor authentication enabled." : "Two-factor authentication disabled.";
 
             return RedirectToAction(nameof(Security));
         }
@@ -589,11 +609,12 @@ namespace Juan_NET.Web.Controllers
             var (passwordHash, passwordSalt) = HashSecret(viewModel.ChangePassword.NewPassword);
             var token = CreateUrlToken();
             var (tokenHash, tokenSalt) = HashSecret(token);
-            user.PendingPasswordHash = passwordHash;
-            user.PendingPasswordSalt = passwordSalt;
-            user.PasswordChangeTokenHash = tokenHash;
-            user.PasswordChangeTokenSalt = tokenSalt;
-            user.PasswordChangeTokenExpiresAt = DateTime.UtcNow.AddHours(1);
+            var securityToken = GetOrCreateSecurityToken(user);
+            securityToken.PendingPasswordHash = passwordHash;
+            securityToken.PendingPasswordSalt = passwordSalt;
+            securityToken.PasswordChangeTokenHash = tokenHash;
+            securityToken.PasswordChangeTokenSalt = tokenSalt;
+            securityToken.PasswordChangeTokenExpiresAt = DateTime.UtcNow.AddHours(1);
             await _context.SaveChangesAsync();
 
             var link = Url.Action(nameof(ConfirmPasswordChange), "Account", new { email = user.Email, token }, Request.Scheme);
@@ -612,7 +633,9 @@ namespace Juan_NET.Web.Controllers
             }
 
             var normalizedEmail = email.Trim().ToLowerInvariant();
-            var user = await _context.Users.FirstOrDefaultAsync(item => item.Email == normalizedEmail);
+            var user = await _context.Users
+                .Include(item => item.SecurityTokens)
+                .FirstOrDefaultAsync(item => item.Email == normalizedEmail);
 
             if (user is null)
             {
@@ -620,19 +643,21 @@ namespace Juan_NET.Web.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            if (user.PasswordChangeTokenExpiresAt < DateTime.UtcNow || !VerifySecret(token, user.PasswordChangeTokenHash, user.PasswordChangeTokenSalt) || user.PendingPasswordHash is null || user.PendingPasswordSalt is null)
+            var securityToken = GetSecurityToken(user);
+
+            if (securityToken is null || securityToken.PasswordChangeTokenExpiresAt < DateTime.UtcNow || !VerifySecret(token, securityToken.PasswordChangeTokenHash, securityToken.PasswordChangeTokenSalt) || securityToken.PendingPasswordHash is null || securityToken.PendingPasswordSalt is null)
             {
                 TempData["AuthMessage"] = "Password change link is invalid or expired.";
                 return RedirectToAction(nameof(Login));
             }
 
-            user.PasswordHash = user.PendingPasswordHash;
-            user.PasswordSalt = user.PendingPasswordSalt;
-            user.PendingPasswordHash = null;
-            user.PendingPasswordSalt = null;
-            user.PasswordChangeTokenHash = null;
-            user.PasswordChangeTokenSalt = null;
-            user.PasswordChangeTokenExpiresAt = null;
+            user.PasswordHash = securityToken.PendingPasswordHash;
+            user.PasswordSalt = securityToken.PendingPasswordSalt;
+            securityToken.PendingPasswordHash = null;
+            securityToken.PendingPasswordSalt = null;
+            securityToken.PasswordChangeTokenHash = null;
+            securityToken.PasswordChangeTokenSalt = null;
+            securityToken.PasswordChangeTokenExpiresAt = null;
             await _context.SaveChangesAsync();
             TempData["AuthMessage"] = "Password changed successfully.";
 
@@ -685,7 +710,12 @@ namespace Juan_NET.Web.Controllers
         private async Task<User?> GetCurrentUserAsync()
         {
             var idValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(idValue, out var id) ? await _context.Users.FindAsync(id) : null;
+            return int.TryParse(idValue, out var id)
+                ? await _context.Users
+                    .Include(user => user.Addresses)
+                    .Include(user => user.SecurityTokens)
+                    .FirstOrDefaultAsync(user => user.Id == id)
+                : null;
         }
 
         private async Task SignInAsync(User user, bool rememberMe)
@@ -709,15 +739,18 @@ namespace Juan_NET.Web.Controllers
         {
             var code = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
             var (hash, salt) = HashSecret(code);
-            user.TwoFactorCodeHash = hash;
-            user.TwoFactorCodeSalt = salt;
-            user.TwoFactorCodeExpiresAt = DateTime.UtcNow.AddMinutes(10);
+            var securityToken = GetOrCreateSecurityToken(user);
+            securityToken.TwoFactorCodeHash = hash;
+            securityToken.TwoFactorCodeSalt = salt;
+            securityToken.TwoFactorCodeExpiresAt = DateTime.UtcNow.AddMinutes(10);
             await _context.SaveChangesAsync();
             await _emailService.SendAsync(user.Email, "Juan verification code", $"<p>Your Juan login code is <strong>{code}</strong>.</p><p>It expires in 10 minutes.</p>");
         }
 
         private static ProfileViewModel CreateProfileViewModel(User user, ChangePasswordViewModel? changePassword = null, List<ProfileOrderViewModel>? orders = null)
         {
+            var address = GetDefaultAddress(user);
+            var securityToken = GetSecurityToken(user);
             var hasDeliveryInformation = HasDeliveryInformation(user);
 
             return new ProfileViewModel
@@ -726,11 +759,11 @@ namespace Juan_NET.Web.Controllers
                 FullName = user.FullName,
                 Email = user.Email,
                 ProfileImageUrl = user.ProfileImageUrl,
-                IsTwoFactorEnabled = user.IsTwoFactorEnabled,
-                DeliveryRecipientFullName = user.DeliveryRecipientFullName ?? string.Empty,
-                DeliveryAddressLine1 = user.DeliveryAddressLine1 ?? string.Empty,
-                DeliveryAddressLine2 = user.DeliveryAddressLine2,
-                DeliveryFin = user.DeliveryFin ?? string.Empty,
+                IsTwoFactorEnabled = securityToken?.IsTwoFactorEnabled ?? false,
+                DeliveryRecipientFullName = address?.RecipientFullName ?? string.Empty,
+                DeliveryAddressLine1 = address?.AddressLine1 ?? string.Empty,
+                DeliveryAddressLine2 = address?.AddressLine2,
+                DeliveryFin = address?.Fin ?? string.Empty,
                 HasDeliveryInformation = hasDeliveryInformation,
                 ChangePassword = changePassword ?? new ChangePasswordViewModel(),
                 Orders = orders ?? new List<ProfileOrderViewModel>()
@@ -739,10 +772,40 @@ namespace Juan_NET.Web.Controllers
 
         private static bool HasDeliveryInformation(User user)
         {
-            return !string.IsNullOrWhiteSpace(user.DeliveryRecipientFullName) &&
-                !string.IsNullOrWhiteSpace(user.DeliveryAddressLine1) &&
-                !string.IsNullOrWhiteSpace(user.DeliveryFin) &&
-                user.DeliveryFin.Trim().Length == 7;
+            var address = GetDefaultAddress(user);
+
+            return address is not null &&
+                !string.IsNullOrWhiteSpace(address.RecipientFullName) &&
+                !string.IsNullOrWhiteSpace(address.AddressLine1) &&
+                !string.IsNullOrWhiteSpace(address.Fin) &&
+                address.Fin.Trim().Length == 7;
+        }
+
+        private static UserAddress? GetDefaultAddress(User user)
+        {
+            return user.Addresses
+                .OrderByDescending(address => address.IsDefault)
+                .ThenBy(address => address.Id)
+                .FirstOrDefault();
+        }
+
+        private static UserSecurityToken? GetSecurityToken(User user)
+        {
+            return user.SecurityTokens.FirstOrDefault();
+        }
+
+        private UserSecurityToken GetOrCreateSecurityToken(User user)
+        {
+            var securityToken = GetSecurityToken(user);
+
+            if (securityToken is not null)
+            {
+                return securityToken;
+            }
+
+            securityToken = new UserSecurityToken { UserId = user.Id };
+            user.SecurityTokens.Add(securityToken);
+            return securityToken;
         }
 
         private void RemoveModelStateEntries(string prefix)

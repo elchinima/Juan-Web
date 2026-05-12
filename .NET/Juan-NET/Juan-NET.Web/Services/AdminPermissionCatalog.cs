@@ -13,7 +13,8 @@ namespace Juan_NET.Web.Services
             new(AdminPermissionKeys.Users, "Users", "Users", true),
             new(AdminPermissionKeys.Subscribe, "Subscribe", "Subscribe", true),
             new(AdminPermissionKeys.Roles, "Roles", "Roles", true),
-            new(AdminPermissionKeys.FooterSettings, "Footer", "FooterSettings", true)
+            new(AdminPermissionKeys.FooterSettings, "Footer", "FooterSettings", true),
+            new(AdminPermissionKeys.Support, "Support", "Support", false)
         ];
 
         public static IReadOnlyList<AdminPermissionItem> NavItems { get; } =

@@ -46,7 +46,9 @@ namespace Juan_NET.Web.Controllers
                 return Unauthorized(new { message = "Please sign in before checkout." });
             }
 
-            var user = await _context.Users.FindAsync(userId.Value);
+            var user = await _context.Users
+                .Include(item => item.Addresses)
+                .FirstOrDefaultAsync(item => item.Id == userId.Value);
             if (user is null)
             {
                 return Unauthorized(new { message = "Please sign in before checkout." });
@@ -213,11 +215,15 @@ namespace Juan_NET.Web.Controllers
                 return;
             }
 
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users
+                .Include(item => item.Addresses)
+                .FirstOrDefaultAsync(item => item.Id == userId);
             if (user is null || !HasDeliveryInformation(user))
             {
                 return;
             }
+
+            var address = GetDefaultAddress(user)!;
 
             var basketItems = await _context.BasketItems
                 .Include(item => item.Product)
@@ -232,10 +238,10 @@ namespace Juan_NET.Web.Controllers
             var order = new Order
             {
                 UserId = userId,
-                RecipientFullName = user.DeliveryRecipientFullName!.Trim(),
-                AddressLine1 = user.DeliveryAddressLine1!.Trim(),
-                AddressLine2 = string.IsNullOrWhiteSpace(user.DeliveryAddressLine2) ? null : user.DeliveryAddressLine2.Trim(),
-                Fin = user.DeliveryFin!.Trim().ToUpperInvariant(),
+                RecipientFullName = address.RecipientFullName.Trim(),
+                AddressLine1 = address.AddressLine1.Trim(),
+                AddressLine2 = string.IsNullOrWhiteSpace(address.AddressLine2) ? null : address.AddressLine2.Trim(),
+                Fin = address.Fin.Trim().ToUpperInvariant(),
                 StripeSessionId = session.Id,
                 PromoCode = session.Metadata is not null && session.Metadata.TryGetValue("promoCode", out var promoCode) && !string.IsNullOrWhiteSpace(promoCode) ? promoCode : null,
                 Currency = NormalizeCurrency(session.Currency ?? _stripeSettings.Currency),
@@ -293,16 +299,29 @@ namespace Juan_NET.Web.Controllers
 
         private async Task<bool> HasDeliveryInformationAsync(int userId)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users
+                .Include(item => item.Addresses)
+                .FirstOrDefaultAsync(item => item.Id == userId);
             return user is not null && HasDeliveryInformation(user);
         }
 
         private static bool HasDeliveryInformation(User user)
         {
-            return !string.IsNullOrWhiteSpace(user.DeliveryRecipientFullName) &&
-                !string.IsNullOrWhiteSpace(user.DeliveryAddressLine1) &&
-                !string.IsNullOrWhiteSpace(user.DeliveryFin) &&
-                user.DeliveryFin.Trim().Length == 7;
+            var address = GetDefaultAddress(user);
+
+            return address is not null &&
+                !string.IsNullOrWhiteSpace(address.RecipientFullName) &&
+                !string.IsNullOrWhiteSpace(address.AddressLine1) &&
+                !string.IsNullOrWhiteSpace(address.Fin) &&
+                address.Fin.Trim().Length == 7;
+        }
+
+        private static UserAddress? GetDefaultAddress(User user)
+        {
+            return user.Addresses
+                .OrderByDescending(address => address.IsDefault)
+                .ThenBy(address => address.Id)
+                .FirstOrDefault();
         }
 
         private static decimal GetDeliveryPrice(decimal productPrice)

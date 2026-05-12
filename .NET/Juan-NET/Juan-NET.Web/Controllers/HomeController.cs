@@ -1,6 +1,7 @@
 using Juan_NET.Domain.Entities;
 using Juan_NET.Persistence.Context;
 using Juan_NET.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -64,6 +65,58 @@ public class HomeController : Controller
     public IActionResult Contact()
     {
         return View(new ContactMessageViewModel());
+    }
+
+    public IActionResult SupportChat()
+    {
+        return View();
+    }
+
+    public IActionResult SupportChatHistory()
+    {
+        return View();
+    }
+
+    [Authorize]
+    public async Task<IActionResult> SupportChatOrders()
+    {
+        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(userIdValue, out var userId))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var orders = await _context.Orders
+            .Where(order => order.UserId == userId)
+            .OrderByDescending(order => order.CreatedAt)
+            .Select(order => new ProfileOrderViewModel
+            {
+                Id = order.Id,
+                CreatedAt = order.CreatedAt,
+                Status = order.Status,
+                Currency = order.Currency,
+                Subtotal = order.Subtotal,
+                DeliveryTotal = order.DeliveryTotal,
+                DiscountTotal = order.DiscountTotal,
+                Total = order.Total,
+                PromoCode = order.PromoCode,
+                Items = order.Items
+                    .OrderBy(item => item.Id)
+                    .Select(item => new ProfileOrderItemViewModel
+                    {
+                        ProductName = item.ProductName,
+                        ImageUrl = item.ProductImageUrl ?? "/main assets/img/product/product-1.jpg",
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice,
+                        UnitDeliveryPrice = item.UnitDeliveryPrice,
+                        LineTotal = item.LineTotal
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
+
+        return View(orders);
     }
 
     [HttpPost]

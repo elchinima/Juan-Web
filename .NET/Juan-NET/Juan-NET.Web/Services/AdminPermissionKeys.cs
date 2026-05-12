@@ -12,5 +12,6 @@ namespace Juan_NET.Web.Services
         public const string Subscribe = "Admin.Subscribe";
         public const string Roles = "Admin.Roles";
         public const string FooterSettings = "Admin.FooterSettings";
+        public const string Support = "Admin.Support";
     }
 }

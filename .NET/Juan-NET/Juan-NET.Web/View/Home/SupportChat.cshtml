@@ -1,0 +1,57 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Technical Support";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Juan</title>
+    <link rel="shortcut icon" href="~/admin assets/img/logo.png" type="image/png" />
+    <link href="~/main assets/css/vendor.css" rel="stylesheet" />
+    <link href="~/main assets/css/style.css" rel="stylesheet" />
+    <link href="~/main assets/css/home-admin.css" rel="stylesheet" />
+</head>
+<body class="support-chat-body">
+    <section class="support-chat-page">
+        <nav class="support-chat-nav" aria-label="Technical support chat navigation">
+            <a asp-controller="Home" asp-action="Index">Home</a>
+            <a class="active" asp-controller="Home" asp-action="SupportChat">Communication</a>
+            <a asp-controller="Home" asp-action="SupportChatHistory">History</a>
+            <a asp-controller="Home" asp-action="SupportChatOrders">My Orders</a>
+        </nav>
+
+        <section class="support-chat-panel">
+            <div class="support-chat-head">
+                <div>
+                    <p class="contact-label">Live Simulation</p>
+                    <h1>Technical Support</h1>
+                </div>
+                <span>Online</span>
+            </div>
+
+            <div class="support-chat-messages">
+                <article class="support-chat-message agent">
+                    <strong>Juan Support</strong>
+                    <p>Hello. Tell us what happened and we will help you with the next step.</p>
+                </article>
+                <article class="support-chat-message user">
+                    <strong>You</strong>
+                    <p>I need help with my order status.</p>
+                </article>
+                <article class="support-chat-message agent">
+                    <strong>Juan Support</strong>
+                    <p>Send the order number here. This chat is a simulation for now.</p>
+                </article>
+            </div>
+
+            <form class="support-chat-form">
+                <input type="text" placeholder="Type your message" disabled />
+                <button type="button" disabled>Send</button>
+            </form>
+        </section>
+    </section>
+</body>
+</html>

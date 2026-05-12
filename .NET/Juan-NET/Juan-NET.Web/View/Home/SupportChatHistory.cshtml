@@ -1,0 +1,46 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Support History";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Juan</title>
+    <link rel="shortcut icon" href="~/admin assets/img/logo.png" type="image/png" />
+    <link href="~/main assets/css/vendor.css" rel="stylesheet" />
+    <link href="~/main assets/css/style.css" rel="stylesheet" />
+    <link href="~/main assets/css/home-admin.css" rel="stylesheet" />
+</head>
+<body class="support-chat-body">
+    <section class="support-chat-page support-history-page">
+        <nav class="support-chat-nav" aria-label="Technical support chat navigation">
+            <a asp-controller="Home" asp-action="Index">Home</a>
+            <a asp-controller="Home" asp-action="SupportChat">Communication</a>
+            <a class="active" asp-controller="Home" asp-action="SupportChatHistory">History</a>
+            <a asp-controller="Home" asp-action="SupportChatOrders">My Orders</a>
+        </nav>
+
+        <section class="support-history-panel">
+            <p class="contact-label">History</p>
+            <h1>Recent chats</h1>
+            <div class="support-history-list">
+                <div>
+                    <strong>Order delivery question</strong>
+                    <span>Today, 12:40</span>
+                </div>
+                <div>
+                    <strong>Payment check</strong>
+                    <span>Yesterday, 18:15</span>
+                </div>
+                <div>
+                    <strong>Product details</strong>
+                    <span>May 10, 2026</span>
+                </div>
+            </div>
+        </section>
+    </section>
+</body>
+</html>

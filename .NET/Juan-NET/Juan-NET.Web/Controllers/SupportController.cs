@@ -1,6 +1,7 @@
 namespace Juan_NET.Web.Controllers
 {
     [Authorize]
+    [AdminPermission(AdminPermissionKeys.Support)]
     public class SupportController : Controller
     {
         public IActionResult Index()

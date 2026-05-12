@@ -77,7 +77,6 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Jua
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\gyi4rew5zq-{0}-h904f6yjc8-h904f6yjc8.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\tzkcqpjac4-{0}-1uc6tkjh4l-1uc6tkjh4l.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\nkaueamihd-{0}-rhj4pbhtc7-rhj4pbhtc7.gz
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\mlmam3ig23-{0}-mibgo99c5a-mibgo99c5a.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\5a3n6b3ann-{0}-v3sa88hf69-v3sa88hf69.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\xfhzxcb05n-{0}-2ooh12ub0y-2ooh12ub0y.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\g0gcr14xzg-{0}-68fh7bv7bd-68fh7bv7bd.gz
@@ -108,6 +107,53 @@ C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Web.deps.json
 C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Web.runtimeconfig.json
 C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Web.dll
 C:\Users\dmatc\AppData\Local\Temp\JuanNetPaymentUiVerify\Juan-NET.Web.pdb
-D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\zkuu6267hi-{0}-j03fivkrlt-j03fivkrlt.gz
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\c0dlqfi59e-{0}-t6k3aciy32-t6k3aciy32.gz
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\appsettings.Development.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\appsettings.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\artifacts\obj\Juan-NET.Web.csproj.nuget.dgspec.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\artifacts\obj\project.assets.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\appsettings.Development.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\appsettings.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\artifacts\obj\Juan-NET.Web.csproj.nuget.dgspec.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\artifacts\obj\project.assets.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\Juan-NET.Web.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\Juan-NET.Web.runtimeconfig.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\Juan-NET.Web.staticwebassets.endpoints.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Debug\net10.0\Juan-NET.Web.staticwebassets.runtime.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\appsettings.Development.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\appsettings.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\artifacts\obj\Juan-NET.Web.csproj.nuget.dgspec.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\artifacts\obj\project.assets.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\Juan-NET.Web.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\Juan-NET.Web.runtimeconfig.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\Juan-NET.Web.staticwebassets.endpoints.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\bin\Release\net10.0\Juan-NET.Web.staticwebassets.runtime.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Web.staticwebassets.runtime.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Web.staticwebassets.endpoints.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Web.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Web.runtimeconfig.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Web.dll
+C:\Users\dmatc\AppData\Local\Temp\JuanNetProfileBuild\Debug\net10.0\Juan-NET.Web.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\compressed\mlmam3ig23-{0}-rckdpv70ap-rckdpv70ap.gz
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\appsettings.Development.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\appsettings.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\artifacts\obj\Juan-NET.Web.csproj.nuget.dgspec.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\artifacts\obj\project.assets.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Web.staticwebassets.runtime.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Web.staticwebassets.endpoints.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Web.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Web.runtimeconfig.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Web.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build\Juan-NET.Web.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\appsettings.Development.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\appsettings.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\artifacts\obj\Juan-NET.Web.csproj.nuget.dgspec.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\artifacts\obj\project.assets.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Web.staticwebassets.runtime.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Web.staticwebassets.endpoints.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Web.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Web.runtimeconfig.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Web.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\verify-user-split-build-2\Juan-NET.Web.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
