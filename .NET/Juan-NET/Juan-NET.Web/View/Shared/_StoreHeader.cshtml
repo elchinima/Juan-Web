@@ -86,9 +86,6 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="mobile-main-header">
-                        <div class="mobile-logo">
-                            <a asp-controller="Home" asp-action="Index"><img src="~/main assets/img/logo/logo.png" alt="Brand Logo" /></a>
-                        </div>
                         <div class="mobile-menu-toggler">
                             <a asp-controller="Account" asp-action="@(User.Identity?.IsAuthenticated == true ? "Profile" : "Login")">
                                 @if (User.Identity?.IsAuthenticated == true)
@@ -100,8 +97,13 @@
                                     <i class="ion-log-in"></i>
                                 }
                             </a>
+                        </div>
+                        <div class="mobile-shop-icons">
                             <a href="#" data-open-shop-list="wishlist" data-no-transition><i class="fa fa-heart-o"></i><span class="notification" data-wishlist-count>0</span></a>
                             <a href="#" data-open-shop-list="basket" data-no-transition><i class="fa fa-shopping-bag"></i><span class="notification" data-basket-count>0</span></a>
+                        </div>
+                        <div class="mobile-logo">
+                            <a asp-controller="Home" asp-action="Index"><img src="~/main assets/img/logo/logo.png" alt="Brand Logo" /></a>
                         </div>
                     </div>
                 </div>

@@ -42,14 +42,20 @@
         .shop-action-message.is-visible{opacity:1;transform:translateY(0)}
         .header-configure-wrapper{display:flex;justify-content:flex-end}
         .header-configure-area{padding-right:0}
-        .header-configure-area>.nav{align-items:center;justify-content:flex-end!important;flex-wrap:nowrap;gap:6px}
+        .header-configure-area>.nav{align-items:center;justify-content:flex-end!important;flex-wrap:nowrap;gap:12px}
         .header-configure-area>.nav>li{margin-left:0}
         .header-configure-area>.nav>li>a:not(.header-user-name){display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;font-size:20px;border-radius:50%;color:#222}
         .header-configure-area>.nav>li>a:not(.header-user-name):hover,.header-configure-area>.nav>li>a.is-active{color:#e3a51e;background:#fff7e7}
         .header-configure-area>.nav>li>a .notification{top:-2px;right:-2px}
         .header-user-name{display:block;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px!important;font-weight:700;letter-spacing:0;color:#222}
-        .mobile-menu-toggler a[data-open-shop-list]{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px}
-        .mobile-menu-toggler a[data-open-shop-list] .notification{position:absolute;top:0;right:0;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;font-size:10px;color:#fff;background:#e3a51e}
+        .mobile-menu-toggler{gap:16px}
+        .mobile-menu-toggler>a{color:#000!important}
+        .mobile-menu-toggler>a i{font-size:27px;line-height:1;color:#000}
+        .mobile-user-name{display:block;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#000;font-size:24px;font-weight:800;line-height:1}
+        .mobile-shop-icons{display:flex;align-items:center;justify-content:flex-end;gap:16px}
+        .mobile-shop-icons a[data-open-shop-list]{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;color:#000!important}
+        .mobile-shop-icons a[data-open-shop-list] i{font-size:27px;line-height:1;color:#000}
+        .mobile-shop-icons a[data-open-shop-list] .notification{position:absolute;top:0;right:0;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;font-size:10px;color:#fff;background:#e3a51e}
         .product-action-link a.is-active{color:#fff;background-color:#e3a51e}
         @@media (max-width:575px){.shop-list-row{grid-template-columns:60px 1fr auto}.shop-list-row img{width:60px;height:60px}.shop-list-foot{display:block}.shop-list-total{margin-bottom:12px}.shop-list-actions{justify-content:flex-start}}
     </style>

@@ -70,21 +70,21 @@
                 </div>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form asp-controller="Home" asp-action="Contact" method="post">
+            <form asp-controller="Home" asp-action="Contact" method="post" data-complaint-form>
                 <div class="modal-body contact-message">
                     <p class="complaint-modal-text">Describe the problem and the support team will review it from the admin messages panel.</p>
                     <div asp-validation-summary="ModelOnly" class="contact-error"></div>
                     <div class="row">
                         <div class="col-md-6">
-                            <input asp-for="Name" placeholder="Name" />
+                            <input asp-for="Name" placeholder="Name" required maxlength="120" />
                             <span asp-validation-for="Name" class="contact-error"></span>
                         </div>
                         <div class="col-md-6">
-                            <input asp-for="Email" type="email" placeholder="Email" />
+                            <input asp-for="Email" type="email" placeholder="Email" required maxlength="180" />
                             <span asp-validation-for="Email" class="contact-error"></span>
                         </div>
                         <div class="col-12">
-                            <textarea asp-for="Message" rows="7" placeholder="Message"></textarea>
+                            <textarea asp-for="Message" rows="7" placeholder="Message" required maxlength="1000"></textarea>
                             <span asp-validation-for="Message" class="contact-error"></span>
                         </div>
                     </div>
@@ -100,6 +100,20 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            var complaintForm = document.querySelector("[data-complaint-form]");
+
+            if (complaintForm) {
+                complaintForm.addEventListener("submit", function (event) {
+                    if (!complaintForm.checkValidity()) {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                        document.body.classList.remove("page-leave");
+                        complaintForm.classList.add("was-validated");
+                        complaintForm.reportValidity();
+                    }
+                }, true);
+            }
+
             if (@(ViewBag.OpenComplaintModal == true ? "true" : "false") && window.jQuery && window.jQuery.fn.modal) {
                 window.jQuery("#supportComplaintModal").modal("show");
             }
