@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Juan-NET.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d405ff834b99ecf26e81b476df4d750416b9dd58")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bcc035c762a53339b12b828e043007e8abd350ee")]
 [assembly: System.Reflection.AssemblyProductAttribute("Juan-NET.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Juan-NET.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

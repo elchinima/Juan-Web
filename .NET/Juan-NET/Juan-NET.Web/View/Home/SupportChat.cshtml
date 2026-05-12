@@ -29,10 +29,6 @@
                 <div>
                     @if (Model.IsWaitingForOperator)
                     {
-                        <p class="contact-label support-waiting-label">
-                            <span>@Model.OperatorFullName</span>
-                            <i aria-hidden="true"></i>
-                        </p>
                         <h1>@Model.OperatorRole</h1>
                     }
                     else
@@ -41,7 +37,14 @@
                         <h1>@Model.OperatorFullName</h1>
                     }
                 </div>
-                <span>@(Model.IsWaitingForOperator ? "Waiting" : "Online")</span>
+                @if (Model.IsWaitingForOperator)
+                {
+                    <span class="support-waiting-label">Waiting<i aria-hidden="true"></i></span>
+                }
+                else
+                {
+                    <span>Online</span>
+                }
             </div>
 
             <div class="support-chat-messages">

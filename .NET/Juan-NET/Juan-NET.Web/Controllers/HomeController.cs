@@ -225,7 +225,7 @@ public class HomeController : Controller
 
         var isWaitingForOperator = ticket?.OperatorUser is null;
         var operatorInfo = isWaitingForOperator
-            ? ("В ожидании", "Оператор подключается")
+            ? (FullName: "Waiting", Role: "Operator is joining")
             : await GetSupportOperatorInfoAsync(ticket!.OperatorUser!);
 
         return new SupportChatViewModel
