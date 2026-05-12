@@ -4,10 +4,19 @@ namespace Juan_NET.Web.Controllers
     [AdminPermission(AdminPermissionKeys.Support)]
     public class SupportController : Controller
     {
-        public IActionResult Index()
+        private readonly AppDbContext _context;
+        private readonly ImageStorageService _imageStorage;
+
+        public SupportController(AppDbContext context, ImageStorageService imageStorage)
         {
-            var reports = BuildReports();
-            var weekStats = BuildWeekStats();
+            _context = context;
+            _imageStorage = imageStorage;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var reports = await BuildReportsAsync();
+            var weekStats = await BuildWeekStatsAsync();
 
             var viewModel = new SupportDashboardViewModel
             {
@@ -15,7 +24,7 @@ namespace Juan_NET.Web.Controllers
                 DailyBonusReportTarget = 800,
                 WorkHourTarget = 8,
                 BonusWorkHourTarget = 12,
-                TodayReports = 286,
+                TodayReports = reports.Count(item => item.CreatedAt.Date == DateTime.UtcNow.Date),
                 WeekReports = weekStats.Sum(item => item.Reports),
                 OpenReports = reports.Count(item => item.Status != "Resolved"),
                 ResolvedReports = reports.Count(item => item.Status == "Resolved"),
@@ -26,40 +35,150 @@ namespace Juan_NET.Web.Controllers
             return View(viewModel);
         }
 
-        public IActionResult Reports()
+        public async Task<IActionResult> Reports()
         {
-            return View(BuildReports());
+            return View(await BuildReportsAsync());
         }
 
-        private static IReadOnlyList<SupportReportViewModel> BuildReports()
+        public async Task<IActionResult> Details(int id)
         {
-            var now = DateTime.Now;
+            var ticket = await _context.SupportTickets
+                .Include(item => item.User)
+                .Include(item => item.Messages)
+                .ThenInclude(message => message.SenderUser)
+                .FirstOrDefaultAsync(item => item.Id == id);
 
-            return
-            [
-                new SupportReportViewModel { Code = "SUP-1048", Customer = "Aydan M.", Subject = "Payment was captured twice", Priority = "High", Status = "Open", CreatedAt = now.AddMinutes(-7) },
-                new SupportReportViewModel { Code = "SUP-1047", Customer = "Murad A.", Subject = "Order tracking page is empty", Priority = "Medium", Status = "In Progress", CreatedAt = now.AddMinutes(-18) },
-                new SupportReportViewModel { Code = "SUP-1046", Customer = "Leyla S.", Subject = "Cannot change delivery address", Priority = "High", Status = "Open", CreatedAt = now.AddMinutes(-31) },
-                new SupportReportViewModel { Code = "SUP-1045", Customer = "Nihat R.", Subject = "Product image is missing", Priority = "Low", Status = "Resolved", CreatedAt = now.AddMinutes(-52) },
-                new SupportReportViewModel { Code = "SUP-1044", Customer = "Farida H.", Subject = "Refund confirmation not received", Priority = "Medium", Status = "In Progress", CreatedAt = now.AddHours(-1).AddMinutes(-16) },
-                new SupportReportViewModel { Code = "SUP-1043", Customer = "Orkhan T.", Subject = "Promo code does not apply", Priority = "Low", Status = "Resolved", CreatedAt = now.AddHours(-2).AddMinutes(-4) },
-                new SupportReportViewModel { Code = "SUP-1042", Customer = "Samira Q.", Subject = "Account email verification failed", Priority = "Medium", Status = "Open", CreatedAt = now.AddHours(-2).AddMinutes(-37) },
-                new SupportReportViewModel { Code = "SUP-1041", Customer = "Elvin B.", Subject = "Wrong shoe size arrived", Priority = "High", Status = "In Progress", CreatedAt = now.AddHours(-3).AddMinutes(-11) }
-            ];
+            if (ticket is null)
+            {
+                return RedirectToAction(nameof(Reports));
+            }
+
+            var viewModel = new SupportTicketDetailsViewModel
+            {
+                Id = ticket.Id,
+                Code = ticket.Code,
+                Customer = ticket.User.FullName,
+                Subject = ticket.Subject,
+                Status = ticket.Status,
+                CreatedAt = ticket.CreatedAt,
+                Messages = ticket.Messages
+                    .OrderBy(message => message.CreatedAt)
+                    .Select(message => new SupportMessageViewModel
+                    {
+                        SenderName = message.SenderUser.FullName,
+                        IsOperator = message.IsOperator,
+                        Text = message.Text,
+                        ImageUrl = message.ImageUrl,
+                        CreatedAt = message.CreatedAt
+                    })
+                    .ToList()
+            };
+
+            return View(viewModel);
         }
 
-        private static IReadOnlyList<SupportDayStatViewModel> BuildWeekStats()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reply(SupportMessageInput input)
         {
-            return
-            [
-                new SupportDayStatViewModel { Day = "Mon", Reports = 428, Hours = 8.1m },
-                new SupportDayStatViewModel { Day = "Tue", Reports = 476, Hours = 8.4m },
-                new SupportDayStatViewModel { Day = "Wed", Reports = 391, Hours = 7.8m },
-                new SupportDayStatViewModel { Day = "Thu", Reports = 512, Hours = 9.2m },
-                new SupportDayStatViewModel { Day = "Fri", Reports = 449, Hours = 8.6m },
-                new SupportDayStatViewModel { Day = "Sat", Reports = 318, Hours = 6.3m },
-                new SupportDayStatViewModel { Day = "Sun", Reports = 286, Hours = 4.5m }
-            ];
+            if (!input.TicketId.HasValue)
+            {
+                return RedirectToAction(nameof(Reports));
+            }
+
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var text = input.Text?.Trim();
+            if (string.IsNullOrWhiteSpace(text) && input.ImageFile is not { Length: > 0 })
+            {
+                return RedirectToAction(nameof(Details), new { id = input.TicketId.Value });
+            }
+
+            var ticket = await _context.SupportTickets.FindAsync(input.TicketId.Value);
+            if (ticket is null)
+            {
+                return RedirectToAction(nameof(Reports));
+            }
+
+            string? imageUrl = null;
+            if (input.ImageFile is { Length: > 0 })
+            {
+                imageUrl = await _imageStorage.SaveSupportAttachmentAsWebpAsync(input.ImageFile);
+            }
+
+            ticket.OperatorUserId = userId.Value;
+            ticket.Status = "In Progress";
+            ticket.UpdatedAt = DateTime.UtcNow;
+
+            _context.SupportMessages.Add(new SupportMessage
+            {
+                SupportTicketId = ticket.Id,
+                SenderUserId = userId.Value,
+                IsOperator = true,
+                Text = text,
+                ImageUrl = imageUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = ticket.Id });
+        }
+
+        private async Task<IReadOnlyList<SupportReportViewModel>> BuildReportsAsync()
+        {
+            return await _context.SupportTickets
+                .Include(ticket => ticket.User)
+                .Include(ticket => ticket.OperatorUser)
+                .Include(ticket => ticket.Messages)
+                .OrderByDescending(ticket => ticket.UpdatedAt)
+                .Select(ticket => new SupportReportViewModel
+                {
+                    Id = ticket.Id,
+                    Code = ticket.Code,
+                    Customer = ticket.User.FullName,
+                    Subject = ticket.Subject,
+                    Priority = ticket.Priority,
+                    Status = ticket.Status,
+                    Operator = ticket.OperatorUser == null ? "Unassigned" : ticket.OperatorUser.FullName,
+                    MessageCount = ticket.Messages.Count,
+                    CreatedAt = ticket.CreatedAt
+                })
+                .ToListAsync();
+        }
+
+        private async Task<IReadOnlyList<SupportDayStatViewModel>> BuildWeekStatsAsync()
+        {
+            var startDate = DateTime.UtcNow.Date.AddDays(-6);
+            var tickets = await _context.SupportTickets
+                .Where(ticket => ticket.CreatedAt >= startDate)
+                .GroupBy(ticket => ticket.CreatedAt.Date)
+                .Select(group => new { Date = group.Key, Count = group.Count() })
+                .ToListAsync();
+
+            return Enumerable.Range(0, 7)
+                .Select(index =>
+                {
+                    var date = startDate.AddDays(index);
+                    var count = tickets.FirstOrDefault(item => item.Date == date)?.Count ?? 0;
+                    return new SupportDayStatViewModel
+                    {
+                        Day = date.ToString("ddd", CultureInfo.InvariantCulture),
+                        Reports = count,
+                        Hours = 0
+                    };
+                })
+                .ToList();
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userIdValue, out var userId) ? userId : null;
         }
     }
 }

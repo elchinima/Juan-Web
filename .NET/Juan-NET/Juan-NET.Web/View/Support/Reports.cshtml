@@ -28,7 +28,7 @@
 <section class="panel reveal">
     <div class="panel-head">
         <div>
-            <p class="eyebrow">Simulation</p>
+            <p class="eyebrow">Live queue</p>
             <h3>Incoming Reports</h3>
         </div>
     </div>
@@ -46,7 +46,7 @@
             <article class="support-table-row">
                 <span>@report.Code</span>
                 <strong>@report.Customer</strong>
-                <p>@report.Subject</p>
+                <p><a asp-controller="Support" asp-action="Details" asp-route-id="@report.Id">@report.Subject</a></p>
                 <em class="priority-pill @report.Priority.ToLowerInvariant()">@report.Priority</em>
                 <em class="status-pill">@report.Status</em>
                 <time>@report.CreatedAt.ToString("HH:mm")</time>

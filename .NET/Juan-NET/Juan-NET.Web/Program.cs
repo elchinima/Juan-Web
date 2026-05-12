@@ -36,6 +36,7 @@ using (var scope = app.Services.CreateScope())
     await ShopListInfrastructureService.EnsureInfrastructureAsync(context);
     await SiteSettingsInfrastructureService.EnsureInfrastructureAsync(context);
     await OrderInfrastructureService.EnsureInfrastructureAsync(context);
+    await SupportInfrastructureService.EnsureInfrastructureAsync(context);
 }
 
 if (app.Environment.IsDevelopment())

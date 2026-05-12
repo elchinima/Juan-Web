@@ -42,6 +42,12 @@
 
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
+        public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+
+        public DbSet<SupportTicketCreatedDate> SupportTicketCreatedDates => Set<SupportTicketCreatedDate>();
+
+        public DbSet<SupportMessage> SupportMessages => Set<SupportMessage>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -124,6 +130,51 @@
                 entity.HasOne(item => item.Product)
                     .WithMany(product => product.OrderItems)
                     .HasForeignKey(item => item.ProductId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<SupportTicket>(entity =>
+            {
+                entity.HasIndex(ticket => ticket.Code).IsUnique();
+                entity.Property(ticket => ticket.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(ticket => ticket.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(ticket => ticket.Priority).HasDefaultValue("Medium");
+                entity.Property(ticket => ticket.Status).HasDefaultValue("Open");
+
+                entity.HasOne(ticket => ticket.User)
+                    .WithMany(user => user.SupportTickets)
+                    .HasForeignKey(ticket => ticket.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(ticket => ticket.OperatorUser)
+                    .WithMany(user => user.AssignedSupportTickets)
+                    .HasForeignKey(ticket => ticket.OperatorUserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<SupportTicketCreatedDate>(entity =>
+            {
+                entity.Property(date => date.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(date => date.SupportTicketId).IsUnique();
+
+                entity.HasOne(date => date.SupportTicket)
+                    .WithOne(ticket => ticket.CreatedDate)
+                    .HasForeignKey<SupportTicketCreatedDate>(date => date.SupportTicketId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SupportMessage>(entity =>
+            {
+                entity.Property(message => message.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(message => message.SupportTicket)
+                    .WithMany(ticket => ticket.Messages)
+                    .HasForeignKey(message => message.SupportTicketId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(message => message.SenderUser)
+                    .WithMany(user => user.SupportMessages)
+                    .HasForeignKey(message => message.SenderUserId)
                     .OnDelete(DeleteBehavior.NoAction);
             });
 

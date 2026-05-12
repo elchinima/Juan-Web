@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9EACBE8C-7A8D-96DC-13F6-26584DDA0C09}|Juan-NET.Web\\Juan-NET.Web.csproj|d:\\project-work\\code academy\\mini projects\\juan - online store\\.net\\juan-net\\juan-net.web\\services\\imagestorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9EACBE8C-7A8D-96DC-13F6-26584DDA0C09}|Juan-NET.Web\\Juan-NET.Web.csproj|solutionrelative:juan-net.web\\services\\imagestorageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +14,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ImageStorageService.cs",
+              "DocumentMoniker": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Web\\Services\\ImageStorageService.cs",
+              "RelativeDocumentMoniker": "Juan-NET.Web\\Services\\ImageStorageService.cs",
+              "ToolTip": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Web\\Services\\ImageStorageService.cs",
+              "RelativeToolTip": "Juan-NET.Web\\Services\\ImageStorageService.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAcwDEAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T19:24:34.761Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:130:0:{75188d03-9892-4ae2-abf1-207126247ce5}"

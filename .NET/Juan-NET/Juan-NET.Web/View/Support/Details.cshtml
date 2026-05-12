@@ -1,0 +1,58 @@
+@model SupportTicketDetailsViewModel
+@{
+    Layout = "_SupportLayout";
+    ViewData["Title"] = Model.Code;
+    ViewData["PageName"] = "support-report-details";
+    ViewData["ActivePage"] = "Reports";
+}
+
+@section SidebarCard {
+    <span>@Model.Status</span>
+    <strong>@Model.Code</strong>
+    <p>@Model.CreatedAt.ToString("MMM d, yyyy HH:mm")</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">@Model.Customer</p>
+        <h1>@Model.Subject</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Support" asp-action="Reports">Reports</a>
+    </div>
+</header>
+
+<section class="panel reveal support-ticket-panel">
+    <div class="support-chat-messages support-admin-messages">
+        @foreach (var message in Model.Messages)
+        {
+            <article class="support-chat-message @(message.IsOperator ? "agent" : "user")">
+                <strong>@message.SenderName</strong>
+                @if (!string.IsNullOrWhiteSpace(message.Text))
+                {
+                    <p>@message.Text</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(message.ImageUrl))
+                {
+                    <a class="support-chat-attachment" href="@message.ImageUrl" target="_blank" rel="noopener">
+                        <img src="@message.ImageUrl" alt="Support attachment" />
+                    </a>
+                }
+            </article>
+        }
+    </div>
+
+    <form class="support-chat-form" asp-controller="Support" asp-action="Reply" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="TicketId" value="@Model.Id" />
+        <label class="support-file-button" aria-label="Attach image">
+            <input type="file" name="ImageFile" accept=".png,.jpg,.jpeg,image/png,image/jpeg" />
+            <span>+</span>
+        </label>
+        <input type="text" name="Text" placeholder="Type your message" maxlength="2000" />
+        <button type="submit">Send</button>
+    </form>
+</section>

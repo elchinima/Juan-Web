@@ -1,3 +1,4 @@
+@model IReadOnlyList<SupportTicket>
 @{
     Layout = null;
     ViewData["Title"] = "Support History";
@@ -27,18 +28,23 @@
             <p class="contact-label">History</p>
             <h1>Recent chats</h1>
             <div class="support-history-list">
-                <div>
-                    <strong>Order delivery question</strong>
-                    <span>Today, 12:40</span>
-                </div>
-                <div>
-                    <strong>Payment check</strong>
-                    <span>Yesterday, 18:15</span>
-                </div>
-                <div>
-                    <strong>Product details</strong>
-                    <span>May 10, 2026</span>
-                </div>
+                @if (Model.Any())
+                {
+                    @foreach (var ticket in Model)
+                    {
+                        <div>
+                            <strong>@ticket.Subject</strong>
+                            <span>@ticket.Code · @ticket.Status · @ticket.CreatedAt.ToString("MMM d, yyyy HH:mm")</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div>
+                        <strong>No support requests yet</strong>
+                        <span>Your support history will appear here.</span>
+                    </div>
+                }
             </div>
         </section>
     </section>

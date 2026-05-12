@@ -671,6 +671,27 @@ body {
   font-weight: 900;
 }
 
+.support-waiting-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.support-waiting-label i {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(227, 165, 30, 0.25);
+  border-top-color: var(--juan-accent);
+  border-radius: 50%;
+  animation: support-waiting-spin 0.8s linear infinite;
+}
+
+@keyframes support-waiting-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .support-chat-messages {
   display: grid;
   gap: 16px;
@@ -707,19 +728,20 @@ body {
 
 .support-chat-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 130px;
+  grid-template-columns: 50px minmax(0, 1fr) 130px;
   gap: 12px;
   padding: 22px 28px 28px;
   border-top: 1px solid #f0eadf;
 }
 
 .support-chat-form input,
-.support-chat-form button {
+.support-chat-form button,
+.support-file-button {
   height: 50px;
   border-radius: 6px;
 }
 
-.support-chat-form input {
+.support-chat-form input[type="text"] {
   border: 1px solid #e3ded2;
   padding: 0 16px;
   background: #f9f8f5;
@@ -730,6 +752,51 @@ body {
   background: var(--juan-accent);
   color: #ffffff;
   font-weight: 900;
+}
+
+.support-file-button {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border: 1px solid #e3ded2;
+  background: #f9f8f5;
+  color: var(--juan-ink);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.support-file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.support-file-button span {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.support-chat-attachment {
+  display: block;
+  margin-top: 10px;
+}
+
+.support-chat-attachment img {
+  display: block;
+  width: min(100%, 260px);
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.support-ticket-panel {
+  overflow: hidden;
+}
+
+.support-admin-messages {
+  min-height: 360px;
 }
 
 .support-history-panel {
@@ -1077,13 +1144,14 @@ body {
   }
 
   .support-chat-body .support-chat-form {
-    grid-template-columns: minmax(0, 1fr) 82px;
+    grid-template-columns: 46px minmax(0, 1fr) 82px;
     gap: 8px;
     padding: 12px;
   }
 
   .support-chat-body .support-chat-form input,
-  .support-chat-body .support-chat-form button {
+  .support-chat-body .support-chat-form button,
+  .support-chat-body .support-file-button {
     height: 46px;
   }
 

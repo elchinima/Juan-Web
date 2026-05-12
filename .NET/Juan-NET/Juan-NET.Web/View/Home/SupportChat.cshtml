@@ -1,3 +1,4 @@
+@model SupportChatViewModel
 @{
     Layout = null;
     ViewData["Title"] = "Technical Support";
@@ -26,30 +27,61 @@
         <section class="support-chat-panel">
             <div class="support-chat-head">
                 <div>
-                    <p class="contact-label">Live Simulation</p>
-                    <h1>Technical Support</h1>
+                    @if (Model.IsWaitingForOperator)
+                    {
+                        <p class="contact-label support-waiting-label">
+                            <span>@Model.OperatorFullName</span>
+                            <i aria-hidden="true"></i>
+                        </p>
+                        <h1>@Model.OperatorRole</h1>
+                    }
+                    else
+                    {
+                        <p class="contact-label">@Model.OperatorRole</p>
+                        <h1>@Model.OperatorFullName</h1>
+                    }
                 </div>
-                <span>Online</span>
+                <span>@(Model.IsWaitingForOperator ? "Waiting" : "Online")</span>
             </div>
 
             <div class="support-chat-messages">
-                <article class="support-chat-message agent">
-                    <strong>Juan Support</strong>
-                    <p>Hello. Tell us what happened and we will help you with the next step.</p>
-                </article>
-                <article class="support-chat-message user">
-                    <strong>You</strong>
-                    <p>I need help with my order status.</p>
-                </article>
-                <article class="support-chat-message agent">
-                    <strong>Juan Support</strong>
-                    <p>Send the order number here. This chat is a simulation for now.</p>
-                </article>
+                @if (Model.Messages.Any())
+                {
+                    @foreach (var message in Model.Messages)
+                    {
+                        <article class="support-chat-message @(message.IsOperator ? "agent" : "user")">
+                            <strong>@message.SenderName</strong>
+                            @if (!string.IsNullOrWhiteSpace(message.Text))
+                            {
+                                <p>@message.Text</p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(message.ImageUrl))
+                            {
+                                <a class="support-chat-attachment" href="@message.ImageUrl" target="_blank" rel="noopener">
+                                    <img src="@message.ImageUrl" alt="Support attachment" />
+                                </a>
+                            }
+                        </article>
+                    }
+                }
+                else
+                {
+                    <article class="support-chat-message agent">
+                        <strong>@Model.OperatorFullName</strong>
+                        <p>Your request is in the queue. An operator will join this chat.</p>
+                    </article>
+                }
             </div>
 
-            <form class="support-chat-form">
-                <input type="text" placeholder="Type your message" disabled />
-                <button type="button" disabled>Send</button>
+            <form class="support-chat-form" asp-controller="Home" asp-action="SendSupportMessage" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                <label class="support-file-button" aria-label="Attach image">
+                    <input type="file" name="ImageFile" accept=".png,.jpg,.jpeg,image/png,image/jpeg" />
+                    <span>+</span>
+                </label>
+                <input type="text" name="Text" placeholder="Type your message" maxlength="2000" />
+                <button type="submit">Send</button>
             </form>
         </section>
     </section>

@@ -10,10 +10,12 @@ namespace Juan_NET.Web.Controllers;
 public class HomeController : Controller
 {
     private readonly AppDbContext _context;
+    private readonly ImageStorageService _imageStorage;
 
-    public HomeController(AppDbContext context)
+    public HomeController(AppDbContext context, ImageStorageService imageStorage)
     {
         _context = context;
+        _imageStorage = imageStorage;
     }
 
     public async Task<IActionResult> Index()
@@ -67,14 +69,106 @@ public class HomeController : Controller
         return View(new ContactMessageViewModel());
     }
 
-    public IActionResult SupportChat()
+    [Authorize]
+    public async Task<IActionResult> SupportChat()
     {
-        return View();
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        return View(await BuildSupportChatViewModelAsync(userId.Value));
     }
 
-    public IActionResult SupportChatHistory()
+    [Authorize]
+    public async Task<IActionResult> SupportChatHistory()
     {
-        return View();
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var tickets = await _context.SupportTickets
+            .Where(ticket => ticket.UserId == userId.Value)
+            .OrderByDescending(ticket => ticket.UpdatedAt)
+            .ToListAsync();
+
+        return View(tickets);
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SendSupportMessage(SupportMessageInput input)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var text = input.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(text) && input.ImageFile is not { Length: > 0 })
+        {
+            return RedirectToAction(nameof(SupportChat));
+        }
+
+        string? imageUrl = null;
+        if (input.ImageFile is { Length: > 0 })
+        {
+            imageUrl = await _imageStorage.SaveSupportAttachmentAsWebpAsync(input.ImageFile);
+        }
+
+        var ticket = input.TicketId.HasValue
+            ? await _context.SupportTickets.FirstOrDefaultAsync(item => item.Id == input.TicketId.Value && item.UserId == userId.Value)
+            : await _context.SupportTickets
+                .Where(item => item.UserId == userId.Value && item.Status != "Resolved")
+                .OrderByDescending(item => item.UpdatedAt)
+                .FirstOrDefaultAsync();
+
+        if (ticket is null)
+        {
+            ticket = new SupportTicket
+            {
+                UserId = userId.Value,
+                Code = $"PENDING-{Guid.NewGuid():N}"[..32],
+                Subject = BuildSupportSubject(text, imageUrl),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.SupportTickets.Add(ticket);
+            await _context.SaveChangesAsync();
+
+            ticket.Code = $"SUP-{ticket.CreatedAt:yyyyMMdd}-{ticket.Id:D6}";
+            _context.SupportTicketCreatedDates.Add(new SupportTicketCreatedDate
+            {
+                SupportTicketId = ticket.Id,
+                CreatedAt = ticket.CreatedAt
+            });
+        }
+
+        ticket.UpdatedAt = DateTime.UtcNow;
+        if (ticket.Status == "Resolved")
+        {
+            ticket.Status = "Open";
+        }
+
+        _context.SupportMessages.Add(new SupportMessage
+        {
+            SupportTicketId = ticket.Id,
+            SenderUserId = userId.Value,
+            IsOperator = false,
+            Text = text,
+            ImageUrl = imageUrl,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(SupportChat));
     }
 
     [Authorize]
@@ -117,6 +211,70 @@ public class HomeController : Controller
             .ToListAsync();
 
         return View(orders);
+    }
+
+    private async Task<SupportChatViewModel> BuildSupportChatViewModelAsync(int userId)
+    {
+        var ticket = await _context.SupportTickets
+            .Include(item => item.OperatorUser)
+            .Include(item => item.Messages)
+            .ThenInclude(message => message.SenderUser)
+            .Where(item => item.UserId == userId && item.Status != "Resolved")
+            .OrderByDescending(item => item.UpdatedAt)
+            .FirstOrDefaultAsync();
+
+        var isWaitingForOperator = ticket?.OperatorUser is null;
+        var operatorInfo = isWaitingForOperator
+            ? ("В ожидании", "Оператор подключается")
+            : await GetSupportOperatorInfoAsync(ticket!.OperatorUser!);
+
+        return new SupportChatViewModel
+        {
+            TicketId = ticket?.Id,
+            TicketCode = ticket?.Code ?? string.Empty,
+            OperatorFullName = operatorInfo.FullName,
+            OperatorRole = operatorInfo.Role,
+            IsWaitingForOperator = isWaitingForOperator,
+            Messages = ticket?.Messages
+                .OrderBy(message => message.CreatedAt)
+                .Select(message => new SupportMessageViewModel
+                {
+                    SenderName = message.IsOperator ? operatorInfo.FullName : "You",
+                    IsOperator = message.IsOperator,
+                    Text = message.Text,
+                    ImageUrl = message.ImageUrl,
+                    CreatedAt = message.CreatedAt
+                })
+                .ToList() ?? []
+        };
+    }
+
+    private async Task<(string FullName, string Role)> GetSupportOperatorInfoAsync(User operatorUser)
+    {
+        var role = await _context.UserAdminRoles
+            .Where(userRole => userRole.UserId == operatorUser.Id && userRole.AdminRole.Permissions.Any(permission => permission.PermissionKey == AdminPermissionKeys.Support))
+            .OrderBy(userRole => userRole.AdminRole.DisplayOrder)
+            .Select(userRole => userRole.AdminRole.Name)
+            .FirstOrDefaultAsync();
+
+        return (operatorUser.FullName, role ?? "Support Operator");
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(userIdValue, out var userId) ? userId : null;
+    }
+
+    private static string BuildSupportSubject(string? text, string? imageUrl)
+    {
+        var subject = string.IsNullOrWhiteSpace(text) ? "Image attachment" : text;
+        if (!string.IsNullOrWhiteSpace(imageUrl) && string.IsNullOrWhiteSpace(text))
+        {
+            subject = "Image attachment";
+        }
+
+        return subject.Length <= 160 ? subject : subject[..160];
     }
 
     [HttpPost]

@@ -42,5 +42,11 @@ namespace Juan_NET.Domain.Entities
         public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
 
         public ICollection<Order> Orders { get; set; } = new List<Order>();
+
+        public ICollection<SupportTicket> SupportTickets { get; set; } = new List<SupportTicket>();
+
+        public ICollection<SupportTicket> AssignedSupportTickets { get; set; } = new List<SupportTicket>();
+
+        public ICollection<SupportMessage> SupportMessages { get; set; } = new List<SupportMessage>();
     }
 }

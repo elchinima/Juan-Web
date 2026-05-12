@@ -15,11 +15,26 @@ namespace Juan_NET.Web.Services
 
         public async Task<string> SaveAsWebpAsync(IFormFile file, string folder)
         {
+            return await SaveAsWebpAsync(file, folder, 30, AllowedExtensions, "Only png, jpeg, jpg and gif images are allowed.");
+        }
+
+        public async Task<string> SaveSupportAttachmentAsWebpAsync(IFormFile file)
+        {
+            return await SaveAsWebpAsync(file, "support", 10, new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ".png",
+                ".jpeg",
+                ".jpg"
+            }, "Only png, jpeg and jpg images are allowed.");
+        }
+
+        private static async Task<string> SaveAsWebpAsync(IFormFile file, string folder, int quality, HashSet<string> allowedExtensions, string errorMessage)
+        {
             var extension = Path.GetExtension(file.FileName);
 
-            if (!AllowedExtensions.Contains(extension))
+            if (!allowedExtensions.Contains(extension))
             {
-                throw new InvalidOperationException("Only png, jpeg, jpg and gif images are allowed.");
+                throw new InvalidOperationException(errorMessage);
             }
 
             var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folder);
@@ -32,7 +47,7 @@ namespace Juan_NET.Web.Services
             using var image = await Image.LoadAsync(input);
             await image.SaveAsWebpAsync(filePath, new WebpEncoder
             {
-                Quality = 40
+                Quality = quality
             });
 
             return $"/uploads/{folder}/{fileName}";
