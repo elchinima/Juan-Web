@@ -774,6 +774,11 @@ button {
   gap: 14px;
 }
 
+.support-rating-table .support-table-head,
+.support-rating-table .support-table-row {
+  grid-template-columns: 100px 130px minmax(220px, 1fr) 100px 120px 90px 80px;
+}
+
 .support-table-head {
   min-height: 40px;
   padding: 0 16px;
@@ -806,6 +811,24 @@ button {
   padding: 22px 26px;
   border-bottom: 1px solid var(--line);
   background: #ffffff;
+}
+
+.support-rating-summary {
+  display: grid;
+  gap: 6px;
+  padding: 14px 26px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfaf7;
+}
+
+.support-rating-summary strong {
+  color: var(--accent);
+  font-size: 24px;
+}
+
+.support-rating-summary p {
+  margin: 0;
+  color: var(--muted);
 }
 
 .support-chat-messages {
@@ -862,6 +885,15 @@ button {
   border-radius: 8px;
 }
 
+.support-processed-label {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .support-chat-form {
   display: grid;
   grid-template-columns: 50px minmax(0, 1fr) 130px;
@@ -869,6 +901,48 @@ button {
   padding: 18px 26px 22px;
   border-top: 1px solid var(--line);
   background: #ffffff;
+}
+
+.support-selected-attachment {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf7;
+}
+
+.support-selected-attachment[hidden] {
+  display: none;
+}
+
+.support-selected-attachment img {
+  width: 72px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.support-selected-attachment span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.support-selected-attachment button {
+  min-width: 88px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--danger);
+  font-weight: 900;
 }
 
 .support-chat-form input,
@@ -913,6 +987,38 @@ button {
 
 .support-file-button span {
   font-size: 24px;
+  line-height: 1;
+}
+
+.support-image-lightbox {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(34, 34, 34, 0.78);
+}
+
+.support-image-lightbox img {
+  max-width: min(960px, 92vw);
+  max-height: 86vh;
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.support-image-lightbox button {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 30px;
   line-height: 1;
 }
 

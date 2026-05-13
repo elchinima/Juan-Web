@@ -6,6 +6,10 @@ namespace Juan_NET.Web.ViewModels
 
         public string TicketCode { get; set; } = string.Empty;
 
+        public string Topic { get; set; } = string.Empty;
+
+        public string Subject { get; set; } = string.Empty;
+
         public string OperatorFullName { get; set; } = "Juan Support";
 
         public string OperatorRole { get; set; } = "Support Operator";

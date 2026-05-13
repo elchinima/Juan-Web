@@ -40,42 +40,47 @@
         <div class="support-table-head">
             <span>Code</span>
             <span>Customer</span>
-            <span>Subject</span>
+            <span>Category</span>
             <span>Priority</span>
             <span>Status</span>
             <span>Action</span>
         </div>
-        @foreach (var report in Model)
-        {
-            <article class="support-table-row">
-                <span>@report.Code</span>
-                <strong>@report.Customer</strong>
-                <p>@report.Subject</p>
-                <em class="priority-pill @report.Priority.ToLowerInvariant()">@report.Priority</em>
-                <em class="status-pill">@report.Status</em>
-                <form asp-controller="Support" asp-action="Take" asp-route-id="@report.Id" method="post">
-                    @Html.AntiForgeryToken()
-                    @if (ViewBag.ActiveReportId is not null)
-                    {
-                        <button class="primary-button compact-button" type="submit" disabled>Take</button>
-                    }
-                    else
-                    {
-                        <button class="primary-button compact-button" type="submit">Take</button>
-                    }
-                </form>
-            </article>
-        }
-        @if (!Model.Any())
-        {
-            <article class="support-table-row">
-                <span>No reports</span>
-                <strong>Queue is empty</strong>
-                <p>New reports will appear here.</p>
-                <em class="priority-pill low">Low</em>
-                <em class="status-pill">Open</em>
-                <time>@DateTime.UtcNow.ToString("HH:mm")</time>
-            </article>
-        }
+        <div data-support-token-source hidden>
+            @Html.AntiForgeryToken()
+        </div>
+        <div data-support-report-queue data-support-report-queue-url="@Url.Action("ReportQueue", "Support")" data-support-take-url="@Url.Action("Take", "Support")" data-support-has-active-report="@(ViewBag.ActiveReportId is not null ? "true" : "false")">
+            @foreach (var report in Model)
+            {
+                <article class="support-table-row">
+                    <span>@report.Code</span>
+                    <strong>@report.Customer</strong>
+                    <p>@report.Topic</p>
+                    <em class="priority-pill @report.Priority.ToLowerInvariant()">@report.Priority</em>
+                    <em class="status-pill">@report.Status</em>
+                    <form asp-controller="Support" asp-action="Take" asp-route-id="@report.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        @if (ViewBag.ActiveReportId is not null)
+                        {
+                            <button class="primary-button compact-button" type="submit" disabled>Take</button>
+                        }
+                        else
+                        {
+                            <button class="primary-button compact-button" type="submit">Take</button>
+                        }
+                    </form>
+                </article>
+            }
+            @if (!Model.Any())
+            {
+                <article class="support-table-row" data-support-empty-row>
+                    <span>No reports</span>
+                    <strong>Queue is empty</strong>
+                    <p>New reports will appear here.</p>
+                    <em class="priority-pill low">Low</em>
+                    <em class="status-pill">Open</em>
+                    <time>@DateTime.UtcNow.ToString("HH:mm")</time>
+                </article>
+            }
+        </div>
     </div>
 </section>

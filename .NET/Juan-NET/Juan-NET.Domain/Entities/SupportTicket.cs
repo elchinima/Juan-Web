@@ -16,6 +16,9 @@ namespace Juan_NET.Domain.Entities
         [Required, MaxLength(160)]
         public string Subject { get; set; } = string.Empty;
 
+        [Required, MaxLength(40)]
+        public string Topic { get; set; } = "Other";
+
         [Required, MaxLength(20)]
         public string Priority { get; set; } = "Medium";
 
@@ -33,6 +36,8 @@ namespace Juan_NET.Domain.Entities
         public User? OperatorUser { get; set; }
 
         public SupportTicketCreatedDate? CreatedDate { get; set; }
+
+        public SupportRating? Rating { get; set; }
 
         public ICollection<SupportMessage> Messages { get; set; } = new List<SupportMessage>();
     }

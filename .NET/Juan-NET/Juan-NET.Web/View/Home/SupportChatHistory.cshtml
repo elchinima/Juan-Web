@@ -18,10 +18,10 @@
 <body class="support-chat-body">
     <section class="support-chat-page support-history-page">
         <nav class="support-chat-nav" aria-label="Technical support chat navigation">
-            <a asp-controller="Home" asp-action="Index">Home</a>
-            <a asp-controller="Home" asp-action="SupportChat">Communication</a>
-            <a class="active" asp-controller="Home" asp-action="SupportChatHistory">History</a>
-            <a asp-controller="Home" asp-action="SupportChatOrders">My Orders</a>
+            <a asp-controller="Home" asp-action="Index" aria-label="Home"><i class="fa fa-home" aria-hidden="true"></i><span>Home</span></a>
+            <a asp-controller="Home" asp-action="SupportChat" aria-label="Communication"><i class="fa fa-comments-o" aria-hidden="true"></i><span>Communication</span></a>
+            <a class="active" asp-controller="Home" asp-action="SupportChatHistory" aria-label="History"><i class="fa fa-history" aria-hidden="true"></i><span>History</span></a>
+            <a asp-controller="Home" asp-action="SupportChatOrders" aria-label="My Orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i><span>My Orders</span></a>
         </nav>
 
         <section class="support-history-panel">
@@ -32,18 +32,47 @@
                 {
                     @foreach (var ticket in Model)
                     {
-                        <div>
-                            <strong>@ticket.Subject</strong>
-                            <span>@ticket.Code · @ticket.Status · @ticket.CreatedAt.ToString("MMM d, yyyy HH:mm")</span>
-                        </div>
+                        var currentRating = (int)Math.Clamp(Math.Round(ticket.Rating?.Rating ?? 5m, MidpointRounding.AwayFromZero), 1m, 5m);
+                        <article class="support-history-card">
+                            <div class="support-history-card-head">
+                                <div>
+                                    <strong>@ticket.Subject</strong>
+                                    <span>@ticket.Code · @ticket.Topic · @ticket.Status · @ticket.CreatedAt.ToString("MMM d, yyyy HH:mm")</span>
+                                </div>
+                                @if (ticket.Rating is not null)
+                                {
+                                    <em>@ticket.Rating.Rating.ToString("0.0", CultureInfo.InvariantCulture)</em>
+                                }
+                            </div>
+                            @if (ticket.OperatorUser is not null)
+                            {
+                                <span>Operator: @ticket.OperatorUser.FullName</span>
+                                <form asp-controller="Home" asp-action="RateSupportTicket" method="post" class="support-rating-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="TicketId" value="@ticket.Id" />
+                                    <fieldset class="support-rating-stars" aria-label="Rating">
+                                        @for (var rating = 5; rating >= 1; rating--)
+                                        {
+                                            <input id="rating-@ticket.Id-@rating" type="radio" name="Rating" value="@rating" checked="@(currentRating == rating)" />
+                                            <label for="rating-@ticket.Id-@rating" aria-label="@rating stars">★</label>
+                                        }
+                                    </fieldset>
+                                    <label class="support-rating-comment">
+                                        <span>Comment</span>
+                                        <textarea name="Comment" maxlength="1000" rows="2" placeholder="Optional">@ticket.Rating?.Comment</textarea>
+                                    </label>
+                                    <button type="submit">@(ticket.Rating is null ? "Rate" : "Update rating")</button>
+                                </form>
+                            }
+                        </article>
                     }
                 }
                 else
                 {
-                    <div>
+                    <article class="support-history-card">
                         <strong>No support requests yet</strong>
                         <span>Your support history will appear here.</span>
-                    </div>
+                    </article>
                 }
             </div>
         </section>

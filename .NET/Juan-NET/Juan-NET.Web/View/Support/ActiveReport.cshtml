@@ -32,7 +32,7 @@
 <section class="panel reveal support-ticket-panel support-operator-chat-panel">
     <div class="panel-head">
         <div>
-            <p class="eyebrow">@Model.Code</p>
+            <p class="eyebrow">@Model.Code · @Model.Topic</p>
             <h3>@Model.Subject</h3>
         </div>
         <em class="status-pill">@Model.Status</em>
@@ -66,6 +66,11 @@
         </label>
         <input type="text" name="Text" placeholder="Type your message" maxlength="2000" />
         <button type="submit">Send</button>
+        <div class="support-selected-attachment" data-support-selected-attachment hidden>
+            <img alt="Selected attachment preview" data-support-selected-image />
+            <span data-support-selected-name></span>
+            <button type="button" data-support-remove-attachment aria-label="Remove attached file">Remove</button>
+        </div>
     </form>
 </section>
 

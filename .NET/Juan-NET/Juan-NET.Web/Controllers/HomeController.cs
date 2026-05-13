@@ -132,11 +132,73 @@ public class HomeController : Controller
         }
 
         var tickets = await _context.SupportTickets
+            .Include(ticket => ticket.OperatorUser)
+            .Include(ticket => ticket.Rating)
             .Where(ticket => ticket.UserId == userId.Value && ticket.Status == "Resolved")
             .OrderByDescending(ticket => ticket.UpdatedAt)
             .ToListAsync();
 
         return View(tickets);
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RateSupportTicket(SupportRatingInput input)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var rating = Math.Round(input.Rating, 1, MidpointRounding.AwayFromZero);
+        if (rating < 1.0m || rating > 5.0m)
+        {
+            return RedirectToAction(nameof(SupportChatHistory));
+        }
+
+        var ticket = await _context.SupportTickets
+            .Include(item => item.Rating)
+            .FirstOrDefaultAsync(item => item.Id == input.TicketId &&
+                item.UserId == userId.Value &&
+                item.Status == "Resolved" &&
+                item.OperatorUserId.HasValue);
+
+        if (ticket is null)
+        {
+            return RedirectToAction(nameof(SupportChatHistory));
+        }
+
+        var operatorUserId = ticket.OperatorUserId.GetValueOrDefault();
+        var comment = string.IsNullOrWhiteSpace(input.Comment) ? null : input.Comment.Trim();
+        if (comment is { Length: > 1000 })
+        {
+            comment = comment[..1000];
+        }
+
+        if (ticket.Rating is null)
+        {
+            _context.SupportRatings.Add(new SupportRating
+            {
+                SupportTicketId = ticket.Id,
+                UserId = userId.Value,
+                OperatorUserId = operatorUserId,
+                Rating = rating,
+                Comment = comment,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+        else
+        {
+            ticket.Rating.Rating = rating;
+            ticket.Rating.Comment = comment;
+            ticket.Rating.CreatedAt = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(SupportChatHistory));
     }
 
     [Authorize]
@@ -171,11 +233,18 @@ public class HomeController : Controller
 
         if (ticket is null)
         {
+            var subject = input.IssueTitle?.Trim();
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                return RedirectToAction(nameof(SupportChat));
+            }
+
             ticket = new SupportTicket
             {
                 UserId = userId.Value,
                 Code = $"PENDING-{Guid.NewGuid():N}"[..32],
-                Subject = BuildSupportSubject(text, imageUrl),
+                Topic = NormalizeSupportTopic(input.Topic),
+                Subject = BuildSupportSubject(subject),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -260,15 +329,19 @@ public class HomeController : Controller
             .OrderByDescending(item => item.UpdatedAt)
             .FirstOrDefaultAsync();
 
-        var isWaitingForOperator = ticket?.OperatorUser is null;
+        var isWaitingForOperator = ticket is not null && ticket.OperatorUser is null;
         var operatorInfo = isWaitingForOperator
             ? (FullName: "Waiting", Role: "Operator is joining")
+            : ticket is null
+                ? (FullName: "Juan Support", Role: "New support report")
             : await GetSupportOperatorInfoAsync(ticket!.OperatorUser!);
 
         return new SupportChatViewModel
         {
             TicketId = ticket?.Id,
             TicketCode = ticket?.Code ?? string.Empty,
+            Topic = ticket?.Topic ?? string.Empty,
+            Subject = ticket?.Subject ?? string.Empty,
             OperatorFullName = operatorInfo.FullName,
             OperatorRole = operatorInfo.Role,
             IsWaitingForOperator = isWaitingForOperator,
@@ -303,15 +376,20 @@ public class HomeController : Controller
         return int.TryParse(userIdValue, out var userId) ? userId : null;
     }
 
-    private static string BuildSupportSubject(string? text, string? imageUrl)
+    private static string BuildSupportSubject(string subject)
     {
-        var subject = string.IsNullOrWhiteSpace(text) ? "Image attachment" : text;
-        if (!string.IsNullOrWhiteSpace(imageUrl) && string.IsNullOrWhiteSpace(text))
-        {
-            subject = "Image attachment";
-        }
-
         return subject.Length <= 160 ? subject : subject[..160];
+    }
+
+    private static string NormalizeSupportTopic(string? topic)
+    {
+        return topic switch
+        {
+            "Technical" => "Technical",
+            "Payment" => "Payment",
+            "Delivery" => "Delivery",
+            _ => "Other"
+        };
     }
 
     [HttpPost]

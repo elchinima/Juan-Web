@@ -48,5 +48,11 @@ namespace Juan_NET.Domain.Entities
         public ICollection<SupportTicket> AssignedSupportTickets { get; set; } = new List<SupportTicket>();
 
         public ICollection<SupportMessage> SupportMessages { get; set; } = new List<SupportMessage>();
+
+        public ICollection<SupportRating> SupportRatings { get; set; } = new List<SupportRating>();
+
+        public ICollection<SupportRating> OperatorSupportRatings { get; set; } = new List<SupportRating>();
+
+        public ICollection<SupportOperatorWorkTime> SupportOperatorWorkTimes { get; set; } = new List<SupportOperatorWorkTime>();
     }
 }

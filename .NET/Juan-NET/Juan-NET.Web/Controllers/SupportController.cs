@@ -4,6 +4,9 @@ namespace Juan_NET.Web.Controllers
     [AdminPermission(AdminPermissionKeys.Support)]
     public class SupportController : Controller
     {
+        private const int MaxShiftSeconds = 12 * 60 * 60;
+        private static readonly TimeSpan SupportLocalOffset = TimeSpan.FromHours(4);
+
         private readonly AppDbContext _context;
         private readonly ImageStorageService _imageStorage;
 
@@ -19,6 +22,9 @@ namespace Juan_NET.Web.Controllers
             var queueReports = reports.Where(item => item.Status != "Resolved").ToList();
             var weekStats = await BuildWeekStatsAsync();
             var activeReport = await GetActiveTicketAsync();
+            var userId = GetCurrentUserId();
+            var shift = userId.HasValue ? await UpdateShiftAsync(userId.Value, true) : (Seconds: 0, LimitReached: false);
+            var monthlyRatings = userId.HasValue ? await BuildMonthlyRatingStatsAsync(userId.Value) : (Average: 5.0m, Count: 0);
 
             var viewModel = new SupportDashboardViewModel
             {
@@ -30,6 +36,10 @@ namespace Juan_NET.Web.Controllers
                 WeekReports = weekStats.Sum(item => item.Reports),
                 OpenReports = queueReports.Count,
                 ResolvedReports = reports.Count(item => item.Status == "Resolved"),
+                MonthlyRating = monthlyRatings.Average,
+                MonthlyRatingCount = monthlyRatings.Count,
+                ShiftSeconds = shift.Seconds,
+                IsShiftLimitReached = shift.LimitReached,
                 RecentReports = queueReports.Take(5).ToList(),
                 WeekStats = weekStats,
                 ActiveReportId = activeReport?.Id,
@@ -39,12 +49,50 @@ namespace Juan_NET.Web.Controllers
             return View(viewModel);
         }
 
+        public async Task<IActionResult> ShiftStatus()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            var shift = await UpdateShiftAsync(userId.Value, true);
+
+            return Json(new
+            {
+                seconds = shift.Seconds,
+                hours = Math.Round(shift.Seconds / 3600m, 2, MidpointRounding.AwayFromZero),
+                isLimitReached = shift.LimitReached
+            });
+        }
+
         public async Task<IActionResult> Reports()
         {
             var activeReport = await GetActiveTicketAsync();
             ViewBag.ActiveReportId = activeReport?.Id;
 
             return View(await BuildReportsAsync(ticket => ticket.Status == "Open" && ticket.OperatorUserId == null));
+        }
+
+        public async Task<IActionResult> ReportQueue()
+        {
+            var activeReport = await GetActiveTicketAsync();
+            var reports = await BuildReportsAsync(ticket => ticket.Status == "Open" && ticket.OperatorUserId == null);
+
+            return Json(new
+            {
+                activeReportId = activeReport?.Id,
+                reports = reports.Select(report => new
+                {
+                    id = report.Id,
+                    code = report.Code,
+                    customer = report.Customer,
+                    category = report.Topic,
+                    priority = report.Priority,
+                    status = report.Status
+                })
+            });
         }
 
         [HttpPost]
@@ -143,6 +191,7 @@ namespace Juan_NET.Web.Controllers
 
             var ticket = await _context.SupportTickets
                 .Include(item => item.User)
+                .Include(item => item.Rating)
                 .Include(item => item.Messages)
                 .ThenInclude(message => message.SenderUser)
                 .FirstOrDefaultAsync(item => item.Id == id && item.Status == "Resolved" && item.OperatorUserId == userId.Value);
@@ -241,17 +290,21 @@ namespace Juan_NET.Web.Controllers
                 .Include(ticket => ticket.User)
                 .Include(ticket => ticket.OperatorUser)
                 .Include(ticket => ticket.Messages)
+                .Include(ticket => ticket.Rating)
                 .OrderByDescending(ticket => ticket.UpdatedAt)
                 .Select(ticket => new SupportReportViewModel
                 {
                     Id = ticket.Id,
                     Code = ticket.Code,
                     Customer = ticket.User.FullName,
+                    Topic = ticket.Topic,
                     Subject = ticket.Subject,
                     Priority = ticket.Priority,
                     Status = ticket.Status,
                     Operator = ticket.OperatorUser == null ? "Unassigned" : ticket.OperatorUser.FullName,
                     MessageCount = ticket.Messages.Count,
+                    Rating = ticket.Rating == null ? null : ticket.Rating.Rating,
+                    RatingComment = ticket.Rating == null ? null : ticket.Rating.Comment,
                     CreatedAt = ticket.CreatedAt,
                     UpdatedAt = ticket.UpdatedAt
                 })
@@ -280,6 +333,7 @@ namespace Juan_NET.Web.Controllers
 
             return await _context.SupportTickets
                 .Include(item => item.User)
+                .Include(item => item.Rating)
                 .Include(item => item.Messages)
                 .ThenInclude(message => message.SenderUser)
                 .FirstOrDefaultAsync(item => item.OperatorUserId == userId.Value && item.Status == "In Progress");
@@ -292,9 +346,12 @@ namespace Juan_NET.Web.Controllers
                 Id = ticket.Id,
                 Code = ticket.Code,
                 Customer = ticket.User.FullName,
+                Topic = ticket.Topic,
                 Subject = ticket.Subject,
                 Status = ticket.Status,
                 CreatedAt = ticket.CreatedAt,
+                Rating = ticket.Rating == null ? null : ticket.Rating.Rating,
+                RatingComment = ticket.Rating == null ? null : ticket.Rating.Comment,
                 Messages = ticket.Messages
                     .OrderBy(message => message.CreatedAt)
                     .Select(message => new SupportMessageViewModel
@@ -331,6 +388,71 @@ namespace Juan_NET.Web.Controllers
                     };
                 })
                 .ToList();
+        }
+
+        private async Task<(decimal Average, int Count)> BuildMonthlyRatingStatsAsync(int userId)
+        {
+            var (monthStartUtc, nextMonthStartUtc) = GetCurrentSupportMonthUtcRange();
+            var ratings = await _context.SupportRatings
+                .Where(rating => rating.OperatorUserId == userId && rating.CreatedAt >= monthStartUtc && rating.CreatedAt < nextMonthStartUtc)
+                .Select(rating => rating.Rating)
+                .ToListAsync();
+
+            if (!ratings.Any())
+            {
+                return (5.0m, 0);
+            }
+
+            return (Math.Round(ratings.Average(), 1, MidpointRounding.AwayFromZero), ratings.Count);
+        }
+
+        private async Task<(int Seconds, bool LimitReached)> UpdateShiftAsync(int userId, bool startIfNotRunning)
+        {
+            var now = DateTime.UtcNow;
+            var workDate = now.Add(SupportLocalOffset).Date;
+            var shift = await _context.SupportOperatorWorkTimes
+                .FirstOrDefaultAsync(item => item.OperatorUserId == userId && item.WorkDate == workDate);
+
+            if (shift is null)
+            {
+                shift = new SupportOperatorWorkTime
+                {
+                    OperatorUserId = userId,
+                    WorkDate = workDate,
+                    LastStartedAt = startIfNotRunning ? now : null,
+                    UpdatedAt = now
+                };
+                _context.SupportOperatorWorkTimes.Add(shift);
+            }
+            else if (shift.LastStartedAt.HasValue)
+            {
+                var secondsToAdd = Math.Max(0, (int)Math.Floor((now - shift.LastStartedAt.Value).TotalSeconds));
+                shift.TotalSeconds = Math.Min(MaxShiftSeconds, shift.TotalSeconds + secondsToAdd);
+                shift.LastStartedAt = shift.TotalSeconds >= MaxShiftSeconds ? null : now;
+                shift.UpdatedAt = now;
+            }
+
+            if (shift.TotalSeconds >= MaxShiftSeconds)
+            {
+                shift.TotalSeconds = MaxShiftSeconds;
+                shift.LastStartedAt = null;
+            }
+            else if (startIfNotRunning && !shift.LastStartedAt.HasValue)
+            {
+                shift.LastStartedAt = now;
+                shift.UpdatedAt = now;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return (shift.TotalSeconds, shift.TotalSeconds >= MaxShiftSeconds);
+        }
+
+        private static (DateTime MonthStartUtc, DateTime NextMonthStartUtc) GetCurrentSupportMonthUtcRange()
+        {
+            var supportNow = DateTime.UtcNow.Add(SupportLocalOffset);
+            var monthStartLocal = new DateTime(supportNow.Year, supportNow.Month, 1);
+            return (monthStartLocal.Subtract(SupportLocalOffset), monthStartLocal.AddMonths(1).Subtract(SupportLocalOffset));
         }
 
         private int? GetCurrentUserId()

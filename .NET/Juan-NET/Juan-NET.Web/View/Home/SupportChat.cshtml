@@ -18,16 +18,21 @@
 <body class="support-chat-body">
     <section class="support-chat-page">
         <nav class="support-chat-nav" aria-label="Technical support chat navigation">
-            <a asp-controller="Home" asp-action="Index">Home</a>
-            <a class="active" asp-controller="Home" asp-action="SupportChat">Communication</a>
-            <a asp-controller="Home" asp-action="SupportChatHistory">History</a>
-            <a asp-controller="Home" asp-action="SupportChatOrders">My Orders</a>
+            <a asp-controller="Home" asp-action="Index" aria-label="Home"><i class="fa fa-home" aria-hidden="true"></i><span>Home</span></a>
+            <a class="active" asp-controller="Home" asp-action="SupportChat" aria-label="Communication"><i class="fa fa-comments-o" aria-hidden="true"></i><span>Communication</span></a>
+            <a asp-controller="Home" asp-action="SupportChatHistory" aria-label="History"><i class="fa fa-history" aria-hidden="true"></i><span>History</span></a>
+            <a asp-controller="Home" asp-action="SupportChatOrders" aria-label="My Orders"><i class="fa fa-shopping-bag" aria-hidden="true"></i><span>My Orders</span></a>
         </nav>
 
         <section class="support-chat-panel">
             <div class="support-chat-head" data-support-chat-head>
                 <div>
-                    @if (Model.IsWaitingForOperator)
+                    @if (!Model.TicketId.HasValue)
+                    {
+                        <p class="contact-label" data-support-operator-role>@Model.OperatorRole</p>
+                        <h1 data-support-operator-name>Create Report</h1>
+                    }
+                    else if (Model.IsWaitingForOperator)
                     {
                         <h1 data-support-operator-name>@Model.OperatorRole</h1>
                         <p class="contact-label" data-support-operator-role hidden>@Model.OperatorRole</p>
@@ -37,8 +42,16 @@
                         <p class="contact-label" data-support-operator-role>@Model.OperatorRole</p>
                         <h1 data-support-operator-name>@Model.OperatorFullName</h1>
                     }
+                    @if (!string.IsNullOrWhiteSpace(Model.Subject))
+                    {
+                        <p class="support-ticket-meta">@Model.Topic · @Model.Subject</p>
+                    }
                 </div>
-                @if (Model.IsWaitingForOperator)
+                @if (!Model.TicketId.HasValue)
+                {
+                    <span data-support-chat-state>New</span>
+                }
+                else if (Model.IsWaitingForOperator)
                 {
                     <span class="support-waiting-label" data-support-chat-state>Waiting<i aria-hidden="true"></i></span>
                 }
@@ -68,7 +81,7 @@
                         </article>
                     }
                 }
-                else
+                else if (Model.TicketId.HasValue)
                 {
                     <article class="support-chat-message agent">
                         <strong>@Model.OperatorFullName</strong>
@@ -80,12 +93,29 @@
             <form class="support-chat-form" asp-controller="Home" asp-action="SendSupportMessage" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                @if (!Model.TicketId.HasValue)
+                {
+                    <div class="support-ticket-fields">
+                        <select name="Topic" required aria-label="Report topic">
+                            <option value="Technical">Technical</option>
+                            <option value="Payment">Payment</option>
+                            <option value="Delivery">Delivery</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" name="IssueTitle" placeholder="Short problem title" maxlength="160" required />
+                    </div>
+                }
                 <label class="support-file-button" aria-label="Attach image">
                     <input type="file" name="ImageFile" accept=".png,.jpg,.jpeg,image/png,image/jpeg" />
                     <span>+</span>
                 </label>
                 <input type="text" name="Text" placeholder="Type your message" maxlength="2000" />
                 <button type="submit">Send</button>
+                <div class="support-selected-attachment" data-support-selected-attachment hidden>
+                    <img alt="Selected attachment preview" data-support-selected-image />
+                    <span data-support-selected-name></span>
+                    <button type="button" data-support-remove-attachment aria-label="Remove attached file">Remove</button>
+                </div>
             </form>
         </section>
     </section>

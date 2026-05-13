@@ -28,11 +28,22 @@
 <section class="panel reveal support-ticket-panel">
     <div class="panel-head">
         <div>
-            <p class="eyebrow">@Model.Code</p>
+            <p class="eyebrow">@Model.Code · @Model.Topic</p>
             <h3>@Model.Subject</h3>
         </div>
         <em class="status-pill">@Model.Status</em>
     </div>
+
+    @if (Model.Rating.HasValue)
+    {
+        <div class="support-rating-summary">
+            <strong>@Model.Rating.Value.ToString("0.0", CultureInfo.InvariantCulture)</strong>
+            @if (!string.IsNullOrWhiteSpace(Model.RatingComment))
+            {
+                <p>@Model.RatingComment</p>
+            }
+        </div>
+    }
 
     <div class="support-chat-messages support-admin-messages">
         @foreach (var message in Model.Messages)

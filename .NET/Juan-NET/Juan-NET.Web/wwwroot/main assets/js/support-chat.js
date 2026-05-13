@@ -9,6 +9,11 @@
   var operatorName = document.querySelector("[data-support-operator-name]");
   var operatorRole = document.querySelector("[data-support-operator-role]");
   var chatState = document.querySelector("[data-support-chat-state]");
+  var fileInput = form ? form.querySelector("input[name='ImageFile']") : null;
+  var selectedAttachment = document.querySelector("[data-support-selected-attachment]");
+  var selectedImage = document.querySelector("[data-support-selected-image]");
+  var selectedName = document.querySelector("[data-support-selected-name]");
+  var removeAttachment = document.querySelector("[data-support-remove-attachment]");
   var lastSignature = "";
   var isSubmitting = false;
 
@@ -42,6 +47,11 @@
       image.alt = "Support attachment";
       link.appendChild(image);
       article.appendChild(link);
+
+      var processedLabel = document.createElement("span");
+      processedLabel.className = "support-processed-label";
+      processedLabel.textContent = "Processed WebP image";
+      article.appendChild(processedLabel);
     }
 
     return article;
@@ -106,6 +116,18 @@
     return url.toString();
   }
 
+  function clearSelectedAttachment() {
+    if (fileInput) {
+      fileInput.value = "";
+    }
+
+    if (selectedAttachment && selectedImage && selectedName) {
+      selectedAttachment.hidden = true;
+      selectedImage.removeAttribute("src");
+      selectedName.textContent = "";
+    }
+  }
+
   async function refreshMessages() {
     try {
       var response = await fetch(buildPollUrl(), {
@@ -137,6 +159,11 @@
         if (ticketInput) {
           ticketInput.value = data.ticketId;
         }
+
+        var ticketFields = document.querySelector(".support-ticket-fields");
+        if (ticketFields) {
+          ticketFields.remove();
+        }
       }
 
       updateUserHeader(data);
@@ -146,6 +173,25 @@
   }
 
   if (form) {
+    if (fileInput && selectedAttachment && selectedImage && selectedName) {
+      fileInput.addEventListener("change", function () {
+        var file = fileInput.files && fileInput.files[0];
+
+        if (!file) {
+          clearSelectedAttachment();
+          return;
+        }
+
+        selectedImage.src = URL.createObjectURL(file);
+        selectedName.textContent = file.name;
+        selectedAttachment.hidden = false;
+      });
+    }
+
+    if (removeAttachment) {
+      removeAttachment.addEventListener("click", clearSelectedAttachment);
+    }
+
     form.addEventListener("submit", async function (event) {
       if (!window.fetch || isSubmitting) {
         return;
@@ -169,9 +215,7 @@
             textInput.value = "";
           }
 
-          if (fileInput) {
-            fileInput.value = "";
-          }
+          clearSelectedAttachment();
 
           await refreshMessages();
         }
@@ -180,6 +224,27 @@
       }
     });
   }
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest(".support-chat-attachment");
+
+    if (!link) {
+      return;
+    }
+
+    event.preventDefault();
+    var modal = document.createElement("div");
+    modal.className = "support-image-lightbox";
+    modal.innerHTML = "<button type=\"button\" aria-label=\"Close image preview\">×</button><img alt=\"Support attachment preview\" />";
+    modal.querySelector("img").src = link.href;
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", function (modalEvent) {
+      if (modalEvent.target === modal || modalEvent.target.tagName === "BUTTON") {
+        modal.remove();
+      }
+    });
+  });
 
   refreshMessages();
   setInterval(refreshMessages, 2000);

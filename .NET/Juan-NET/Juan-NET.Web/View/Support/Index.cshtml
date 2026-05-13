@@ -11,8 +11,8 @@
 
 @section SidebarCard {
     <span>Live Shift</span>
-    <strong data-support-timer>00:00:00</strong>
-    <p>Timer starts when this panel is opened.</p>
+    <strong data-support-timer data-initial-seconds="@Model.ShiftSeconds" data-status-url="@Url.Action("ShiftStatus", "Support")">00:00:00</strong>
+    <p>@(Model.IsShiftLimitReached ? "Daily limit reached." : "Saved in database.")</p>
 }
 
 <header class="topbar">
@@ -40,8 +40,8 @@
     </div>
     <div class="hero-metric">
         <span>Shift Time</span>
-        <strong data-support-timer>00:00:00</strong>
-        <small>Live from page opening</small>
+        <strong data-support-timer data-initial-seconds="@Model.ShiftSeconds" data-status-url="@Url.Action("ShiftStatus", "Support")">00:00:00</strong>
+        <small>@(Model.IsShiftLimitReached ? "Stopped at 12 hours" : "UTC+4 daily counter")</small>
     </div>
 </section>
 
@@ -70,6 +70,11 @@
         <span>Active Report</span>
         <strong>@(Model.ActiveReportCode ?? "None")</strong>
         <p>@(Model.ActiveReportId.HasValue ? "You can answer only this report." : "Take one report from the queue.")</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Monthly Rating</span>
+        <strong>@Model.MonthlyRating.ToString("0.0", CultureInfo.InvariantCulture)</strong>
+        <p>@Model.MonthlyRatingCount ratings this month</p>
     </article>
 </section>
 

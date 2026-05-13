@@ -48,6 +48,10 @@
 
         public DbSet<SupportMessage> SupportMessages => Set<SupportMessage>();
 
+        public DbSet<SupportRating> SupportRatings => Set<SupportRating>();
+
+        public DbSet<SupportOperatorWorkTime> SupportOperatorWorkTimes => Set<SupportOperatorWorkTime>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>(entity =>
@@ -140,6 +144,7 @@
                 entity.Property(ticket => ticket.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(ticket => ticket.Priority).HasDefaultValue("Medium");
                 entity.Property(ticket => ticket.Status).HasDefaultValue("Open");
+                entity.Property(ticket => ticket.Topic).HasDefaultValue("Other");
                 entity.HasIndex(ticket => ticket.ClosedAt);
 
                 entity.HasOne(ticket => ticket.User)
@@ -177,6 +182,41 @@
                     .WithMany(user => user.SupportMessages)
                     .HasForeignKey(message => message.SenderUserId)
                     .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<SupportRating>(entity =>
+            {
+                entity.Property(rating => rating.Rating).HasColumnType("decimal(2,1)");
+                entity.Property(rating => rating.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(rating => rating.SupportTicketId).IsUnique();
+                entity.HasIndex(rating => new { rating.OperatorUserId, rating.CreatedAt });
+
+                entity.HasOne(rating => rating.SupportTicket)
+                    .WithOne(ticket => ticket.Rating)
+                    .HasForeignKey<SupportRating>(rating => rating.SupportTicketId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(rating => rating.User)
+                    .WithMany(user => user.SupportRatings)
+                    .HasForeignKey(rating => rating.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(rating => rating.OperatorUser)
+                    .WithMany(user => user.OperatorSupportRatings)
+                    .HasForeignKey(rating => rating.OperatorUserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<SupportOperatorWorkTime>(entity =>
+            {
+                entity.Property(time => time.WorkDate).HasColumnType("date");
+                entity.Property(time => time.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(time => new { time.OperatorUserId, time.WorkDate }).IsUnique();
+
+                entity.HasOne(time => time.OperatorUser)
+                    .WithMany(user => user.SupportOperatorWorkTimes)
+                    .HasForeignKey(time => time.OperatorUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<AdminRole>(entity =>

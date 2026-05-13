@@ -33,13 +33,14 @@
             <h3>Closed Reports</h3>
         </div>
     </div>
-    <div class="support-table">
+    <div class="support-table support-rating-table">
         <div class="support-table-head">
             <span>Code</span>
             <span>Customer</span>
             <span>Subject</span>
             <span>Priority</span>
             <span>Status</span>
+            <span>Rating</span>
             <span>Closed</span>
         </div>
         @foreach (var report in Model)
@@ -47,9 +48,10 @@
             <article class="support-table-row">
                 <span>@report.Code</span>
                 <strong>@report.Customer</strong>
-                <p><a asp-controller="Support" asp-action="Details" asp-route-id="@report.Id">@report.Subject</a></p>
+                <p><a asp-controller="Support" asp-action="Details" asp-route-id="@report.Id">@report.Topic · @report.Subject</a></p>
                 <em class="priority-pill @report.Priority.ToLowerInvariant()">@report.Priority</em>
                 <em class="status-pill">@report.Status</em>
+                <span>@(report.Rating.HasValue ? report.Rating.Value.ToString("0.0", CultureInfo.InvariantCulture) : "Not rated")</span>
                 <time>@report.UpdatedAt.ToString("MMM d")</time>
             </article>
         }
@@ -61,6 +63,7 @@
                 <p>Your closed reports will appear here.</p>
                 <em class="priority-pill low">Low</em>
                 <em class="status-pill">Resolved</em>
+                <span>Not rated</span>
                 <time>@DateTime.UtcNow.ToString("MMM d")</time>
             </article>
         }
