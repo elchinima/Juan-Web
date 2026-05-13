@@ -8,6 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ImageStorageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AdminAccessService>();
+builder.Services.AddScoped<SupportWorkTimeService>();
 builder.Services.AddHostedService<SupportReportCleanupService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -54,6 +55,27 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 app.UseAuthentication();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var userIdValue = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (int.TryParse(userIdValue, out var userId))
+        {
+            var isSupportPath = context.Request.Path.StartsWithSegments("/Support", StringComparison.OrdinalIgnoreCase);
+            var adminAccess = context.RequestServices.GetRequiredService<AdminAccessService>();
+
+            if (await adminAccess.HasPermissionAsync(context.User, AdminPermissionKeys.Support))
+            {
+                var supportWorkTime = context.RequestServices.GetRequiredService<SupportWorkTimeService>();
+                await supportWorkTime.UpdateShiftAsync(userId, isSupportPath);
+            }
+        }
+    }
+
+    await next();
+});
 
 app.MapControllerRoute(
     name: "default",

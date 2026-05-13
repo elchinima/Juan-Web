@@ -4,16 +4,17 @@ namespace Juan_NET.Web.Controllers
     [AdminPermission(AdminPermissionKeys.Support)]
     public class SupportController : Controller
     {
-        private const int MaxShiftSeconds = 12 * 60 * 60;
         private static readonly TimeSpan SupportLocalOffset = TimeSpan.FromHours(4);
 
         private readonly AppDbContext _context;
         private readonly ImageStorageService _imageStorage;
+        private readonly SupportWorkTimeService _supportWorkTime;
 
-        public SupportController(AppDbContext context, ImageStorageService imageStorage)
+        public SupportController(AppDbContext context, ImageStorageService imageStorage, SupportWorkTimeService supportWorkTime)
         {
             _context = context;
             _imageStorage = imageStorage;
+            _supportWorkTime = supportWorkTime;
         }
 
         public async Task<IActionResult> Index()
@@ -23,7 +24,7 @@ namespace Juan_NET.Web.Controllers
             var weekStats = await BuildWeekStatsAsync();
             var activeReport = await GetActiveTicketAsync();
             var userId = GetCurrentUserId();
-            var shift = userId.HasValue ? await UpdateShiftAsync(userId.Value, true) : (Seconds: 0, LimitReached: false);
+            var shift = userId.HasValue ? await _supportWorkTime.UpdateShiftAsync(userId.Value, true) : (Seconds: 0, LimitReached: false);
             var monthlyRatings = userId.HasValue ? await BuildMonthlyRatingStatsAsync(userId.Value) : (Average: 5.0m, Count: 0);
 
             var viewModel = new SupportDashboardViewModel
@@ -57,7 +58,7 @@ namespace Juan_NET.Web.Controllers
                 return Unauthorized();
             }
 
-            var shift = await UpdateShiftAsync(userId.Value, true);
+            var shift = await _supportWorkTime.UpdateShiftAsync(userId.Value, true);
 
             return Json(new
             {
@@ -404,48 +405,6 @@ namespace Juan_NET.Web.Controllers
             }
 
             return (Math.Round(ratings.Average(), 1, MidpointRounding.AwayFromZero), ratings.Count);
-        }
-
-        private async Task<(int Seconds, bool LimitReached)> UpdateShiftAsync(int userId, bool startIfNotRunning)
-        {
-            var now = DateTime.UtcNow;
-            var workDate = now.Add(SupportLocalOffset).Date;
-            var shift = await _context.SupportOperatorWorkTimes
-                .FirstOrDefaultAsync(item => item.OperatorUserId == userId && item.WorkDate == workDate);
-
-            if (shift is null)
-            {
-                shift = new SupportOperatorWorkTime
-                {
-                    OperatorUserId = userId,
-                    WorkDate = workDate,
-                    LastStartedAt = startIfNotRunning ? now : null,
-                    UpdatedAt = now
-                };
-                _context.SupportOperatorWorkTimes.Add(shift);
-            }
-            else if (shift.LastStartedAt.HasValue)
-            {
-                var secondsToAdd = Math.Max(0, (int)Math.Floor((now - shift.LastStartedAt.Value).TotalSeconds));
-                shift.TotalSeconds = Math.Min(MaxShiftSeconds, shift.TotalSeconds + secondsToAdd);
-                shift.LastStartedAt = shift.TotalSeconds >= MaxShiftSeconds ? null : now;
-                shift.UpdatedAt = now;
-            }
-
-            if (shift.TotalSeconds >= MaxShiftSeconds)
-            {
-                shift.TotalSeconds = MaxShiftSeconds;
-                shift.LastStartedAt = null;
-            }
-            else if (startIfNotRunning && !shift.LastStartedAt.HasValue)
-            {
-                shift.LastStartedAt = now;
-                shift.UpdatedAt = now;
-            }
-
-            await _context.SaveChangesAsync();
-
-            return (shift.TotalSeconds, shift.TotalSeconds >= MaxShiftSeconds);
         }
 
         private static (DateTime MonthStartUtc, DateTime NextMonthStartUtc) GetCurrentSupportMonthUtcRange()

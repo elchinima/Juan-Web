@@ -243,6 +243,7 @@ namespace Juan_NET.Web.Controllers
                 AddressLine2 = string.IsNullOrWhiteSpace(address.AddressLine2) ? null : address.AddressLine2.Trim(),
                 Fin = address.Fin.Trim().ToUpperInvariant(),
                 StripeSessionId = session.Id,
+                StripePaymentIntentId = session.PaymentIntentId,
                 PromoCode = session.Metadata is not null && session.Metadata.TryGetValue("promoCode", out var promoCode) && !string.IsNullOrWhiteSpace(promoCode) ? promoCode : null,
                 Currency = NormalizeCurrency(session.Currency ?? _stripeSettings.Currency),
                 Status = "Paid",

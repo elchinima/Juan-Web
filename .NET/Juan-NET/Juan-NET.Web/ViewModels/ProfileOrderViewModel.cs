@@ -20,6 +20,8 @@ namespace Juan_NET.Web.ViewModels
 
         public string? PromoCode { get; set; }
 
+        public bool CanRequestRefund { get; set; }
+
         public List<ProfileOrderItemViewModel> Items { get; set; } = new();
     }
 }

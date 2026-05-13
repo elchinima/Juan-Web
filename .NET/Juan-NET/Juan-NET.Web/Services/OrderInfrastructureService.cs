@@ -182,6 +182,7 @@ namespace Juan_NET.Web.Services
                         [AddressLine2] nvarchar(180) NULL,
                         [Fin] nvarchar(7) NOT NULL,
                         [StripeSessionId] nvarchar(120) NULL,
+                        [StripePaymentIntentId] nvarchar(120) NULL,
                         [PromoCode] nvarchar(80) NULL,
                         [Currency] nvarchar(12) NOT NULL,
                         [Status] nvarchar(40) NOT NULL CONSTRAINT [DF_Orders_Status] DEFAULT (N'Paid'),
@@ -190,12 +191,37 @@ namespace Juan_NET.Web.Services
                         [DiscountTotal] decimal(18,2) NOT NULL,
                         [Total] decimal(18,2) NOT NULL,
                         [CreatedAt] datetime2 NOT NULL CONSTRAINT [DF_Orders_CreatedAt] DEFAULT (GETUTCDATE()),
+                        [RefundRequestedAt] datetime2 NULL,
+                        [RefundedAt] datetime2 NULL,
+                        [RefundedByUserId] int NULL,
                         CONSTRAINT [PK_Orders] PRIMARY KEY ([Id]),
                         CONSTRAINT [FK_Orders_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
                     );
 
                     CREATE INDEX [IX_Orders_UserId] ON [Orders] ([UserId]);
+                    CREATE INDEX [IX_Orders_StripePaymentIntentId] ON [Orders] ([StripePaymentIntentId]);
                     CREATE UNIQUE INDEX [IX_Orders_StripeSessionId] ON [Orders] ([StripeSessionId]) WHERE [StripeSessionId] IS NOT NULL;
+                END
+
+                IF COL_LENGTH(N'[Orders]', N'StripePaymentIntentId') IS NULL
+                BEGIN
+                    ALTER TABLE [Orders] ADD [StripePaymentIntentId] nvarchar(120) NULL;
+                    CREATE INDEX [IX_Orders_StripePaymentIntentId] ON [Orders] ([StripePaymentIntentId]);
+                END
+
+                IF COL_LENGTH(N'[Orders]', N'RefundRequestedAt') IS NULL
+                BEGIN
+                    ALTER TABLE [Orders] ADD [RefundRequestedAt] datetime2 NULL;
+                END
+
+                IF COL_LENGTH(N'[Orders]', N'RefundedAt') IS NULL
+                BEGIN
+                    ALTER TABLE [Orders] ADD [RefundedAt] datetime2 NULL;
+                END
+
+                IF COL_LENGTH(N'[Orders]', N'RefundedByUserId') IS NULL
+                BEGIN
+                    ALTER TABLE [Orders] ADD [RefundedByUserId] int NULL;
                 END
 
                 IF OBJECT_ID(N'[OrderItems]', N'U') IS NULL

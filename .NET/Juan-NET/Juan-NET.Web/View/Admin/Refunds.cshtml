@@ -1,0 +1,99 @@
+@model IReadOnlyList<AdminRefundOrderViewModel>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Refund";
+    ViewData["PageName"] = "refund";
+    ViewData["ActivePage"] = "Refund";
+    var currentStatus = ViewBag.RefundStatus as string ?? "Refund Requested";
+    var statuses = ViewBag.RefundStatuses as string[] ?? ["Refund Requested", "Refunded", "All"];
+}
+
+@section SidebarCard {
+    <span>Refund</span>
+    <strong>@Model.Count Requests</strong>
+    <p>Customer refund requests after paid orders.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Orders</p>
+        <h1>Refund</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Admin" asp-action="Index">Dashboard</a>
+    </div>
+</header>
+
+@if (TempData["RefundMessage"] is string refundMessage)
+{
+    <div class="status good admin-message">@refundMessage</div>
+}
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Requests</p>
+            <h3>Refund Orders</h3>
+        </div>
+        <form class="admin-search-form" asp-controller="Admin" asp-action="Refunds" method="get">
+            <select name="status">
+                @foreach (var status in statuses)
+                {
+                    <option value="@status" selected="@(status == currentStatus)">@status</option>
+                }
+            </select>
+            <button class="primary-button" type="submit">Filter</button>
+        </form>
+    </div>
+
+    <div class="message-list">
+        @if (Model.Any())
+        {
+            @foreach (var order in Model)
+            {
+                <article class="message-card">
+                    <div>
+                        <strong>Order #@order.Id</strong>
+                        <a href="mailto:@order.Email">@order.Customer</a>
+                    </div>
+                    <p>@order.ItemsSummary</p>
+                    <div class="message-meta">
+                        <span>Status: @order.Status</span>
+                        <span>Total: @order.Total.ToString("C") @order.Currency.ToUpperInvariant()</span>
+                        <span>Created: @order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</span>
+                        @if (order.RefundRequestedAt.HasValue)
+                        {
+                            <span>Requested: @order.RefundRequestedAt.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</span>
+                        }
+                        @if (order.RefundedAt.HasValue)
+                        {
+                            <span>Refunded: @order.RefundedAt.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</span>
+                        }
+                    </div>
+                    @if (order.Status == "Refund Requested")
+                    {
+                        <form asp-controller="Admin" asp-action="CompleteRefund" method="post" data-confirm="Complete Stripe refund for this order?">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@currentStatus" />
+                            <button class="primary-button compact-button" type="submit">Complete Refund</button>
+                        </form>
+                    }
+                </article>
+            }
+        }
+        else
+        {
+            <article class="message-card">
+                <div>
+                    <strong>No refund orders found</strong>
+                    <a asp-controller="Admin" asp-action="Index">Dashboard</a>
+                </div>
+                <p>Refund requests will appear here after customers request them.</p>
+                <span>-</span>
+            </article>
+        }
+    </div>
+</section>

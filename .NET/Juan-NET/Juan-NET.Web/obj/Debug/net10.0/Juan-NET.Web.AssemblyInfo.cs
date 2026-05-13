@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Juan-NET.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d01df01b9aa00adde4787ce19d339c634bc8f919")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0f2f7bc3db91d56e5d4262c464a60e4af30b9bd9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Juan-NET.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Juan-NET.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -113,6 +113,7 @@
                 entity.Property(order => order.Total).HasColumnType("decimal(18,2)");
                 entity.Property(order => order.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.HasIndex(order => order.StripeSessionId).IsUnique().HasFilter("[StripeSessionId] IS NOT NULL");
+                entity.HasIndex(order => order.StripePaymentIntentId);
 
                 entity.HasOne(order => order.User)
                     .WithMany(user => user.Orders)

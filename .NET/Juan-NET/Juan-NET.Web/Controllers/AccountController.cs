@@ -467,6 +467,7 @@ namespace Juan_NET.Web.Controllers
                     DiscountTotal = order.DiscountTotal,
                     Total = order.Total,
                     PromoCode = order.PromoCode,
+                    CanRequestRefund = order.Status == "Paid",
                     Items = order.Items
                         .OrderBy(item => item.Id)
                         .Select(item => new ProfileOrderItemViewModel
@@ -483,6 +484,32 @@ namespace Juan_NET.Web.Controllers
                 .ToListAsync();
 
             return View(CreateProfileViewModel(user, orders: orders));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestRefund(int id, string? returnAction)
+        {
+            var user = await GetCurrentUserAsync();
+            if (user is null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(item => item.Id == id && item.UserId == user.Id && item.Status == "Paid");
+
+            if (order is not null)
+            {
+                order.Status = "Refund Requested";
+                order.RefundRequestedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                TempData["RefundRequestMessage"] = "Refund is in progress.";
+            }
+
+            return string.Equals(returnAction, "SupportChatOrders", StringComparison.Ordinal)
+                ? RedirectToAction("SupportChatOrders", "Home")
+                : RedirectToAction(nameof(Orders));
         }
 
         [Authorize]

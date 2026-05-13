@@ -301,6 +301,7 @@ public class HomeController : Controller
                 DiscountTotal = order.DiscountTotal,
                 Total = order.Total,
                 PromoCode = order.PromoCode,
+                CanRequestRefund = order.Status == "Paid",
                 Items = order.Items
                     .OrderBy(item => item.Id)
                     .Select(item => new ProfileOrderItemViewModel

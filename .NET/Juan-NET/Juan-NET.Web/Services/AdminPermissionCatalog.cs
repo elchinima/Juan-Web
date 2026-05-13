@@ -14,6 +14,7 @@ namespace Juan_NET.Web.Services
             new(AdminPermissionKeys.Subscribe, "Subscribe", "Subscribe", true),
             new(AdminPermissionKeys.Roles, "Roles", "Roles", true),
             new(AdminPermissionKeys.FooterSettings, "Footer", "FooterSettings", true),
+            new(AdminPermissionKeys.Refunds, "Refund", "Refunds", true),
             new(AdminPermissionKeys.Support, "Support", "Support", false)
         ];
 

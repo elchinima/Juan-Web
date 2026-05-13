@@ -23,6 +23,9 @@ namespace Juan_NET.Domain.Entities
         [MaxLength(120)]
         public string? StripeSessionId { get; set; }
 
+        [MaxLength(120)]
+        public string? StripePaymentIntentId { get; set; }
+
         [MaxLength(80)]
         public string? PromoCode { get; set; }
 
@@ -41,6 +44,12 @@ namespace Juan_NET.Domain.Entities
         public decimal Total { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime? RefundRequestedAt { get; set; }
+
+        public DateTime? RefundedAt { get; set; }
+
+        public int? RefundedByUserId { get; set; }
 
         public User User { get; set; } = null!;
 

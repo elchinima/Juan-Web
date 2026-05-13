@@ -33,6 +33,106 @@ namespace Juan_NET.Web.Controllers
             return View();
         }
 
+        [AdminPermission(AdminPermissionKeys.Refunds)]
+        public async Task<IActionResult> Refunds(string? status)
+        {
+            var normalizedStatus = string.IsNullOrWhiteSpace(status) ? "Refund Requested" : status.Trim();
+            var ordersQuery = _context.Orders
+                .Include(order => order.User)
+                .Include(order => order.Items)
+                .Where(order => order.Status == normalizedStatus || (normalizedStatus == "All" && (order.Status == "Refund Requested" || order.Status == "Refunded")))
+                .AsQueryable();
+
+            ViewBag.RefundStatus = normalizedStatus;
+            ViewBag.RefundStatuses = new[] { "Refund Requested", "Refunded", "All" };
+
+            var orderEntities = await ordersQuery
+                .OrderByDescending(order => order.RefundRequestedAt ?? order.CreatedAt)
+                .ToListAsync();
+
+            var orders = orderEntities
+                .Select(order => new AdminRefundOrderViewModel
+                {
+                    Id = order.Id,
+                    Customer = order.User.FullName,
+                    Email = order.User.Email,
+                    Status = order.Status,
+                    Currency = order.Currency,
+                    Total = order.Total,
+                    CreatedAt = order.CreatedAt,
+                    RefundRequestedAt = order.RefundRequestedAt,
+                    RefundedAt = order.RefundedAt,
+                    ItemsSummary = string.Join(", ", order.Items.OrderBy(item => item.Id).Select(item => item.ProductName + " x" + item.Quantity))
+                })
+                .ToList();
+
+            return View(orders);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AdminPermission(AdminPermissionKeys.Refunds)]
+        public async Task<IActionResult> CompleteRefund(int id, string? status)
+        {
+            var order = await _context.Orders
+                .Include(item => item.Items)
+                .ThenInclude(item => item.Product)
+                .FirstOrDefaultAsync(item => item.Id == id && item.Status == "Refund Requested");
+
+            if (order is null)
+            {
+                TempData["RefundMessage"] = "Refund request was not found.";
+                return RedirectToAction(nameof(Refunds), new { status });
+            }
+
+            if (string.IsNullOrWhiteSpace(order.StripePaymentIntentId))
+            {
+                TempData["RefundMessage"] = "Stripe payment intent was not found for this order.";
+                return RedirectToAction(nameof(Refunds), new { status });
+            }
+
+            var stripeSettings = HttpContext.RequestServices.GetRequiredService<IConfiguration>().GetSection("Stripe").Get<StripeSettings>() ?? new StripeSettings();
+
+            if (string.IsNullOrWhiteSpace(stripeSettings.SecretKey))
+            {
+                TempData["RefundMessage"] = "Stripe keys are not configured.";
+                return RedirectToAction(nameof(Refunds), new { status });
+            }
+
+            Stripe.StripeConfiguration.ApiKey = stripeSettings.SecretKey;
+
+            try
+            {
+                await new Stripe.RefundService().CreateAsync(new Stripe.RefundCreateOptions
+                {
+                    PaymentIntent = order.StripePaymentIntentId,
+                    Metadata = new Dictionary<string, string>
+                    {
+                        ["orderId"] = order.Id.ToString(CultureInfo.InvariantCulture)
+                    }
+                });
+            }
+            catch (Stripe.StripeException exception)
+            {
+                TempData["RefundMessage"] = exception.StripeError?.Message ?? "Stripe refund failed.";
+                return RedirectToAction(nameof(Refunds), new { status });
+            }
+
+            foreach (var item in order.Items)
+            {
+                item.Product.StockCount += item.Quantity;
+            }
+
+            order.Status = "Refunded";
+            order.RefundedAt = DateTime.UtcNow;
+            order.RefundedByUserId = GetCurrentUserId();
+
+            await _context.SaveChangesAsync();
+            TempData["RefundMessage"] = "Refund completed successfully.";
+
+            return RedirectToAction(nameof(Refunds), new { status });
+        }
+
         [AdminPermission(AdminPermissionKeys.Products)]
         public async Task<IActionResult> Products(string? search)
         {
@@ -977,6 +1077,12 @@ namespace Juan_NET.Web.Controllers
                 .ToListAsync();
 
             return new AdminAccessResult { Permissions = permissionKeys.ToHashSet(StringComparer.OrdinalIgnoreCase) }.HasPermission(permissionKey);
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var idValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(idValue, out var id) ? id : null;
         }
 
         private async Task<SiteFooterSettings> GetFooterSettingsAsync()
