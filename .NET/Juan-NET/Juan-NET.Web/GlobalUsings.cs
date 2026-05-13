@@ -10,3 +10,4 @@ global using Microsoft.EntityFrameworkCore;
 global using System.Security.Claims;
 global using Microsoft.AspNetCore.Localization;
 global using System.Globalization;
+global using System.Linq.Expressions;

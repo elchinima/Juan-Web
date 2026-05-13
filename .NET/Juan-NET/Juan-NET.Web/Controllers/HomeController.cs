@@ -91,7 +91,7 @@ public class HomeController : Controller
         }
 
         var tickets = await _context.SupportTickets
-            .Where(ticket => ticket.UserId == userId.Value)
+            .Where(ticket => ticket.UserId == userId.Value && ticket.Status == "Resolved")
             .OrderByDescending(ticket => ticket.UpdatedAt)
             .ToListAsync();
 
@@ -122,7 +122,7 @@ public class HomeController : Controller
         }
 
         var ticket = input.TicketId.HasValue
-            ? await _context.SupportTickets.FirstOrDefaultAsync(item => item.Id == input.TicketId.Value && item.UserId == userId.Value)
+            ? await _context.SupportTickets.FirstOrDefaultAsync(item => item.Id == input.TicketId.Value && item.UserId == userId.Value && item.Status != "Resolved")
             : await _context.SupportTickets
                 .Where(item => item.UserId == userId.Value && item.Status != "Resolved")
                 .OrderByDescending(item => item.UpdatedAt)
@@ -151,10 +151,6 @@ public class HomeController : Controller
         }
 
         ticket.UpdatedAt = DateTime.UtcNow;
-        if (ticket.Status == "Resolved")
-        {
-            ticket.Status = "Open";
-        }
 
         _context.SupportMessages.Add(new SupportMessage
         {

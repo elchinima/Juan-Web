@@ -8,6 +8,7 @@ build_property.ProjectTypeGuids =
 build_property.InvariantGlobalization = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EntryPointFilePath = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Juan_NET.Web
 build_property.RootNamespace = Juan_NET.Web
@@ -158,8 +159,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xTaGFyZWRcX1N1cHBvcnRMYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Support/ActiveReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTdXBwb3J0XEFjdGl2ZVJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Support/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld1xTdXBwb3J0XERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Support/History.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld1xTdXBwb3J0XEhpc3RvcnkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Project-Work/Code Academy/Mini Projects/Juan - Online Store/.NET/Juan-NET/Juan-NET.Web/View/Support/Index.cshtml]

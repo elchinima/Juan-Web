@@ -24,6 +24,10 @@
         <h1>Dashboard</h1>
     </div>
     <div class="topbar-actions">
+        @if (Model.ActiveReportId.HasValue)
+        {
+            <a class="ghost-button" asp-controller="Support" asp-action="ActiveReport">Active Report</a>
+        }
         <a class="primary-button" asp-controller="Support" asp-action="Reports">Open Reports</a>
     </div>
 </header>
@@ -61,6 +65,11 @@
         <span>Open Reports</span>
         <strong data-count="@Model.OpenReports">0</strong>
         <p>@Model.ResolvedReports resolved today</p>
+    </article>
+    <article class="stat-card reveal">
+        <span>Active Report</span>
+        <strong>@(Model.ActiveReportCode ?? "None")</strong>
+        <p>@(Model.ActiveReportId.HasValue ? "You can answer only this report." : "Take one report from the queue.")</p>
     </article>
 </section>
 

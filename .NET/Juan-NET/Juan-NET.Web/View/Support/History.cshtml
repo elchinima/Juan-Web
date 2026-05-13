@@ -1,0 +1,68 @@
+@model IReadOnlyList<SupportReportViewModel>
+@{
+    Layout = "_SupportLayout";
+    ViewData["Title"] = "Report History";
+    ViewData["PageName"] = "support-report-history";
+    ViewData["ActivePage"] = "History";
+}
+
+@section SidebarCard {
+    <span>Archive</span>
+    <strong>@Model.Count</strong>
+    <p>Your closed reports.</p>
+}
+
+<header class="topbar">
+    <button class="menu-button" type="button" aria-label="Toggle menu" data-menu-toggle>
+        <span></span><span></span><span></span>
+    </button>
+    <div>
+        <p class="eyebrow">Technical Support</p>
+        <h1>Report History</h1>
+    </div>
+    <div class="topbar-actions">
+        <a class="ghost-button" asp-controller="Support" asp-action="ActiveReport">Active Report</a>
+        <a class="ghost-button" asp-controller="Support" asp-action="Reports">Reports</a>
+    </div>
+</header>
+
+<section class="panel reveal">
+    <div class="panel-head">
+        <div>
+            <p class="eyebrow">Archive</p>
+            <h3>Closed Reports</h3>
+        </div>
+    </div>
+    <div class="support-table">
+        <div class="support-table-head">
+            <span>Code</span>
+            <span>Customer</span>
+            <span>Subject</span>
+            <span>Priority</span>
+            <span>Status</span>
+            <span>Closed</span>
+        </div>
+        @foreach (var report in Model)
+        {
+            <article class="support-table-row">
+                <span>@report.Code</span>
+                <strong>@report.Customer</strong>
+                <p><a asp-controller="Support" asp-action="Details" asp-route-id="@report.Id">@report.Subject</a></p>
+                <em class="priority-pill @report.Priority.ToLowerInvariant()">@report.Priority</em>
+                <em class="status-pill">@report.Status</em>
+                <time>@report.UpdatedAt.ToString("MMM d")</time>
+            </article>
+        }
+        @if (!Model.Any())
+        {
+            <article class="support-table-row">
+                <span>No history</span>
+                <strong>Nothing closed yet</strong>
+                <p>Your closed reports will appear here.</p>
+                <em class="priority-pill low">Low</em>
+                <em class="status-pill">Resolved</em>
+                <time>@DateTime.UtcNow.ToString("MMM d")</time>
+            </article>
+        }
+    </div>
+</section>

@@ -21,6 +21,10 @@
         <h1>Reports</h1>
     </div>
     <div class="topbar-actions">
+        @if (ViewBag.ActiveReportId is not null)
+        {
+            <a class="primary-button" asp-controller="Support" asp-action="ActiveReport">Active Report</a>
+        }
         <a class="ghost-button" asp-controller="Support" asp-action="Index">Dashboard</a>
     </div>
 </header>
@@ -39,17 +43,38 @@
             <span>Subject</span>
             <span>Priority</span>
             <span>Status</span>
-            <span>Created</span>
+            <span>Action</span>
         </div>
         @foreach (var report in Model)
         {
             <article class="support-table-row">
                 <span>@report.Code</span>
                 <strong>@report.Customer</strong>
-                <p><a asp-controller="Support" asp-action="Details" asp-route-id="@report.Id">@report.Subject</a></p>
+                <p>@report.Subject</p>
                 <em class="priority-pill @report.Priority.ToLowerInvariant()">@report.Priority</em>
                 <em class="status-pill">@report.Status</em>
-                <time>@report.CreatedAt.ToString("HH:mm")</time>
+                <form asp-controller="Support" asp-action="Take" asp-route-id="@report.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    @if (ViewBag.ActiveReportId is not null)
+                    {
+                        <button class="primary-button compact-button" type="submit" disabled>Take</button>
+                    }
+                    else
+                    {
+                        <button class="primary-button compact-button" type="submit">Take</button>
+                    }
+                </form>
+            </article>
+        }
+        @if (!Model.Any())
+        {
+            <article class="support-table-row">
+                <span>No reports</span>
+                <strong>Queue is empty</strong>
+                <p>New reports will appear here.</p>
+                <em class="priority-pill low">Low</em>
+                <em class="status-pill">Open</em>
+                <time>@DateTime.UtcNow.ToString("HH:mm")</time>
             </article>
         }
     </div>

@@ -10,6 +10,8 @@ namespace Juan_NET.Web.ViewModels
         public int WeekReports { get; set; }
         public int OpenReports { get; set; }
         public int ResolvedReports { get; set; }
+        public int? ActiveReportId { get; set; }
+        public string? ActiveReportCode { get; set; }
         public IReadOnlyList<SupportReportViewModel> RecentReports { get; set; } = [];
         public IReadOnlyList<SupportDayStatViewModel> WeekStats { get; set; } = [];
     }

@@ -25,6 +25,8 @@
             <nav class="side-nav" aria-label="Support navigation">
                 <a class="@(ViewData["ActivePage"]?.ToString() == "Dashboard" ? "active" : "")" asp-controller="Support" asp-action="Index">Dashboard</a>
                 <a class="@(ViewData["ActivePage"]?.ToString() == "Reports" ? "active" : "")" asp-controller="Support" asp-action="Reports">Reports</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "ActiveReport" ? "active" : "")" asp-controller="Support" asp-action="ActiveReport">Active Report</a>
+                <a class="@(ViewData["ActivePage"]?.ToString() == "History" ? "active" : "")" asp-controller="Support" asp-action="History">Report History</a>
             </nav>
             <div class="sidebar-card">
                 @RenderSection("SidebarCard", required: false)

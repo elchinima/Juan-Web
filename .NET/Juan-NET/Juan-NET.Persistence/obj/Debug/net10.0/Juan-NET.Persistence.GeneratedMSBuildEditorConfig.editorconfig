@@ -17,6 +17,7 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v10.0
+build_property.EntryPointFilePath = 
 build_property.RootNamespace = Juan_NET.Persistence
 build_property.ProjectDir = D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\
 build_property.EnableComHosting = 

@@ -1,9 +1,9 @@
 @model SupportTicketDetailsViewModel
 @{
     Layout = "_SupportLayout";
-    ViewData["Title"] = Model.Code;
-    ViewData["PageName"] = "support-report-details";
-    ViewData["ActivePage"] = "History";
+    ViewData["Title"] = "Active Report";
+    ViewData["PageName"] = "support-active-report";
+    ViewData["ActivePage"] = "ActiveReport";
 }
 
 @section SidebarCard {
@@ -18,10 +18,14 @@
     </button>
     <div>
         <p class="eyebrow">@Model.Customer</p>
-        <h1>@Model.Subject</h1>
+        <h1>Active Report</h1>
     </div>
     <div class="topbar-actions">
-        <a class="ghost-button" asp-controller="Support" asp-action="History">Report History</a>
+        <form asp-controller="Support" asp-action="Close" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <button class="danger-button" type="submit">Close Report</button>
+        </form>
+        <a class="ghost-button" asp-controller="Support" asp-action="Reports">Reports</a>
     </div>
 </header>
 
@@ -52,4 +56,15 @@
             </article>
         }
     </div>
+
+    <form class="support-chat-form" asp-controller="Support" asp-action="Reply" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="TicketId" value="@Model.Id" />
+        <label class="support-file-button" aria-label="Attach image">
+            <input type="file" name="ImageFile" accept=".png,.jpg,.jpeg,image/png,image/jpeg" />
+            <span>+</span>
+        </label>
+        <input type="text" name="Text" placeholder="Type your message" maxlength="2000" />
+        <button type="submit">Send</button>
+    </form>
 </section>

@@ -11,5 +11,6 @@ namespace Juan_NET.Web.ViewModels
         public string Operator { get; set; } = string.Empty;
         public int MessageCount { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

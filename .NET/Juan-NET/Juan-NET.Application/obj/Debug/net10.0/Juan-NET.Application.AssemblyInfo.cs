@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Juan-NET.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aa17445dd9dff913962be9357364a9359ea64207")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc49ba15cbbd8c3946a6df5fe61103bd1ba8694f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Juan-NET.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Juan-NET.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

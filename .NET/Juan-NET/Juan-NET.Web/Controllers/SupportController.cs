@@ -15,8 +15,10 @@ namespace Juan_NET.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var reports = await BuildReportsAsync();
+            var reports = await BuildReportsAsync(ticket => true);
+            var queueReports = reports.Where(item => item.Status != "Resolved").ToList();
             var weekStats = await BuildWeekStatsAsync();
+            var activeReport = await GetActiveTicketAsync();
 
             var viewModel = new SupportDashboardViewModel
             {
@@ -26,10 +28,12 @@ namespace Juan_NET.Web.Controllers
                 BonusWorkHourTarget = 12,
                 TodayReports = reports.Count(item => item.CreatedAt.Date == DateTime.UtcNow.Date),
                 WeekReports = weekStats.Sum(item => item.Reports),
-                OpenReports = reports.Count(item => item.Status != "Resolved"),
+                OpenReports = queueReports.Count,
                 ResolvedReports = reports.Count(item => item.Status == "Resolved"),
-                RecentReports = reports.Take(5).ToList(),
-                WeekStats = weekStats
+                RecentReports = queueReports.Take(5).ToList(),
+                WeekStats = weekStats,
+                ActiveReportId = activeReport?.Id,
+                ActiveReportCode = activeReport?.Code
             };
 
             return View(viewModel);
@@ -37,44 +41,94 @@ namespace Juan_NET.Web.Controllers
 
         public async Task<IActionResult> Reports()
         {
-            return View(await BuildReportsAsync());
+            var activeReport = await GetActiveTicketAsync();
+            ViewBag.ActiveReportId = activeReport?.Id;
+
+            return View(await BuildReportsAsync(ticket => ticket.Status == "Open" && ticket.OperatorUserId == null));
         }
 
-        public async Task<IActionResult> Details(int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Take(int id)
         {
-            var ticket = await _context.SupportTickets
-                .Include(item => item.User)
-                .Include(item => item.Messages)
-                .ThenInclude(message => message.SenderUser)
-                .FirstOrDefaultAsync(item => item.Id == id);
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
+            var updatedAt = DateTime.UtcNow;
+            var updatedCount = await _context.Database.ExecuteSqlInterpolatedAsync($"""
+                UPDATE [SupportTickets]
+                SET [OperatorUserId] = {userId.Value}, [Status] = N'In Progress', [UpdatedAt] = {updatedAt}
+                WHERE [Id] = {id}
+                    AND [Status] = N'Open'
+                    AND [OperatorUserId] IS NULL
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM [SupportTickets] WITH (UPDLOCK, HOLDLOCK)
+                        WHERE [OperatorUserId] = {userId.Value}
+                            AND [Status] = N'In Progress'
+                    )
+                """);
+
+            if (updatedCount == 0)
+            {
+                var hasActiveReport = await _context.SupportTickets
+                    .AnyAsync(ticket => ticket.OperatorUserId == userId.Value && ticket.Status == "In Progress");
+
+                return hasActiveReport
+                    ? RedirectToAction(nameof(ActiveReport))
+                    : RedirectToAction(nameof(Reports));
+            }
+
+            return RedirectToAction(nameof(ActiveReport));
+        }
+
+        public async Task<IActionResult> ActiveReport()
+        {
+            var ticket = await GetActiveTicketWithMessagesAsync();
             if (ticket is null)
             {
                 return RedirectToAction(nameof(Reports));
             }
 
-            var viewModel = new SupportTicketDetailsViewModel
-            {
-                Id = ticket.Id,
-                Code = ticket.Code,
-                Customer = ticket.User.FullName,
-                Subject = ticket.Subject,
-                Status = ticket.Status,
-                CreatedAt = ticket.CreatedAt,
-                Messages = ticket.Messages
-                    .OrderBy(message => message.CreatedAt)
-                    .Select(message => new SupportMessageViewModel
-                    {
-                        SenderName = message.SenderUser.FullName,
-                        IsOperator = message.IsOperator,
-                        Text = message.Text,
-                        ImageUrl = message.ImageUrl,
-                        CreatedAt = message.CreatedAt
-                    })
-                    .ToList()
-            };
+            return View(BuildTicketDetailsViewModel(ticket));
+        }
 
-            return View(viewModel);
+        public async Task<IActionResult> History()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var reports = await BuildReportsAsync(ticket => ticket.Status == "Resolved" && ticket.OperatorUserId == userId.Value);
+
+            return View(reports);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var ticket = await _context.SupportTickets
+                .Include(item => item.User)
+                .Include(item => item.Messages)
+                .ThenInclude(message => message.SenderUser)
+                .FirstOrDefaultAsync(item => item.Id == id && item.Status == "Resolved" && item.OperatorUserId == userId.Value);
+
+            if (ticket is null)
+            {
+                return RedirectToAction(nameof(History));
+            }
+
+            return View(BuildTicketDetailsViewModel(ticket));
         }
 
         [HttpPost]
@@ -95,13 +149,15 @@ namespace Juan_NET.Web.Controllers
             var text = input.Text?.Trim();
             if (string.IsNullOrWhiteSpace(text) && input.ImageFile is not { Length: > 0 })
             {
-                return RedirectToAction(nameof(Details), new { id = input.TicketId.Value });
+                return RedirectToAction(nameof(ActiveReport));
             }
 
-            var ticket = await _context.SupportTickets.FindAsync(input.TicketId.Value);
+            var ticket = await _context.SupportTickets
+                .FirstOrDefaultAsync(item => item.Id == input.TicketId.Value && item.OperatorUserId == userId.Value && item.Status == "In Progress");
+
             if (ticket is null)
             {
-                return RedirectToAction(nameof(Reports));
+                return RedirectToAction(nameof(ActiveReport));
             }
 
             string? imageUrl = null;
@@ -110,8 +166,6 @@ namespace Juan_NET.Web.Controllers
                 imageUrl = await _imageStorage.SaveSupportAttachmentAsWebpAsync(input.ImageFile);
             }
 
-            ticket.OperatorUserId = userId.Value;
-            ticket.Status = "In Progress";
             ticket.UpdatedAt = DateTime.UtcNow;
 
             _context.SupportMessages.Add(new SupportMessage
@@ -126,12 +180,39 @@ namespace Juan_NET.Web.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Details), new { id = ticket.Id });
+            return RedirectToAction(nameof(ActiveReport));
         }
 
-        private async Task<IReadOnlyList<SupportReportViewModel>> BuildReportsAsync()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Close(int id)
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var ticket = await _context.SupportTickets
+                .FirstOrDefaultAsync(item => item.Id == id && item.OperatorUserId == userId.Value && item.Status == "In Progress");
+
+            if (ticket is null)
+            {
+                return RedirectToAction(nameof(ActiveReport));
+            }
+
+            ticket.Status = "Resolved";
+            ticket.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(History));
+        }
+
+        private async Task<IReadOnlyList<SupportReportViewModel>> BuildReportsAsync(Expression<Func<SupportTicket, bool>> predicate)
         {
             return await _context.SupportTickets
+                .Where(predicate)
                 .Include(ticket => ticket.User)
                 .Include(ticket => ticket.OperatorUser)
                 .Include(ticket => ticket.Messages)
@@ -146,9 +227,61 @@ namespace Juan_NET.Web.Controllers
                     Status = ticket.Status,
                     Operator = ticket.OperatorUser == null ? "Unassigned" : ticket.OperatorUser.FullName,
                     MessageCount = ticket.Messages.Count,
-                    CreatedAt = ticket.CreatedAt
+                    CreatedAt = ticket.CreatedAt,
+                    UpdatedAt = ticket.UpdatedAt
                 })
                 .ToListAsync();
+        }
+
+        private async Task<SupportTicket?> GetActiveTicketAsync()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return null;
+            }
+
+            return await _context.SupportTickets
+                .FirstOrDefaultAsync(ticket => ticket.OperatorUserId == userId.Value && ticket.Status == "In Progress");
+        }
+
+        private async Task<SupportTicket?> GetActiveTicketWithMessagesAsync()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                return null;
+            }
+
+            return await _context.SupportTickets
+                .Include(item => item.User)
+                .Include(item => item.Messages)
+                .ThenInclude(message => message.SenderUser)
+                .FirstOrDefaultAsync(item => item.OperatorUserId == userId.Value && item.Status == "In Progress");
+        }
+
+        private static SupportTicketDetailsViewModel BuildTicketDetailsViewModel(SupportTicket ticket)
+        {
+            return new SupportTicketDetailsViewModel
+            {
+                Id = ticket.Id,
+                Code = ticket.Code,
+                Customer = ticket.User.FullName,
+                Subject = ticket.Subject,
+                Status = ticket.Status,
+                CreatedAt = ticket.CreatedAt,
+                Messages = ticket.Messages
+                    .OrderBy(message => message.CreatedAt)
+                    .Select(message => new SupportMessageViewModel
+                    {
+                        SenderName = message.SenderUser.FullName,
+                        IsOperator = message.IsOperator,
+                        Text = message.Text,
+                        ImageUrl = message.ImageUrl,
+                        CreatedAt = message.CreatedAt
+                    })
+                    .ToList()
+            };
         }
 
         private async Task<IReadOnlyList<SupportDayStatViewModel>> BuildWeekStatsAsync()
