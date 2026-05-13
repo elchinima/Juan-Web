@@ -140,6 +140,7 @@
                 entity.Property(ticket => ticket.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
                 entity.Property(ticket => ticket.Priority).HasDefaultValue("Medium");
                 entity.Property(ticket => ticket.Status).HasDefaultValue("Open");
+                entity.HasIndex(ticket => ticket.ClosedAt);
 
                 entity.HasOne(ticket => ticket.User)
                     .WithMany(user => user.SupportTickets)

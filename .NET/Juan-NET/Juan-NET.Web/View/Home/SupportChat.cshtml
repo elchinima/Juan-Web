@@ -25,29 +25,30 @@
         </nav>
 
         <section class="support-chat-panel">
-            <div class="support-chat-head">
+            <div class="support-chat-head" data-support-chat-head>
                 <div>
                     @if (Model.IsWaitingForOperator)
                     {
-                        <h1>@Model.OperatorRole</h1>
+                        <h1 data-support-operator-name>@Model.OperatorRole</h1>
+                        <p class="contact-label" data-support-operator-role hidden>@Model.OperatorRole</p>
                     }
                     else
                     {
-                        <p class="contact-label">@Model.OperatorRole</p>
-                        <h1>@Model.OperatorFullName</h1>
+                        <p class="contact-label" data-support-operator-role>@Model.OperatorRole</p>
+                        <h1 data-support-operator-name>@Model.OperatorFullName</h1>
                     }
                 </div>
                 @if (Model.IsWaitingForOperator)
                 {
-                    <span class="support-waiting-label">Waiting<i aria-hidden="true"></i></span>
+                    <span class="support-waiting-label" data-support-chat-state>Waiting<i aria-hidden="true"></i></span>
                 }
                 else
                 {
-                    <span>Online</span>
+                    <span data-support-chat-state>Online</span>
                 }
             </div>
 
-            <div class="support-chat-messages">
+            <div class="support-chat-messages" data-support-messages data-support-chat-poll="@Url.Action("SupportChatMessages", "Home")" data-support-current-ticket-id="@Model.TicketId" data-support-inactive-url="@Url.Action("SupportChatHistory", "Home")">
                 @if (Model.Messages.Any())
                 {
                     @foreach (var message in Model.Messages)
@@ -88,5 +89,6 @@
             </form>
         </section>
     </section>
+    <script src="~/main assets/js/support-chat.js"></script>
 </body>
 </html>

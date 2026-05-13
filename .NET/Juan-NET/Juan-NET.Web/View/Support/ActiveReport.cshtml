@@ -29,7 +29,7 @@
     </div>
 </header>
 
-<section class="panel reveal support-ticket-panel">
+<section class="panel reveal support-ticket-panel support-operator-chat-panel">
     <div class="panel-head">
         <div>
             <p class="eyebrow">@Model.Code</p>
@@ -38,7 +38,7 @@
         <em class="status-pill">@Model.Status</em>
     </div>
 
-    <div class="support-chat-messages support-admin-messages">
+    <div class="support-chat-messages support-admin-messages" data-support-messages data-support-chat-poll="@Url.Action("ActiveReportMessages", "Support")" data-support-inactive-url="@Url.Action("Reports", "Support")">
         @foreach (var message in Model.Messages)
         {
             <article class="support-chat-message @(message.IsOperator ? "agent" : "user")">
@@ -68,3 +68,7 @@
         <button type="submit">Send</button>
     </form>
 </section>
+
+@section Scripts {
+    <script src="~/main assets/js/support-chat.js"></script>
+}

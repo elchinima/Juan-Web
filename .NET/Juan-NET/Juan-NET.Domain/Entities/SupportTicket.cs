@@ -26,6 +26,8 @@ namespace Juan_NET.Domain.Entities
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+        public DateTime? ClosedAt { get; set; }
+
         public User User { get; set; } = null!;
 
         public User? OperatorUser { get; set; }

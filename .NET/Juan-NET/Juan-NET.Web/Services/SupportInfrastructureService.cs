@@ -17,6 +17,7 @@ namespace Juan_NET.Web.Services
                         [Status] nvarchar(40) NOT NULL CONSTRAINT [DF_SupportTickets_Status] DEFAULT (N'Open'),
                         [CreatedAt] datetime2 NOT NULL CONSTRAINT [DF_SupportTickets_CreatedAt] DEFAULT (GETUTCDATE()),
                         [UpdatedAt] datetime2 NOT NULL CONSTRAINT [DF_SupportTickets_UpdatedAt] DEFAULT (GETUTCDATE()),
+                        [ClosedAt] datetime2 NULL,
                         CONSTRAINT [PK_SupportTickets] PRIMARY KEY ([Id]),
                         CONSTRAINT [FK_SupportTickets_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
                         CONSTRAINT [FK_SupportTickets_Users_OperatorUserId] FOREIGN KEY ([OperatorUserId]) REFERENCES [Users] ([Id])
@@ -25,7 +26,22 @@ namespace Juan_NET.Web.Services
                     CREATE UNIQUE INDEX [IX_SupportTickets_Code] ON [SupportTickets] ([Code]);
                     CREATE INDEX [IX_SupportTickets_UserId] ON [SupportTickets] ([UserId]);
                     CREATE INDEX [IX_SupportTickets_OperatorUserId] ON [SupportTickets] ([OperatorUserId]);
+                    CREATE INDEX [IX_SupportTickets_ClosedAt] ON [SupportTickets] ([ClosedAt]);
                 END
+
+                IF COL_LENGTH(N'[SupportTickets]', N'ClosedAt') IS NULL
+                BEGIN
+                    ALTER TABLE [SupportTickets] ADD [ClosedAt] datetime2 NULL;
+                END
+
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [name] = N'IX_SupportTickets_ClosedAt' AND [object_id] = OBJECT_ID(N'[SupportTickets]'))
+                BEGIN
+                    CREATE INDEX [IX_SupportTickets_ClosedAt] ON [SupportTickets] ([ClosedAt]);
+                END
+
+                UPDATE [SupportTickets]
+                SET [ClosedAt] = [UpdatedAt]
+                WHERE [Status] = N'Resolved' AND [ClosedAt] IS NULL;
 
                 IF OBJECT_ID(N'[SupportTicketCreatedDates]', N'U') IS NULL
                 BEGIN

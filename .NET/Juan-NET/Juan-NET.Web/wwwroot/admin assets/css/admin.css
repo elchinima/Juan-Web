@@ -793,6 +793,129 @@ button {
   color: var(--ink);
 }
 
+.support-ticket-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  min-height: min(720px, calc(100vh - 180px));
+  padding: 0;
+}
+
+.support-ticket-panel .panel-head {
+  margin: 0;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.support-chat-messages {
+  display: grid;
+  align-content: end;
+  gap: 16px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 26px;
+  background: #fbfaf7;
+}
+
+.support-chat-message {
+  width: min(430px, 92%);
+  padding: 16px 18px;
+  border: 1px solid #ece5d8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.support-chat-message.user {
+  border-color: rgba(227, 165, 30, 0.35);
+  background: #fff8e8;
+}
+
+.support-chat-message.agent {
+  justify-self: end;
+  border-color: rgba(58, 147, 111, 0.32);
+  background: rgba(58, 147, 111, 0.08);
+}
+
+.support-chat-message strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--ink);
+}
+
+.support-chat-message p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.support-chat-attachment {
+  display: block;
+  margin-top: 10px;
+}
+
+.support-chat-attachment img {
+  display: block;
+  width: min(100%, 260px);
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.support-chat-form {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) 130px;
+  gap: 12px;
+  padding: 18px 26px 22px;
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.support-chat-form input,
+.support-chat-form button,
+.support-file-button {
+  height: 50px;
+  border-radius: 6px;
+}
+
+.support-chat-form input[type="text"] {
+  width: 100%;
+  border: 1px solid #e3ded2;
+  padding: 0 16px;
+  background: #f9f8f5;
+}
+
+.support-chat-form button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.support-file-button {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border: 1px solid #e3ded2;
+  background: #f9f8f5;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.support-file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.support-file-button span {
+  font-size: 24px;
+  line-height: 1;
+}
+
 .product-row {
   grid-template-columns: 54px minmax(0, 1fr) auto auto auto auto;
 }
@@ -1717,6 +1840,22 @@ body.modal-open {
   .support-table-head,
   .support-table-row {
     grid-template-columns: 1fr;
+  }
+
+  .support-ticket-panel {
+    min-height: calc(100vh - 220px);
+  }
+
+  .support-chat-form {
+    grid-template-columns: 46px minmax(0, 1fr) 88px;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .support-chat-form input,
+  .support-chat-form button,
+  .support-file-button {
+    height: 46px;
   }
 
   .support-table-head {

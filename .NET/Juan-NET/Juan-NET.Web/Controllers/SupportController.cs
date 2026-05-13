@@ -96,6 +96,30 @@ namespace Juan_NET.Web.Controllers
             return View(BuildTicketDetailsViewModel(ticket));
         }
 
+        public async Task<IActionResult> ActiveReportMessages()
+        {
+            var ticket = await GetActiveTicketWithMessagesAsync();
+            if (ticket is null)
+            {
+                return Json(new { isActive = false });
+            }
+
+            var viewModel = BuildTicketDetailsViewModel(ticket);
+
+            return Json(new
+            {
+                isActive = true,
+                status = viewModel.Status,
+                messages = viewModel.Messages.Select(message => new
+                {
+                    senderName = message.SenderName,
+                    isOperator = message.IsOperator,
+                    text = message.Text,
+                    imageUrl = message.ImageUrl
+                })
+            });
+        }
+
         public async Task<IActionResult> History()
         {
             var userId = GetCurrentUserId();
@@ -203,6 +227,7 @@ namespace Juan_NET.Web.Controllers
 
             ticket.Status = "Resolved";
             ticket.UpdatedAt = DateTime.UtcNow;
+            ticket.ClosedAt = ticket.UpdatedAt;
 
             await _context.SaveChangesAsync();
 

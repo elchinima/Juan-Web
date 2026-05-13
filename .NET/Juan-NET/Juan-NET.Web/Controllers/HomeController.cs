@@ -82,6 +82,47 @@ public class HomeController : Controller
     }
 
     [Authorize]
+    public async Task<IActionResult> SupportChatMessages(int? ticketId)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return Unauthorized();
+        }
+
+        if (ticketId.HasValue)
+        {
+            var watchedTicket = await _context.SupportTickets
+                .Where(ticket => ticket.Id == ticketId.Value && ticket.UserId == userId.Value)
+                .Select(ticket => new { ticket.Status })
+                .FirstOrDefaultAsync();
+
+            if (watchedTicket?.Status == "Resolved")
+            {
+                return Json(new { isClosed = true });
+            }
+        }
+
+        var viewModel = await BuildSupportChatViewModelAsync(userId.Value);
+
+        return Json(new
+        {
+            isClosed = false,
+            ticketId = viewModel.TicketId,
+            isWaitingForOperator = viewModel.IsWaitingForOperator,
+            operatorFullName = viewModel.OperatorFullName,
+            operatorRole = viewModel.OperatorRole,
+            messages = viewModel.Messages.Select(message => new
+            {
+                senderName = message.SenderName,
+                isOperator = message.IsOperator,
+                text = message.Text,
+                imageUrl = message.ImageUrl
+            })
+        });
+    }
+
+    [Authorize]
     public async Task<IActionResult> SupportChatHistory()
     {
         var userId = GetCurrentUserId();

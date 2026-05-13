@@ -8,6 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ImageStorageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AdminAccessService>();
+builder.Services.AddHostedService<SupportReportCleanupService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
