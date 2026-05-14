@@ -36,13 +36,24 @@
     <div class="status good admin-message">@message</div>
 }
 
-<section class="content-grid wide-left">
-    <article class="panel reveal">
+<section class="panel reveal subscribe-panel">
         <div class="panel-head">
             <div>
                 <p class="eyebrow">Recipients</p>
-            <h3>Subscribers</h3>
+                <h3>Subscribers</h3>
             </div>
+            <form class="admin-search-form subscribe-search" asp-controller="Admin" asp-action="Subscribe" method="get">
+                <input name="userSearch" value="@userSearch" placeholder="Search subscriber email" />
+                <button class="primary-button" type="submit">Search</button>
+                @if (!string.IsNullOrWhiteSpace(userSearch))
+                {
+                    <a class="ghost-button" asp-controller="Admin" asp-action="Subscribe">Reset</a>
+                }
+            </form>
+        </div>
+        <div class="subscribe-toolbar">
+            <span>Select subscribers, then send a message or image-rich update.</span>
+            <button class="primary-button" type="button" data-open-subscribe-modal>Compose</button>
         </div>
         <div class="admin-table subscribe-table">
             <div class="admin-table-head">
@@ -74,45 +85,6 @@
                 </div>
             }
         </div>
-    </article>
-
-    <article class="panel reveal subscribe-action-panel">
-        <div class="panel-head">
-            <div>
-                <p class="eyebrow">Users</p>
-                <h3>Find User</h3>
-            </div>
-        </div>
-        <form class="admin-search-form stacked" asp-controller="Admin" asp-action="Subscribe" method="get">
-            <input name="userSearch" value="@userSearch" placeholder="Search name or email" />
-            <button class="primary-button full" type="submit">Search</button>
-            @if (!string.IsNullOrWhiteSpace(userSearch))
-            {
-                <a class="ghost-button full" asp-controller="Admin" asp-action="Subscribe">Reset</a>
-            }
-        </form>
-        <div class="user-pick-list">
-            @if (Model.Users.Any())
-            {
-                @foreach (var user in Model.Users)
-                {
-                    <label>
-                        <span>
-                            <strong>@user.FullName</strong>
-                            <em>@user.Email</em>
-                        </span>
-                        <input type="checkbox" name="SelectedEmails" value="@user.Email" form="subscribe-send-form" checked="@Model.SelectedEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase)" />
-                    </label>
-                }
-            }
-            else
-            {
-                <p class="muted-text">No users found.</p>
-            }
-        </div>
-        <p class="muted-text">Select subscribers or individual users, then compose the email in a modal window.</p>
-        <button class="primary-button full" type="button" data-open-subscribe-modal>Send Message</button>
-    </article>
 </section>
 
 <div class="admin-modal @(ViewData.ModelState.IsValid ? "" : "is-open")" data-subscribe-modal>
@@ -125,13 +97,9 @@
             </div>
             <button class="modal-close" type="button" aria-label="Close modal" data-close-subscribe-modal>&times;</button>
         </div>
-        <form id="subscribe-send-form" class="admin-form" asp-controller="Admin" asp-action="SendSubscribe" method="post" data-confirm="Send this message to selected recipients?">
+        <form id="subscribe-send-form" class="admin-form" asp-controller="Admin" asp-action="SendSubscribe" method="post" enctype="multipart/form-data" data-confirm="Send this message to selected recipients?">
             <input asp-for="UserSearch" type="hidden" />
             <div asp-validation-summary="ModelOnly" class="status off"></div>
-            <label class="inline-check">
-                <input asp-for="SendToAll" />
-                Send to all subscribers
-            </label>
             <span asp-validation-for="SelectedEmails" class="status off"></span>
             <label>
                 Subject
@@ -142,6 +110,12 @@
                 Message
                 <textarea asp-for="Message" rows="7" placeholder="Write message text"></textarea>
                 <span asp-validation-for="Message" class="status off"></span>
+            </label>
+            <label class="image-picker">
+                Image
+                <input asp-for="ImageFile" type="file" accept="image/*" />
+                <span>Choose newsletter image</span>
+                <span asp-validation-for="ImageFile" class="status off"></span>
             </label>
             <button class="primary-button full" type="submit">Send Message</button>
         </form>

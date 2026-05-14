@@ -18,6 +18,20 @@ namespace Juan_NET.Web.Services
 
                     CREATE INDEX [IX_UserFavoriteCategories_CategoryId] ON [UserFavoriteCategories] ([CategoryId]);
                 END
+
+                IF OBJECT_ID(N'[FavoriteCategoryDigests]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [FavoriteCategoryDigests] (
+                        [Id] int NOT NULL IDENTITY,
+                        [CategoryId] int NOT NULL,
+                        [SentForDate] datetime2 NOT NULL,
+                        [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+                        CONSTRAINT [PK_FavoriteCategoryDigests] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_FavoriteCategoryDigests_Categories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [Categories] ([Id]) ON DELETE CASCADE
+                    );
+
+                    CREATE UNIQUE INDEX [IX_FavoriteCategoryDigests_CategoryId_SentForDate] ON [FavoriteCategoryDigests] ([CategoryId], [SentForDate]);
+                END
                 """);
         }
     }

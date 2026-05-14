@@ -32,6 +32,8 @@
 
         public DbSet<UserFavoriteCategory> UserFavoriteCategories => Set<UserFavoriteCategory>();
 
+        public DbSet<FavoriteCategoryDigest> FavoriteCategoryDigests => Set<FavoriteCategoryDigest>();
+
         public DbSet<BasketItem> BasketItems => Set<BasketItem>();
 
         public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
@@ -286,6 +288,17 @@
                 entity.HasOne(favorite => favorite.Category)
                     .WithMany(category => category.FavoriteUsers)
                     .HasForeignKey(favorite => favorite.CategoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FavoriteCategoryDigest>(entity =>
+            {
+                entity.HasIndex(digest => new { digest.CategoryId, digest.SentForDate }).IsUnique();
+                entity.Property(digest => digest.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(digest => digest.Category)
+                    .WithMany()
+                    .HasForeignKey(digest => digest.CategoryId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

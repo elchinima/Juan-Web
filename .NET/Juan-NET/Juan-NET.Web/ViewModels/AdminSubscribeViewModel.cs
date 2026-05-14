@@ -19,5 +19,7 @@ namespace Juan_NET.Web.ViewModels
 
         [Required, MaxLength(1000)]
         public string Message { get; set; } = string.Empty;
+
+        public IFormFile? ImageFile { get; set; }
     }
 }

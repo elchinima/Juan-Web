@@ -68,18 +68,40 @@
                         <span class="status @(slider.IsActive ? "good" : "off")">@(slider.IsActive ? "Active" : "Hidden")</span>
                     </div>
                     <div class="slider-admin-fields">
-                        <input name="Slider.Subtitle" value="@slider.Subtitle" placeholder="Subtitle" />
-                        <input name="Slider.Title" value="@slider.Title" placeholder="Title" />
-                        <textarea name="Slider.Description" rows="3" placeholder="Description">@slider.Description</textarea>
-                        <input name="Slider.ButtonText" value="@slider.ButtonText" placeholder="Button text" />
-                        <input name="Slider.ButtonUrl" value="@slider.ButtonUrl" placeholder="Button URL" />
-                        <input name="Slider.DisplayOrder" value="@slider.DisplayOrder" type="number" placeholder="Order" />
-                        <label class="inline-check">
+                        <label class="slider-field">
+                            <span>Subtitle</span>
+                            <input name="Slider.Subtitle" value="@slider.Subtitle" placeholder="New collection" />
+                        </label>
+                        <label class="slider-field">
+                            <span>Title</span>
+                            <input name="Slider.Title" value="@slider.Title" placeholder="Step up your style" />
+                        </label>
+                        <label class="slider-field full">
+                            <span>Description</span>
+                            <textarea name="Slider.Description" rows="3" placeholder="Short slide description">@slider.Description</textarea>
+                        </label>
+                        <label class="slider-field">
+                            <span>Button</span>
+                            <input name="Slider.ButtonText" value="@slider.ButtonText" placeholder="Shop now" />
+                        </label>
+                        <label class="slider-field">
+                            <span>Link</span>
+                            <input name="Slider.ButtonUrl" value="@slider.ButtonUrl" placeholder="/Products" />
+                        </label>
+                        <label class="slider-field">
+                            <span>Order</span>
+                            <input name="Slider.DisplayOrder" value="@slider.DisplayOrder" type="number" placeholder="1" />
+                        </label>
+                        <label class="inline-check slider-toggle">
                             <input name="Slider.IsActive" value="true" type="checkbox" checked="@slider.IsActive" />
                             <input name="Slider.IsActive" value="false" type="hidden" />
                             Active
                         </label>
-                        <input name="ImageFile" type="file" accept="image/*" />
+                        <label class="image-picker slider-upload full">
+                            Image
+                            <input name="ImageFile" type="file" accept="image/*" />
+                            <span>Choose new image</span>
+                        </label>
                     </div>
                     <div class="slider-admin-actions">
                         <button class="primary-button" type="submit">Save</button>

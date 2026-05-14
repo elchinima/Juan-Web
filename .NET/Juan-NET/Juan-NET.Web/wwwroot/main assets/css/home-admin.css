@@ -348,6 +348,11 @@ body {
   background: var(--juan-accent);
 }
 
+.footer-subscribe-status {
+  color: var(--juan-accent);
+  font-weight: 700;
+}
+
 .modal .modal-dialog {
   opacity: 0;
   transform: translateY(18px) scale(0.92);

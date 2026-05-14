@@ -2,6 +2,8 @@
 @{
     var footerSettings = await DbContext.SiteFooterSettings.AsNoTracking().FirstOrDefaultAsync(item => item.Id == 1) ?? new SiteFooterSettings();
     var footerPhoneHref = new string(footerSettings.Phone.Where(item => char.IsDigit(item) || item == '+').ToArray());
+    var footerSubscribedEmail = Context.Request.Cookies["JuanSubscribedEmail"] ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+    var isFooterSubscribed = !string.IsNullOrWhiteSpace(footerSubscribedEmail) && await DbContext.Subscribers.AsNoTracking().AnyAsync(subscriber => subscriber.Email == footerSubscribedEmail);
 }
 <!DOCTYPE html>
 <html class="no-js" lang="zxx">
@@ -125,10 +127,21 @@
                                 {
                                     <p>@subscribeMessage</p>
                                 }
-                                <form asp-controller="Home" asp-action="SubscribeEmail" method="post" class="footer-subscribe-form">
-                                    <input name="email" type="email" placeholder="Email address" required />
-                                    <button type="submit">Subscribe</button>
-                                </form>
+                                @if (isFooterSubscribed)
+                                {
+                                    <p class="footer-subscribe-status">You are subscribed.</p>
+                                    <form asp-controller="Home" asp-action="UnsubscribeEmail" method="post" class="footer-subscribe-form">
+                                        <input name="email" type="hidden" value="@footerSubscribedEmail" />
+                                        <button type="submit">Unsubscribe</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Home" asp-action="SubscribeEmail" method="post" class="footer-subscribe-form">
+                                        <input name="email" type="email" placeholder="Email address" required />
+                                        <button type="submit">Subscribe</button>
+                                    </form>
+                                }
                             </div>
                         </div>
                     </div>

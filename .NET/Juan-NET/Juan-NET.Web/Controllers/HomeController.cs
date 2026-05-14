@@ -475,15 +475,51 @@ public class HomeController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SubscribeEmail(string email)
     {
-        if (!string.IsNullOrWhiteSpace(email) && !await _context.Subscribers.AnyAsync(subscriber => subscriber.Email == email))
+        var normalizedEmail = email?.Trim();
+
+        if (!string.IsNullOrWhiteSpace(normalizedEmail) && !await _context.Subscribers.AnyAsync(subscriber => subscriber.Email == normalizedEmail))
         {
             _context.Subscribers.Add(new Subscriber
             {
-                Email = email.Trim(),
+                Email = normalizedEmail,
                 CreatedAt = DateTime.UtcNow
             });
             await _context.SaveChangesAsync();
             TempData["SubscribeMessage"] = "Thank you for subscribing.";
+        }
+
+        if (!string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            Response.Cookies.Append("JuanSubscribedEmail", normalizedEmail, new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddYears(1),
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax
+            });
+        }
+
+        var returnUrl = Request.Headers.Referer.ToString();
+        return Redirect(string.IsNullOrWhiteSpace(returnUrl) ? Url.Action(nameof(Index))! : returnUrl);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UnsubscribeEmail(string email)
+    {
+        var normalizedEmail = email?.Trim();
+
+        if (!string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            var subscriber = await _context.Subscribers.FirstOrDefaultAsync(item => item.Email == normalizedEmail);
+
+            if (subscriber is not null)
+            {
+                _context.Subscribers.Remove(subscriber);
+                await _context.SaveChangesAsync();
+            }
+
+            Response.Cookies.Delete("JuanSubscribedEmail");
+            TempData["SubscribeMessage"] = "You have unsubscribed.";
         }
 
         var returnUrl = Request.Headers.Referer.ToString();

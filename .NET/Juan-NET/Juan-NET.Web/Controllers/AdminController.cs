@@ -699,11 +699,27 @@ namespace Juan_NET.Web.Controllers
                 ? (await GetSubscribeRecipientsQuery().ToListAsync()).Concat(viewModel.SelectedEmails).Distinct(StringComparer.OrdinalIgnoreCase).ToList()
                 : viewModel.SelectedEmails.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-            var body = WebUtility.HtmlEncode(viewModel.Message).Replace("\n", "<br />");
+            string? imageUrl = null;
+
+            if (viewModel.ImageFile is { Length: > 0 })
+            {
+                try
+                {
+                    imageUrl = ToAbsoluteUrl(await _imageStorage.SaveAsWebpAsync(viewModel.ImageFile, "newsletter"));
+                }
+                catch (InvalidOperationException exception)
+                {
+                    ModelState.AddModelError(nameof(AdminSubscribeViewModel.ImageFile), exception.Message);
+                    return View("Subscribe", await CreateSubscribeViewModelAsync(viewModel));
+                }
+            }
+
+            var siteUrl = $"{Request.Scheme}://{Request.Host}";
+            var body = BuildSubscribeEmail(viewModel.Subject, viewModel.Message, imageUrl, siteUrl);
 
             foreach (var recipient in recipients)
             {
-                await _emailService.SendAsync(recipient, viewModel.Subject, $"<p>{body}</p>");
+                await _emailService.SendAsync(recipient, viewModel.Subject, body);
             }
 
             TempData["SubscribeMessage"] = $"Message sent to {recipients.Count} recipient(s).";
@@ -1042,23 +1058,78 @@ namespace Juan_NET.Web.Controllers
 
         private async Task<AdminSubscribeViewModel> CreateSubscribeViewModelAsync(AdminSubscribeViewModel viewModel)
         {
-            var usersQuery = _context.Users.AsQueryable();
+            var subscribersQuery = _context.Subscribers.AsQueryable();
             var normalizedSearch = viewModel.UserSearch?.Trim();
 
             if (!string.IsNullOrWhiteSpace(normalizedSearch))
             {
-                usersQuery = usersQuery.Where(user => user.FullName.Contains(normalizedSearch) || user.Email.Contains(normalizedSearch));
+                subscribersQuery = subscribersQuery.Where(subscriber => subscriber.Email.Contains(normalizedSearch));
             }
 
             viewModel.UserSearch = normalizedSearch;
-            viewModel.Users = await usersQuery.OrderBy(user => user.Email).Take(20).ToListAsync();
-            viewModel.Subscribers = await _context.Subscribers.OrderBy(subscriber => subscriber.Email).ToListAsync();
+            viewModel.Users = [];
+            viewModel.Subscribers = await subscribersQuery.OrderBy(subscriber => subscriber.Email).ToListAsync();
             return viewModel;
         }
 
         private IQueryable<string> GetSubscribeRecipientsQuery()
         {
             return _context.Subscribers.Select(subscriber => subscriber.Email).Distinct();
+        }
+
+        private string ToAbsoluteUrl(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUrl))
+            {
+                return absoluteUrl.ToString();
+            }
+
+            return $"{Request.Scheme}://{Request.Host}{Url.Content(url)}";
+        }
+
+        private static string BuildSubscribeEmail(string subject, string message, string? imageUrl, string siteUrl)
+        {
+            var encodedSubject = WebUtility.HtmlEncode(subject);
+            var encodedMessage = WebUtility.HtmlEncode(message).Replace("\n", "<br />");
+            var imageBlock = string.IsNullOrWhiteSpace(imageUrl)
+                ? string.Empty
+                : $"""
+                    <tr>
+                        <td style="padding:0 28px 22px;">
+                            <img src="{WebUtility.HtmlEncode(imageUrl)}" alt="{encodedSubject}" style="display:block;width:100%;max-height:360px;object-fit:cover;border-radius:12px;background:#f6f2ea;" />
+                        </td>
+                    </tr>
+                    """;
+
+            return $"""
+                <div style="margin:0;padding:0;background:#f5f1ea;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f1ea;padding:28px 12px;">
+                        <tr>
+                            <td align="center">
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:660px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #eee3d1;">
+                                    <tr>
+                                        <td style="padding:30px 28px;background:#222222;color:#ffffff;font-family:Arial,sans-serif;">
+                                            <span style="display:inline-block;margin-bottom:10px;color:#e3a51e;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;">Juan Newsletter</span>
+                                            <h1 style="margin:0;font-size:30px;line-height:1.18;">{encodedSubject}</h1>
+                                        </td>
+                                    </tr>
+                                    {imageBlock}
+                                    <tr>
+                                        <td style="padding:28px;font-family:Arial,sans-serif;color:#333333;font-size:16px;line-height:1.75;">
+                                            {encodedMessage}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:0 28px 30px;font-family:Arial,sans-serif;">
+                                            <a href="{WebUtility.HtmlEncode(siteUrl)}" style="display:inline-block;padding:12px 18px;background:#e3a51e;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700;font-size:12px;text-transform:uppercase;">Juan Store</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                """;
         }
 
         private async Task<bool> HasCurrentUserPermissionAsync(string permissionKey)

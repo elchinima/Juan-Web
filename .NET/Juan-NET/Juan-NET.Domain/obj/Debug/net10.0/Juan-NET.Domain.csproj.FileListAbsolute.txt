@@ -82,3 +82,12 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Jua
 C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Domain.deps.json
 C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Domain.dll
 C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\subscribe-verify-build\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\subscribe-verify-build\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\subscribe-verify-build\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-card-verify-build\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-card-verify-build\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-card-verify-build\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-scroll-verify-build\Juan-NET.Domain.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-scroll-verify-build\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-scroll-verify-build\Juan-NET.Domain.pdb

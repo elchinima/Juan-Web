@@ -10,6 +10,7 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AdminAccessService>();
 builder.Services.AddScoped<SupportWorkTimeService>();
 builder.Services.AddHostedService<SupportReportCleanupService>();
+builder.Services.AddHostedService<FavoriteCategoryDigestService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
