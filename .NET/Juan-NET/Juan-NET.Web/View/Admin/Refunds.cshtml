@@ -6,6 +6,9 @@
     ViewData["ActivePage"] = "Refund";
     var currentStatus = ViewBag.RefundStatus as string ?? "Refund Requested";
     var statuses = ViewBag.RefundStatuses as string[] ?? ["Refund Requested", "Refunded", "All"];
+    var pendingCount = Model.Count(order => order.Status == "Refund Requested");
+    var refundedCount = Model.Count(order => order.Status == "Refunded");
+    var totalAmount = Model.Sum(order => order.Total);
 }
 
 @section SidebarCard {
@@ -32,53 +35,97 @@
     <div class="status good admin-message">@refundMessage</div>
 }
 
-<section class="panel reveal">
-    <div class="panel-head">
+<section class="refund-overview reveal">
+    <article>
+        <span>Current View</span>
+        <strong>@currentStatus</strong>
+        <p>@Model.Count orders in this list</p>
+    </article>
+    <article>
+        <span>Waiting</span>
+        <strong>@pendingCount</strong>
+        <p>Refunds require admin action</p>
+    </article>
+    <article>
+        <span>Completed</span>
+        <strong>@refundedCount</strong>
+        <p>Finished refunds in this view</p>
+    </article>
+    <article>
+        <span>Total Value</span>
+        <strong>@totalAmount.ToString("C")</strong>
+        <p>Combined order amount</p>
+    </article>
+</section>
+
+<section class="panel refund-panel reveal">
+    <div class="panel-head refund-panel-head">
         <div>
             <p class="eyebrow">Requests</p>
             <h3>Refund Orders</h3>
         </div>
-        <form class="admin-search-form" asp-controller="Admin" asp-action="Refunds" method="get">
-            <select name="status">
-                @foreach (var status in statuses)
-                {
-                    <option value="@status" selected="@(status == currentStatus)">@status</option>
-                }
-            </select>
-            <button class="primary-button" type="submit">Filter</button>
-        </form>
+        <div class="refund-filter-tabs">
+            @foreach (var status in statuses)
+            {
+                <a class="@(status == currentStatus ? "active" : "")" asp-controller="Admin" asp-action="Refunds" asp-route-status="@status">@status</a>
+            }
+        </div>
     </div>
 
-    <div class="message-list">
+    <div class="refund-list">
         @if (Model.Any())
         {
             @foreach (var order in Model)
             {
-                <article class="message-card">
-                    <div>
-                        <strong>Order #@order.Id</strong>
-                        <a href="mailto:@order.Email">@order.Customer</a>
+                var isPending = order.Status == "Refund Requested";
+                <article class="refund-card">
+                    <div class="refund-card-main">
+                        <div class="refund-order-title">
+                            <span>Order #@order.Id</span>
+                            <strong>@order.ItemsSummary</strong>
+                        </div>
+                        <div class="refund-customer">
+                            <span>Customer</span>
+                            <a href="mailto:@order.Email">@order.Customer</a>
+                        </div>
                     </div>
-                    <p>@order.ItemsSummary</p>
-                    <div class="message-meta">
-                        <span>Status: @order.Status</span>
-                        <span>Total: @order.Total.ToString("C") @order.Currency.ToUpperInvariant()</span>
-                        <span>Created: @order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</span>
+
+                    <div class="refund-card-body">
+                        <div class="refund-amount">
+                            <span>Total</span>
+                            <strong>@order.Total.ToString("C")</strong>
+                            <small>@order.Currency.ToUpperInvariant()</small>
+                        </div>
+                        <div class="refund-status-block">
+                            <span>Status</span>
+                            <em class="refund-status @(isPending ? "pending" : "done")">@order.Status</em>
+                        </div>
+                        <div class="refund-timeline">
+                            <span>Created</span>
+                            <strong>@order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</strong>
+                        </div>
                         @if (order.RefundRequestedAt.HasValue)
                         {
-                            <span>Requested: @order.RefundRequestedAt.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</span>
+                            <div class="refund-timeline">
+                                <span>Requested</span>
+                                <strong>@order.RefundRequestedAt.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</strong>
+                            </div>
                         }
                         @if (order.RefundedAt.HasValue)
                         {
-                            <span>Refunded: @order.RefundedAt.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</span>
+                            <div class="refund-timeline">
+                                <span>Refunded</span>
+                                <strong>@order.RefundedAt.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</strong>
+                            </div>
                         }
                     </div>
-                    @if (order.Status == "Refund Requested")
+
+                    @if (isPending)
                     {
-                        <form asp-controller="Admin" asp-action="CompleteRefund" method="post" data-confirm="Complete Stripe refund for this order?">
+                        <form class="refund-action-form" asp-controller="Admin" asp-action="CompleteRefund" method="post" data-confirm="Complete Stripe refund for this order?">
                             <input type="hidden" name="id" value="@order.Id" />
                             <input type="hidden" name="status" value="@currentStatus" />
-                            <button class="primary-button compact-button" type="submit">Complete Refund</button>
+                            <button class="primary-button" type="submit">Complete Refund</button>
                         </form>
                     }
                 </article>
@@ -86,13 +133,12 @@
         }
         else
         {
-            <article class="message-card">
+            <article class="refund-empty-state">
                 <div>
                     <strong>No refund orders found</strong>
                     <a asp-controller="Admin" asp-action="Index">Dashboard</a>
                 </div>
                 <p>Refund requests will appear here after customers request them.</p>
-                <span>-</span>
             </article>
         }
     </div>

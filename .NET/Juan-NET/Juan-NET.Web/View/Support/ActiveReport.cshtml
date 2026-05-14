@@ -21,7 +21,7 @@
         <h1>Active Report</h1>
     </div>
     <div class="topbar-actions">
-        <form asp-controller="Support" asp-action="Close" asp-route-id="@Model.Id" method="post">
+        <form asp-controller="Support" asp-action="Close" asp-route-id="@Model.Id" method="post" data-confirm="Close this report?">
             @Html.AntiForgeryToken()
             <button class="danger-button" type="submit">Close Report</button>
         </form>

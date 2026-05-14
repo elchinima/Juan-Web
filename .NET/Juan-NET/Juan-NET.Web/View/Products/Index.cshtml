@@ -21,6 +21,77 @@
 
 <section class="our-product section-padding">
     <div class="container">
+        <form asp-controller="Products" asp-action="Index" method="get" class="product-filter-form">
+            <div class="product-search-bar">
+                <input type="search" name="query" value="@Model.SearchTerm" placeholder="Search products by name" autocomplete="off" />
+                <button class="btn btn-hero" type="submit">Search</button>
+                <button class="btn btn-hero product-filter-button" type="button" data-toggle="modal" data-target="#product_filter">Filters</button>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.CategoryId.HasValue || Model.MinPrice.HasValue || Model.MaxPrice.HasValue || Model.MinRating.HasValue)
+                {
+                    <a class="btn btn-hero product-clear-button" asp-controller="Products" asp-action="Index">Clear</a>
+                }
+            </div>
+
+            <div class="modal" id="product_filter">
+                <div class="modal-dialog modal-dialog-centered product-filter-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Product filters</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="product-filter-grid">
+                                <label>
+                                    <span>Category</span>
+                                    <select name="categoryId">
+                                        <option value="">All categories</option>
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            if (Model.CategoryId == category.Id)
+                                            {
+                                                <option value="@category.Id" selected>@category.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@category.Id">@category.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </label>
+                                <label>
+                                    <span>Rating</span>
+                                    <select name="minRating">
+                                        <option value="">Any rating</option>
+                                        @foreach (var rating in new[] { 5m, 4m, 3m, 2m, 1m })
+                                        {
+                                            if (Model.MinRating == rating)
+                                            {
+                                                <option value="@rating.ToString("0")" selected>@rating.ToString("0")+ stars</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@rating.ToString("0")">@rating.ToString("0")+ stars</option>
+                                            }
+                                        }
+                                    </select>
+                                </label>
+                                <label>
+                                    <span>Min price</span>
+                                    <input type="number" name="minPrice" value="@Model.MinPrice?.ToString("0.##", CultureInfo.InvariantCulture)" min="0" step="0.01" />
+                                </label>
+                                <label>
+                                    <span>Max price</span>
+                                    <input type="number" name="maxPrice" value="@Model.MaxPrice?.ToString("0.##", CultureInfo.InvariantCulture)" min="0" step="0.01" />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-hero" type="submit">Apply filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
         @if (Model.Products.Any())
         {
             <div class="row mbn-50 product-page-grid">
@@ -30,6 +101,9 @@
                     var categories = string.Join(", ", product.ProductCategories.Select(productCategory => productCategory.Category.Name));
                     var description = string.IsNullOrWhiteSpace(product.Description) ? "No description available." : product.Description;
                     var isOutOfStock = product.StockCount < 1;
+                    Model.ReviewSummariesByProductId.TryGetValue(product.Id, out var reviewSummary);
+                    var averageRating = reviewSummary?.AverageRating ?? 0m;
+                    var reviewCount = reviewSummary?.Count ?? 0;
                     <div class="col-lg-3 col-md-4 col-sm-6">
                         <div class="product-item mb-50 @(isOutOfStock ? "is-out-of-stock" : "")"
                              data-product-card
@@ -40,6 +114,8 @@
                              data-product-description="@description"
                              data-product-categories="@categories"
                              data-product-stock="@product.StockCount"
+                             data-product-rating="@averageRating.ToString("0.0")"
+                             data-product-review-count="@reviewCount"
                              data-product-out-of-stock="@isOutOfStock.ToString().ToLowerInvariant()">
                             <div class="product-thumb">
                                 <a href="#" data-product-quick-view>
@@ -55,6 +131,10 @@
                                 <div class="price-box">
                                     <span class="price-regular">@product.Price.ToString("C")</span>
                                 </div>
+                                <div class="product-review-summary">
+                                    <span class="product-review-stars-small">@RenderStars(averageRating)</span>
+                                    <span>@(reviewCount == 0 ? "No reviews" : $"{averageRating:0.0} ({reviewCount})")</span>
+                                </div>
                                 <p>@categories</p>
                                 @if (!isOutOfStock)
                                 {
@@ -67,6 +147,46 @@
                             </div>
                         </div>
                     </div>
+                    <div class="product-reviews-template" data-product-reviews-template="@product.Id">
+                        @{
+                            var productReviews = Model.ReviewsByProductId.TryGetValue(product.Id, out var foundReviews)
+                                ? foundReviews
+                                : new List<ProductReviewViewModel>();
+                        }
+                        @if (productReviews.Any())
+                        {
+                            @foreach (var review in productReviews)
+                            {
+                                var reviewerImage = string.IsNullOrWhiteSpace(review.UserImageUrl) ? Url.Content("~/main assets/img/testimonial/testimonial-1.png") : review.UserImageUrl;
+                                <div class="product-review-item">
+                                    <img src="@reviewerImage" alt="@review.UserName" />
+                                    <div>
+                                        <div class="product-review-heading">
+                                            <strong>@review.UserName</strong>
+                                            <span class="product-review-badge @(review.IsVerifiedPurchase ? "verified" : "")">@(review.IsVerifiedPurchase ? "Bought and reviewed" : "Review only")</span>
+                                            @if (review.CanDelete)
+                                            {
+                                                <form asp-controller="Products" asp-action="DeleteReview" method="post" class="product-review-delete-form" data-no-transition>
+                                                    <input type="hidden" name="id" value="@review.Id" />
+                                                    <button type="submit" title="Delete review" aria-label="Delete review">×</button>
+                                                </form>
+                                            }
+                                        </div>
+                                        <div class="product-review-stars-small">@RenderStars(review.Rating) <span>@review.Rating.ToString("0.0")</span></div>
+                                        @if (!string.IsNullOrWhiteSpace(review.Comment))
+                                        {
+                                            <p>@review.Comment</p>
+                                        }
+                                        <small>@review.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="product-review-empty">No reviews yet.</p>
+                        }
+                    </div>
                 }
             </div>
             @if (Model.HasPreviousPage || Model.HasNextPage)
@@ -74,11 +194,11 @@
                 <nav class="product-pagination" aria-label="Products pagination">
                     @if (Model.HasPreviousPage)
                     {
-                        <a class="btn btn-hero" asp-controller="Products" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)">Назад</a>
+                        <a class="btn btn-hero" asp-controller="Products" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-query="@Model.SearchTerm" asp-route-categoryId="@Model.CategoryId" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice" asp-route-minRating="@Model.MinRating">Назад</a>
                     }
                     @if (Model.HasNextPage)
                     {
-                        <a class="btn btn-hero" asp-controller="Products" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)">Далее</a>
+                        <a class="btn btn-hero" asp-controller="Products" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-query="@Model.SearchTerm" asp-route-categoryId="@Model.CategoryId" asp-route-minPrice="@Model.MinPrice" asp-route-maxPrice="@Model.MaxPrice" asp-route-minRating="@Model.MinRating">Далее</a>
                     }
                 </nav>
             }
@@ -86,16 +206,16 @@
         else
         {
             <div class="section-title text-center">
-                <h2 class="title">No products yet</h2>
-                <p class="sub-title">Add products from the admin panel and they will appear here.</p>
-                <a class="btn btn-hero" asp-controller="Admin" asp-action="Products">Add Product</a>
+                <h2 class="title">No products found</h2>
+                <p class="sub-title">Try changing the search text or filters.</p>
+                <a class="btn btn-hero" asp-controller="Products" asp-action="Index">Show all products</a>
             </div>
         }
     </div>
 </section>
 
 <div class="modal" id="quick_view">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered product-modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -117,9 +237,15 @@
                                     <span class="regular-price" data-modal-product-price>$70.00</span>
                                 </div>
                                 <p data-modal-product-description>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
-                                <p><strong>Category:</strong> <span data-modal-product-categories>-</span></p>
-                                <p><strong>Stock:</strong> <span data-modal-product-stock>-</span></p>
-                                <form asp-controller="Home" asp-action="AddToCart" method="post" class="quantity-cart-box d-flex align-items-center mb-20" data-modal-basket-form data-no-transition>
+                                <div class="product-modal-meta">
+                                    <span><strong>Category</strong> <span data-modal-product-categories>-</span></span>
+                                    <span><strong>Stock</strong> <span data-modal-product-stock>-</span></span>
+                                </div>
+                                <div class="modal-review-summary product-review-pill">
+                                    <span class="product-review-stars-small" data-modal-product-stars>☆☆☆☆☆</span>
+                                    <span data-modal-product-reviews>No reviews</span>
+                                </div>
+                                <form asp-controller="Home" asp-action="AddToCart" method="post" class="quantity-cart-box product-modal-cart" data-modal-basket-form data-no-transition>
                                     <input type="hidden" name="productId" value="" data-modal-product-id />
                                     <div class="quantity">
                                         <div class="pro-qty">
@@ -128,6 +254,31 @@
                                     </div>
                                     <button class="btn btn-default" type="submit">Add To Cart</button>
                                 </form>
+                                <div class="product-review-panel">
+                                    @if (User.Identity?.IsAuthenticated == true)
+                                    {
+                                        <form asp-controller="Products" asp-action="Review" method="post" data-no-transition>
+                                            <input type="hidden" name="ProductId" value="" data-review-product-id />
+                                            <div class="product-review-panel-title">
+                                                <span>Rate this product</span>
+                                                <small>Share your experience</small>
+                                            </div>
+                                            <div class="product-review-stars-input" aria-label="Product rating">
+                                                @for (var star = 5; star >= 1; star--)
+                                                {
+                                                    <input type="radio" id="product-review-@star" name="Rating" value="@star" @(star == 5 ? "checked" : "") />
+                                                    <label for="product-review-@star">★</label>
+                                                }
+                                            </div>
+                                            <textarea name="Comment" rows="3" maxlength="1000" placeholder="Leave a comment if you want"></textarea>
+                                            <button class="btn btn-default" type="submit">Leave review</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-default" asp-controller="Account" asp-action="Login">Login to leave review</a>
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,6 +289,21 @@
 </div>
 
 <style>
+    .product-filter-form{margin-bottom:34px}
+    .product-search-bar{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+    .product-search-bar input{height:46px;min-width:280px;max-width:460px;width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:0 14px;color:#444}
+    .product-filter-button,.product-clear-button{background:#333}
+    .product-filter-dialog{max-width:620px}
+    #product_filter .modal-content{border:0;border-radius:8px;box-shadow:0 18px 42px rgba(0,0,0,.18)}
+    #product_filter .modal-header{align-items:center;border-bottom:1px solid #eee;padding:18px 22px}
+    #product_filter .modal-title{margin:0;color:#222;font-weight:800}
+    #product_filter .close{font-size:28px;font-weight:300;line-height:1;opacity:.75}
+    #product_filter .modal-body{padding:22px}
+    #product_filter .modal-footer{border-top:1px solid #eee;padding:16px 22px}
+    .product-filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .product-filter-grid label{display:block;margin:0}
+    .product-filter-grid span{display:block;color:#222;font-weight:700;margin-bottom:8px}
+    .product-filter-grid input,.product-filter-grid select{width:100%;height:44px;border:1px solid #e0e0e0;border-radius:4px;padding:0 12px;color:#444;background:#fff}
     .product-page-grid .product-item{height:504px}
     .product-page-grid .product-thumb{height:264px}
     .product-page-grid .product-thumb img{max-height:100%;width:auto}
@@ -145,6 +311,73 @@
     .product-item.is-out-of-stock{opacity:.62;filter:grayscale(1);cursor:not-allowed}
     .product-item.is-out-of-stock .product-thumb{position:relative}
     .product-stock-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#222;color:#fff;border-radius:4px;padding:8px 12px;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+    .product-review-summary,.modal-review-summary{display:flex;align-items:center;gap:8px;color:#666;font-size:13px;margin:8px 0}
+    .product-review-stars-small{color:#e3a51e;letter-spacing:1px;white-space:nowrap}
+    .product-review-panel{border-top:1px solid #eee;margin-top:16px;padding-top:16px}
+    .product-review-panel textarea{width:100%;border:1px solid #ddd;border-radius:4px;padding:10px;margin:10px 0 12px;resize:vertical}
+    .product-review-stars-input{display:inline-flex;flex-direction:row-reverse;gap:3px}
+    .product-review-stars-input input{position:absolute;opacity:0;pointer-events:none}
+    .product-review-stars-input label{font-size:26px;color:#d6d6d6;cursor:pointer;line-height:1}
+    .product-review-stars-input input:checked ~ label,.product-review-stars-input label:hover,.product-review-stars-input label:hover ~ label{color:#e3a51e}
+    .product-reviews-template{display:none}
+    .product-review-list{margin-top:18px;max-height:300px;overflow:auto;border-top:1px solid #eee;padding-top:14px}
+    .product-review-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f1f1}
+    .product-review-item img{width:42px;height:42px;border-radius:50%;object-fit:cover}
+    .product-review-item p{margin:6px 0;color:#555}
+    .product-review-heading{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .product-review-badge{background:#f1f1f1;color:#666;border-radius:4px;padding:3px 7px;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+    .product-review-badge.verified{background:#eaf7ef;color:#1f7a3f}
+    .product-review-delete-form{margin-left:auto}
+    .product-review-delete-form button{width:26px;height:26px;border:0;border-radius:50%;background:#f6eaea;color:#a13a3a;font-size:20px;line-height:24px;cursor:pointer}
+    .product-review-delete-form button:hover{background:#d94a4a;color:#fff}
+    .product-review-empty{margin:0;color:#777}
+    #quick_view .product-modal-dialog{max-width:940px}
+    #quick_view .modal-content{border:0;border-radius:10px;box-shadow:0 22px 55px rgba(20,20,20,.22);overflow:hidden}
+    #quick_view .modal-header{position:absolute;right:18px;top:14px;z-index:3;border:0;padding:0}
+    #quick_view .modal-header .close{width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.12);font-size:28px;font-weight:300;line-height:38px;opacity:1}
+    #quick_view .modal-body{padding:28px}
+    #quick_view .product-details-inner>.row{align-items:flex-start}
+    #quick_view .product-large-slider{position:sticky;top:20px;margin:0;background:#f8f8f8;border:1px solid #eeeeee;border-radius:8px;overflow:hidden}
+    #quick_view .pro-large-img{height:430px;display:flex;align-items:center;justify-content:center;padding:28px;background:linear-gradient(180deg,#fff 0%,#f7f7f7 100%)}
+    #quick_view .pro-large-img img{max-width:100%;max-height:100%;object-fit:contain}
+    #quick_view .product-details-des{padding:4px 0 0 14px}
+    #quick_view .pro-det-title{font-size:28px;line-height:1.18;margin:0 44px 12px 0;color:#252525}
+    #quick_view .regular-price{display:inline-block;color:#b98521;font-size:22px;font-weight:800;margin-bottom:12px}
+    #quick_view [data-modal-product-description]{font-size:16px;line-height:1.7;color:#4c4c4c;margin-bottom:18px}
+    .product-modal-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+    .product-modal-meta span{display:inline-flex;align-items:center;gap:6px;background:#f8f8f8;border:1px solid #eeeeee;border-radius:999px;padding:8px 12px;color:#444;font-size:14px}
+    .product-modal-meta strong{color:#222}
+    .product-review-pill{width:max-content;max-width:100%;background:#fff9ec;border:1px solid #f1dfba;border-radius:999px;padding:7px 12px;margin:0 0 16px}
+    .product-modal-cart{display:flex;align-items:center;gap:14px;margin:0 0 18px}
+    .product-modal-cart .quantity{margin:0}
+    .product-modal-cart .pro-qty{border:1px solid #e0e0e0;border-radius:6px;background:#fff;height:46px}
+    .product-modal-cart .pro-qty input{height:44px}
+    .product-modal-cart .btn,.product-review-panel .btn{height:46px;border-radius:6px;padding:0 28px;font-weight:800;letter-spacing:.02em}
+    .product-review-panel{background:#fbfbfb;border:1px solid #ececec;border-radius:8px;margin-top:18px;padding:18px}
+    .product-review-panel-title{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:10px}
+    .product-review-panel-title span{display:block;color:#222;font-weight:800;font-size:16px}
+    .product-review-panel-title small{display:block;color:#8a8a8a;font-size:12px;margin-top:2px}
+    .product-review-stars-input{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:5px;margin-bottom:12px}
+    .product-review-stars-input label{font-size:30px;text-shadow:0 1px 0 rgba(0,0,0,.05)}
+    .product-review-panel textarea{background:#fff;border-color:#e0e0e0;border-radius:7px;min-height:92px;margin:0 0 14px;font-size:14px}
+    .product-review-list{background:#fff;border:1px solid #eeeeee;border-radius:8px;margin-top:18px;padding:4px 16px;max-height:260px}
+    .product-review-item{padding:14px 0}
+    .product-review-empty{background:#fff;border:1px dashed #dddddd;border-radius:8px;color:#777;margin:14px 0 0;padding:18px;text-align:center}
+    @@media (max-width: 991px){
+        #quick_view .product-details-des{padding:22px 0 0}
+        #quick_view .pro-large-img{height:320px}
+        #quick_view .product-large-slider{position:static}
+    }
+    @@media (max-width: 575px){
+        .product-search-bar input{min-width:0}
+        .product-search-bar .btn{width:100%}
+        .product-filter-grid{grid-template-columns:1fr}
+        #quick_view .modal-body{padding:18px}
+        #quick_view .pro-det-title{font-size:22px}
+        .product-modal-cart{align-items:stretch;flex-direction:column}
+        .product-modal-cart .btn{width:100%}
+        .product-review-panel-title{display:block}
+    }
 </style>
 
 @section Scripts {
@@ -181,10 +414,17 @@
                 setText("[data-modal-product-description]", card.dataset.productDescription);
                 setText("[data-modal-product-categories]", card.dataset.productCategories || "-");
                 setText("[data-modal-product-stock]", card.dataset.productStock ? card.dataset.productStock + " item(s)" : "-");
+                setText("[data-modal-product-stars]", renderStars(parseFloat(card.dataset.productRating) || 0));
+                setText("[data-modal-product-reviews]", card.dataset.productReviewCount === "0" ? "No reviews" : card.dataset.productRating + " (" + card.dataset.productReviewCount + ")");
 
                 var productId = modal.querySelector("[data-modal-product-id]");
                 if (productId) {
                     productId.value = card.dataset.productId || "";
+                }
+
+                var reviewProductId = modal.querySelector("[data-review-product-id]");
+                if (reviewProductId) {
+                    reviewProductId.value = card.dataset.productId || "";
                 }
 
                 var quantityInput = modal.querySelector("[data-quantity-limit]");
@@ -198,6 +438,17 @@
                     image.src = card.dataset.productImage;
                     image.alt = card.dataset.productName;
                 }
+
+                var existingReviewList = modal.querySelector(".product-review-list");
+                if (existingReviewList) {
+                    existingReviewList.remove();
+                }
+
+                var template = document.querySelector("[data-product-reviews-template='" + card.dataset.productId + "']");
+                var reviewList = document.createElement("div");
+                reviewList.className = "product-review-list";
+                reviewList.innerHTML = template ? template.innerHTML : "<p class=\"product-review-empty\">No reviews yet.</p>";
+                modal.querySelector(".product-details-des").appendChild(reviewList);
             }
 
             function setText(selector, value) {
@@ -250,6 +501,23 @@
                     input.value = String(maxQuantity);
                 }
             }
+
+            function renderStars(rating) {
+                var rounded = Math.round(rating);
+                var stars = "";
+                for (var index = 1; index <= 5; index++) {
+                    stars += index <= rounded ? "★" : "☆";
+                }
+                return stars;
+            }
         })();
     </script>
+}
+
+@functions {
+    private static string RenderStars(decimal rating)
+    {
+        var rounded = (int)Math.Round(rating, MidpointRounding.AwayFromZero);
+        return new string('★', Math.Clamp(rounded, 0, 5)) + new string('☆', Math.Clamp(5 - rounded, 0, 5));
+    }
 }

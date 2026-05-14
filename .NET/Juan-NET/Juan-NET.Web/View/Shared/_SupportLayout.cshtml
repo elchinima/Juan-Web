@@ -38,6 +38,24 @@
         </main>
     </div>
 
+    <div class="admin-modal confirm-modal" data-confirm-modal>
+        <div class="admin-modal-backdrop" data-confirm-cancel></div>
+        <section class="admin-modal-panel confirm-modal-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Confirm</p>
+                    <h3 id="confirm-title">Confirm Action</h3>
+                </div>
+                <button class="modal-close" type="button" aria-label="Close modal" data-confirm-cancel>&times;</button>
+            </div>
+            <p data-confirm-message>Are you sure you want to continue?</p>
+            <div class="confirm-actions">
+                <button class="ghost-button" type="button" data-confirm-cancel>Cancel</button>
+                <button class="danger-button" type="button" data-confirm-accept>Confirm</button>
+            </div>
+        </section>
+    </div>
+
     <script src="~/admin assets/js/admin.js"></script>
     <script src="~/admin assets/js/support.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

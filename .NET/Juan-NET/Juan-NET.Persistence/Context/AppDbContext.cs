@@ -50,6 +50,8 @@
 
         public DbSet<SupportRating> SupportRatings => Set<SupportRating>();
 
+        public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
+
         public DbSet<SupportOperatorWorkTime> SupportOperatorWorkTimes => Set<SupportOperatorWorkTime>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -205,6 +207,24 @@
                 entity.HasOne(rating => rating.OperatorUser)
                     .WithMany(user => user.OperatorSupportRatings)
                     .HasForeignKey(rating => rating.OperatorUserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<ProductReview>(entity =>
+            {
+                entity.Property(review => review.Rating).HasColumnType("decimal(2,1)");
+                entity.Property(review => review.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(review => new { review.ProductId, review.UserId }).IsUnique();
+                entity.HasIndex(review => new { review.ProductId, review.CreatedAt });
+
+                entity.HasOne(review => review.Product)
+                    .WithMany(product => product.Reviews)
+                    .HasForeignKey(review => review.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(review => review.User)
+                    .WithMany(user => user.ProductReviews)
+                    .HasForeignKey(review => review.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
             });
 

@@ -30,7 +30,7 @@
                         </div>
                         <h3>@category.Name</h3>
                         <p>@category.ProductCount @(category.ProductCount == 1 ? "product" : "products") available</p>
-                        <a asp-controller="Products" asp-action="Index" class="category-link">Browse category</a>
+                        <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id" class="category-link">Browse category</a>
                     </article>
                 }
             </div>

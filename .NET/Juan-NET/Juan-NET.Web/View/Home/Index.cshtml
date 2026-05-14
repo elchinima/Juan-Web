@@ -168,7 +168,7 @@
 </div>
 
 <div class="modal" id="quick_view">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered product-modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -190,9 +190,11 @@
                                     <span class="regular-price" data-modal-product-price>$70.00</span>
                                 </div>
                                 <p data-modal-product-description>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</p>
-                                <p><strong>Category:</strong> <span data-modal-product-categories>-</span></p>
-                                <p><strong>Stock:</strong> <span data-modal-product-stock>-</span></p>
-                                <form asp-controller="Home" asp-action="AddToCart" method="post" class="quantity-cart-box d-flex align-items-center mb-20" data-modal-basket-form data-no-transition>
+                                <div class="product-modal-meta">
+                                    <span><strong>Category</strong> <span data-modal-product-categories>-</span></span>
+                                    <span><strong>Stock</strong> <span data-modal-product-stock>-</span></span>
+                                </div>
+                                <form asp-controller="Home" asp-action="AddToCart" method="post" class="quantity-cart-box product-modal-cart" data-modal-basket-form data-no-transition>
                                     <input type="hidden" name="productId" value="" data-modal-product-id />
                                     <div class="quantity">
                                         <div class="pro-qty">
@@ -209,6 +211,41 @@
         </div>
     </div>
 </div>
+
+<style>
+    #quick_view .product-modal-dialog{max-width:940px}
+    #quick_view .modal-content{border:0;border-radius:10px;box-shadow:0 22px 55px rgba(20,20,20,.22);overflow:hidden}
+    #quick_view .modal-header{position:absolute;right:18px;top:14px;z-index:3;border:0;padding:0}
+    #quick_view .modal-header .close{width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.12);font-size:28px;font-weight:300;line-height:38px;opacity:1}
+    #quick_view .modal-body{padding:28px}
+    #quick_view .product-details-inner>.row{align-items:flex-start}
+    #quick_view .product-large-slider{position:sticky;top:20px;margin:0;background:#f8f8f8;border:1px solid #eeeeee;border-radius:8px;overflow:hidden}
+    #quick_view .pro-large-img{height:430px;display:flex;align-items:center;justify-content:center;padding:28px;background:linear-gradient(180deg,#fff 0%,#f7f7f7 100%)}
+    #quick_view .pro-large-img img{max-width:100%;max-height:100%;object-fit:contain}
+    #quick_view .product-details-des{padding:4px 0 0 14px}
+    #quick_view .pro-det-title{font-size:28px;line-height:1.18;margin:0 44px 12px 0;color:#252525}
+    #quick_view .regular-price{display:inline-block;color:#b98521;font-size:22px;font-weight:800;margin-bottom:12px}
+    #quick_view [data-modal-product-description]{font-size:16px;line-height:1.7;color:#4c4c4c;margin-bottom:18px}
+    .product-modal-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
+    .product-modal-meta span{display:inline-flex;align-items:center;gap:6px;background:#f8f8f8;border:1px solid #eeeeee;border-radius:999px;padding:8px 12px;color:#444;font-size:14px}
+    .product-modal-meta strong{color:#222}
+    .product-modal-cart{display:flex;align-items:center;gap:14px;margin:0}
+    .product-modal-cart .quantity{margin:0}
+    .product-modal-cart .pro-qty{border:1px solid #e0e0e0;border-radius:6px;background:#fff;height:46px}
+    .product-modal-cart .pro-qty input{height:44px}
+    .product-modal-cart .btn{height:46px;border-radius:6px;padding:0 28px;font-weight:800;letter-spacing:.02em}
+    @@media (max-width: 991px){
+        #quick_view .product-details-des{padding:22px 0 0}
+        #quick_view .pro-large-img{height:320px}
+        #quick_view .product-large-slider{position:static}
+    }
+    @@media (max-width: 575px){
+        #quick_view .modal-body{padding:18px}
+        #quick_view .pro-det-title{font-size:22px}
+        .product-modal-cart{align-items:stretch;flex-direction:column}
+        .product-modal-cart .btn{width:100%}
+    }
+</style>
 
 @section Scripts {
     <script>

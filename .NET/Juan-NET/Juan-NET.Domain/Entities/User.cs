@@ -54,5 +54,7 @@ namespace Juan_NET.Domain.Entities
         public ICollection<SupportRating> OperatorSupportRatings { get; set; } = new List<SupportRating>();
 
         public ICollection<SupportOperatorWorkTime> SupportOperatorWorkTimes { get; set; } = new List<SupportOperatorWorkTime>();
+
+        public ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
     }
 }
