@@ -1,0 +1,374 @@
+@{
+    var errorCode = ViewData["ErrorCode"] as int? ?? 500;
+    var isNotFound = errorCode == 404;
+    ViewData["Title"] = isNotFound ? "Page not found" : "Something went wrong";
+}
+
+<partial name="_StoreHeader" />
+
+<section class="error-playground">
+    <div class="container">
+        <div class="error-stage">
+            <div class="error-copy">
+                <span class="error-kicker">Juan store</span>
+                <h1>@errorCode</h1>
+                <h2>@(isNotFound ? "This shelf is empty" : "We dropped a box")</h2>
+                <p>@(isNotFound ? "The page you wanted is out of stock. Catch a few falling products while we point you back to the shop." : "Something unexpected happened. Catch the falling products and try the store again in a moment.")</p>
+                <div class="error-actions">
+                    <a class="btn btn-hero" asp-controller="Home" asp-action="Index">Back home</a>
+                    <a class="btn btn-hero error-shop-button" asp-controller="Products" asp-action="Index">Open shop</a>
+                </div>
+            </div>
+
+            <div class="error-game" data-error-game>
+                <div class="game-panel">
+                    <div class="game-topbar">
+                        <div>
+                            <span>Score</span>
+                            <strong data-game-score>0</strong>
+                        </div>
+                        <div>
+                            <span>Best</span>
+                            <strong data-game-best>0</strong>
+                        </div>
+                        <button type="button" data-game-start>Play</button>
+                    </div>
+                    <canvas data-game-canvas width="520" height="430" aria-label="Catch the falling Juan products"></canvas>
+                    <div class="game-bottom">
+                        <span>Move with arrows, A/D, or drag the basket.</span>
+                        <span data-game-state>Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .error-playground{padding:90px 0 100px;background:linear-gradient(180deg,#fffaf0 0%,#ffffff 48%,#f7f7f7 100%);overflow:hidden}
+    .error-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,520px);gap:52px;align-items:center}
+    .error-copy{position:relative;z-index:2}
+    .error-kicker{display:inline-block;margin-bottom:18px;color:#e3a51e;font-size:14px;font-weight:700;letter-spacing:0;text-transform:uppercase}
+    .error-copy h1{margin:0;color:#222;font-size:132px;font-weight:800;line-height:.85}
+    .error-copy h2{margin:24px 0 18px;color:#222;font-size:42px;font-weight:700;line-height:1.12}
+    .error-copy p{max-width:540px;margin:0;color:#666;font-size:17px;line-height:1.8}
+    .error-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+    .error-shop-button{background:#222;color:#fff}
+    .error-shop-button:hover{background:#e3a51e;color:#fff}
+    .error-game{position:relative}
+    .error-game:before{content:"";position:absolute;inset:22px -22px -22px 22px;background:#e3a51e;opacity:.14;border-radius:8px}
+    .game-panel{position:relative;background:#fff;border:1px solid #eee;border-radius:8px;box-shadow:0 26px 70px rgba(34,34,34,.12);overflow:hidden}
+    .game-topbar{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:center;padding:18px 20px;background:#222;color:#fff}
+    .game-topbar span{display:block;color:#cfcfcf;font-size:12px;line-height:1;text-transform:uppercase}
+    .game-topbar strong{display:block;margin-top:7px;color:#fff;font-size:24px;line-height:1}
+    .game-topbar button{min-width:86px;height:42px;border:0;border-radius:6px;background:#e3a51e;color:#fff;font-weight:700;cursor:pointer;transition:.2s}
+    .game-topbar button:hover{background:#d29416}
+    .game-panel canvas{display:block;width:100%;height:auto;background:radial-gradient(circle at 18% 10%,rgba(227,165,30,.24),transparent 28%),linear-gradient(180deg,#fff7e6 0%,#fff 58%,#f5efe5 100%)}
+    .game-bottom{display:flex;justify-content:space-between;gap:16px;padding:15px 20px;color:#777;font-size:13px;background:#fff;border-top:1px solid #eee}
+    .game-bottom span:last-child{color:#e3a51e;font-weight:700}
+    @@media (max-width:991px){.error-playground{padding:70px 0 80px}.error-stage{grid-template-columns:1fr;gap:36px}.error-copy h1{font-size:104px}.error-copy h2{font-size:34px}}
+    @@media (max-width:575px){.error-playground{padding:52px 0 64px}.error-copy h1{font-size:82px}.error-copy h2{font-size:28px}.error-actions{display:grid}.error-actions .btn{width:100%;text-align:center}.game-topbar{grid-template-columns:1fr 1fr}.game-topbar button{grid-column:1/-1;width:100%}.game-bottom{display:block}.game-bottom span{display:block}.game-bottom span+span{margin-top:8px}}
+</style>
+
+<script>
+    (() => {
+        const root = document.querySelector('[data-error-game]');
+        if (!root) {
+            return;
+        }
+
+        const canvas = root.querySelector('[data-game-canvas]');
+        const context = canvas.getContext('2d');
+        const scoreElement = root.querySelector('[data-game-score]');
+        const bestElement = root.querySelector('[data-game-best]');
+        const stateElement = root.querySelector('[data-game-state]');
+        const startButton = root.querySelector('[data-game-start]');
+        const storageKey = 'juan-error-game-best';
+        const icons = ['shoe', 'bag', 'tag', 'gift'];
+        const hazards = ['x', 'bolt'];
+        let score = 0;
+        let best = Number(localStorage.getItem(storageKey) || 0);
+        let running = false;
+        let lastTime = 0;
+        let nextDrop = 0;
+        let animationFrame = 0;
+        let pointerDown = false;
+        let keys = new Set();
+        let items = [];
+        let basket = { x: canvas.width / 2 - 46, y: canvas.height - 64, width: 92, height: 34 };
+
+        bestElement.textContent = best.toString();
+
+        const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+        const random = (min, max) => Math.random() * (max - min) + min;
+
+        const drawBag = (x, y, size, color) => {
+            context.fillStyle = color;
+            context.fillRect(x - size * .42, y - size * .2, size * .84, size * .62);
+            context.strokeStyle = '#222';
+            context.lineWidth = 3;
+            context.beginPath();
+            context.arc(x, y - size * .2, size * .22, Math.PI, 0);
+            context.stroke();
+        };
+
+        const drawShoe = (x, y, size) => {
+            context.fillStyle = '#222';
+            context.beginPath();
+            context.moveTo(x - size * .45, y + size * .14);
+            context.quadraticCurveTo(x - size * .1, y - size * .18, x + size * .22, y + size * .02);
+            context.quadraticCurveTo(x + size * .52, y + size * .18, x + size * .38, y + size * .32);
+            context.lineTo(x - size * .45, y + size * .32);
+            context.closePath();
+            context.fill();
+            context.fillStyle = '#e3a51e';
+            context.fillRect(x - size * .36, y + size * .28, size * .74, size * .08);
+        };
+
+        const drawTag = (x, y, size) => {
+            context.save();
+            context.translate(x, y);
+            context.rotate(-.18);
+            context.fillStyle = '#e3a51e';
+            context.beginPath();
+            context.moveTo(-size * .36, -size * .3);
+            context.lineTo(size * .2, -size * .3);
+            context.lineTo(size * .42, -size * .02);
+            context.lineTo(size * .2, size * .3);
+            context.lineTo(-size * .36, size * .3);
+            context.closePath();
+            context.fill();
+            context.fillStyle = '#fff';
+            context.beginPath();
+            context.arc(size * .17, -size * .06, size * .06, 0, Math.PI * 2);
+            context.fill();
+            context.restore();
+        };
+
+        const drawGift = (x, y, size) => {
+            context.fillStyle = '#fff';
+            context.fillRect(x - size * .38, y - size * .22, size * .76, size * .56);
+            context.fillStyle = '#e3a51e';
+            context.fillRect(x - size * .06, y - size * .22, size * .12, size * .56);
+            context.fillRect(x - size * .38, y - size * .04, size * .76, size * .12);
+            context.strokeStyle = '#222';
+            context.lineWidth = 2;
+            context.strokeRect(x - size * .38, y - size * .22, size * .76, size * .56);
+        };
+
+        const drawHazard = (x, y, size, type) => {
+            context.strokeStyle = '#d04f32';
+            context.lineWidth = 5;
+            context.lineCap = 'round';
+            if (type === 'bolt') {
+                context.beginPath();
+                context.moveTo(x + size * .12, y - size * .42);
+                context.lineTo(x - size * .18, y);
+                context.lineTo(x + size * .08, y);
+                context.lineTo(x - size * .18, y + size * .42);
+                context.stroke();
+                return;
+            }
+            context.beginPath();
+            context.moveTo(x - size * .28, y - size * .28);
+            context.lineTo(x + size * .28, y + size * .28);
+            context.moveTo(x + size * .28, y - size * .28);
+            context.lineTo(x - size * .28, y + size * .28);
+            context.stroke();
+        };
+
+        const drawBasket = () => {
+            context.fillStyle = '#222';
+            context.beginPath();
+            context.roundRect(basket.x, basket.y, basket.width, basket.height, 8);
+            context.fill();
+            context.fillStyle = '#e3a51e';
+            context.fillRect(basket.x + 12, basket.y + 10, basket.width - 24, 5);
+            context.strokeStyle = '#222';
+            context.lineWidth = 4;
+            context.beginPath();
+            context.arc(basket.x + basket.width / 2, basket.y + 4, 28, Math.PI, 0);
+            context.stroke();
+        };
+
+        const drawItem = (item) => {
+            if (item.hazard) {
+                drawHazard(item.x, item.y, item.size, item.type);
+                return;
+            }
+
+            if (item.type === 'shoe') {
+                drawShoe(item.x, item.y, item.size);
+            } else if (item.type === 'bag') {
+                drawBag(item.x, item.y, item.size, '#e3a51e');
+            } else if (item.type === 'tag') {
+                drawTag(item.x, item.y, item.size);
+            } else {
+                drawGift(item.x, item.y, item.size);
+            }
+        };
+
+        const spawnItem = () => {
+            const hazard = Math.random() < .2;
+            const type = hazard ? hazards[Math.floor(Math.random() * hazards.length)] : icons[Math.floor(Math.random() * icons.length)];
+            items.push({
+                x: random(34, canvas.width - 34),
+                y: -34,
+                size: random(30, 46),
+                speed: random(120, 190) + score * 2,
+                drift: random(-24, 24),
+                type,
+                hazard
+            });
+        };
+
+        const intersectsBasket = (item) => {
+            const nearestX = clamp(item.x, basket.x, basket.x + basket.width);
+            const nearestY = clamp(item.y, basket.y, basket.y + basket.height);
+            const dx = item.x - nearestX;
+            const dy = item.y - nearestY;
+            return dx * dx + dy * dy < (item.size * .46) * (item.size * .46);
+        };
+
+        const endGame = () => {
+            running = false;
+            stateElement.textContent = 'Finished';
+            startButton.textContent = 'Replay';
+            cancelAnimationFrame(animationFrame);
+            if (score > best) {
+                best = score;
+                localStorage.setItem(storageKey, best.toString());
+                bestElement.textContent = best.toString();
+            }
+        };
+
+        const drawScene = () => {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = 'rgba(227,165,30,.12)';
+            for (let i = 0; i < 7; i += 1) {
+                context.beginPath();
+                context.arc(64 + i * 78, 72 + Math.sin(i) * 22, 18 + i % 3 * 7, 0, Math.PI * 2);
+                context.fill();
+            }
+            items.forEach(drawItem);
+            drawBasket();
+        };
+
+        const tick = (time) => {
+            if (!running) {
+                return;
+            }
+
+            const delta = Math.min((time - lastTime) / 1000, .032);
+            lastTime = time;
+            nextDrop -= delta;
+
+            if (nextDrop <= 0) {
+                spawnItem();
+                nextDrop = random(.55, .9);
+            }
+
+            if (keys.has('ArrowLeft') || keys.has('a')) {
+                basket.x -= 330 * delta;
+            }
+
+            if (keys.has('ArrowRight') || keys.has('d')) {
+                basket.x += 330 * delta;
+            }
+
+            basket.x = clamp(basket.x, 12, canvas.width - basket.width - 12);
+
+            items = items.filter((item) => {
+                item.y += item.speed * delta;
+                item.x += item.drift * delta;
+
+                if (intersectsBasket(item)) {
+                    if (item.hazard) {
+                        endGame();
+                    } else {
+                        score += 1;
+                        scoreElement.textContent = score.toString();
+                        stateElement.textContent = 'Caught';
+                    }
+                    return false;
+                }
+
+                return item.y < canvas.height + 50;
+            });
+
+            drawScene();
+            animationFrame = requestAnimationFrame(tick);
+        };
+
+        const startGame = () => {
+            cancelAnimationFrame(animationFrame);
+            score = 0;
+            items = [];
+            running = true;
+            lastTime = performance.now();
+            nextDrop = .25;
+            basket.x = canvas.width / 2 - basket.width / 2;
+            scoreElement.textContent = '0';
+            stateElement.textContent = 'Playing';
+            startButton.textContent = 'Restart';
+            drawScene();
+            animationFrame = requestAnimationFrame(tick);
+        };
+
+        const moveBasketToClientX = (clientX) => {
+            const rect = canvas.getBoundingClientRect();
+            const scale = canvas.width / rect.width;
+            basket.x = clamp((clientX - rect.left) * scale - basket.width / 2, 12, canvas.width - basket.width - 12);
+            if (!running) {
+                drawScene();
+            }
+        };
+
+        startButton.addEventListener('click', startGame);
+        window.addEventListener('keydown', (event) => {
+            if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) {
+                keys.add(event.key);
+                event.preventDefault();
+            }
+        });
+        window.addEventListener('keyup', (event) => keys.delete(event.key));
+        canvas.addEventListener('pointerdown', (event) => {
+            pointerDown = true;
+            canvas.setPointerCapture(event.pointerId);
+            moveBasketToClientX(event.clientX);
+            if (!running) {
+                startGame();
+            }
+        });
+        canvas.addEventListener('pointermove', (event) => {
+            if (pointerDown) {
+                moveBasketToClientX(event.clientX);
+            }
+        });
+        canvas.addEventListener('pointerup', () => {
+            pointerDown = false;
+        });
+        canvas.addEventListener('pointercancel', () => {
+            pointerDown = false;
+        });
+
+        if (!context.roundRect) {
+            context.roundRect = function (x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+                return this;
+            };
+        }
+
+        drawScene();
+    })();
+</script>

@@ -98,3 +98,13 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\art
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\product-review-delete-build\Juan-NET.Persistence.runtimeconfig.json
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\product-review-delete-build\Juan-NET.Persistence.dll
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\product-review-delete-build\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\artifacts\error-page-build\Debug\net10.0\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\artifacts\error-page-build\Debug\net10.0\Juan-NET.Persistence.runtimeconfig.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\artifacts\error-page-build\Debug\net10.0\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\artifacts\error-page-build\Debug\net10.0\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\artifacts\error-page-build\Debug\net10.0\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Persistence\artifacts\error-page-build\Debug\net10.0\Juan-NET.Domain.pdb
+C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Persistence.deps.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Persistence.runtimeconfig.json
+C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Persistence.dll
+C:\Users\dmatc\AppData\Local\Temp\JuanNetErrorPageBuild\Juan-NET.Persistence.pdb
