@@ -1,6 +1,3 @@
-﻿using Juan_NET.Persistence.Context;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Juan_NET.Web.Controllers
 {

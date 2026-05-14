@@ -1,5 +1,3 @@
-using Stripe;
-using Stripe.Checkout;
 
 namespace Juan_NET.Web.Controllers
 {

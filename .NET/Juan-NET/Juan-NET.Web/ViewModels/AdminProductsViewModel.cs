@@ -1,5 +1,3 @@
-using Juan_NET.Domain.Entities;
-using Microsoft.AspNetCore.Http;
 
 namespace Juan_NET.Web.ViewModels
 {

@@ -1,9 +1,3 @@
-﻿using Juan_NET.Domain.Entities;
-using Juan_NET.Persistence.Context;
-using Juan_NET.Web.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace Juan_NET.Web.Controllers
 {

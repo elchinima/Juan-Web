@@ -7,14 +7,30 @@
   "targets": {
     ".NETCoreApp,Version=v10.0": {
       "Juan-NET.Application/1.0.0": {
+        "dependencies": {
+          "Juan-NET.Domain": "1.0.0"
+        },
         "runtime": {
           "Juan-NET.Application.dll": {}
+        }
+      },
+      "Juan-NET.Domain/1.0.0": {
+        "runtime": {
+          "Juan-NET.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
   },
   "libraries": {
     "Juan-NET.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Juan-NET.Domain/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -429,7 +429,7 @@
           }
         },
         "build": {
-          "build/SixLabors.ImageSharp.props": {}
+          "build/_._": {}
         }
       },
       "Stripe.net/51.0.1": {
@@ -555,6 +555,19 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "Juan-NET.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Juan-NET.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Juan-NET.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Juan-NET.Application.dll": {}
+        }
+      },
       "Juan-NET.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -564,6 +577,25 @@
         "runtime": {
           "bin/placeholder/Juan-NET.Domain.dll": {}
         }
+      },
+      "Juan-NET.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Juan-NET.Application": "1.0.0",
+          "Juan-NET.Domain": "1.0.0",
+          "Juan-NET.Persistence": "1.0.0",
+          "SixLabors.ImageSharp": "3.1.12"
+        },
+        "compile": {
+          "bin/placeholder/Juan-NET.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Juan-NET.Infrastructure.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       },
       "Juan-NET.Persistence/1.0.0": {
         "type": "project",
@@ -1308,10 +1340,20 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Juan-NET.Application/1.0.0": {
+      "type": "project",
+      "path": "../Juan-NET.Application/Juan-NET.Application.csproj",
+      "msbuildProject": "../Juan-NET.Application/Juan-NET.Application.csproj"
+    },
     "Juan-NET.Domain/1.0.0": {
       "type": "project",
       "path": "../Juan-NET.Domain/Juan-NET.Domain.csproj",
       "msbuildProject": "../Juan-NET.Domain/Juan-NET.Domain.csproj"
+    },
+    "Juan-NET.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../Juan-NET.Infrastructure/Juan-NET.Infrastructure.csproj",
+      "msbuildProject": "../Juan-NET.Infrastructure/Juan-NET.Infrastructure.csproj"
     },
     "Juan-NET.Persistence/1.0.0": {
       "type": "project",
@@ -1321,10 +1363,11 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "Juan-NET.Application >= 1.0.0",
       "Juan-NET.Domain >= 1.0.0",
+      "Juan-NET.Infrastructure >= 1.0.0",
       "Juan-NET.Persistence >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 10.0.5",
-      "SixLabors.ImageSharp >= 3.1.12",
       "Stripe.net >= 51.0.1"
     ]
   },
@@ -1361,8 +1404,14 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
+            "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Application\\Juan-NET.Application.csproj": {
+              "projectPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Application\\Juan-NET.Application.csproj"
+            },
             "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Domain\\Juan-NET.Domain.csproj": {
               "projectPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Domain\\Juan-NET.Domain.csproj"
+            },
+            "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Infrastructure\\Juan-NET.Infrastructure.csproj": {
+              "projectPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Infrastructure\\Juan-NET.Infrastructure.csproj"
             },
             "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Persistence\\Juan-NET.Persistence.csproj": {
               "projectPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Persistence\\Juan-NET.Persistence.csproj"
@@ -1390,10 +1439,6 @@
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[10.0.5, )"
-          },
-          "SixLabors.ImageSharp": {
-            "target": "Package",
-            "version": "[3.1.12, )"
           },
           "Stripe.net": {
             "target": "Package",

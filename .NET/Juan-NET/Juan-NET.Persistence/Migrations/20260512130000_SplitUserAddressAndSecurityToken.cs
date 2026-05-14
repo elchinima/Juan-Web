@@ -1,7 +1,3 @@
-using Juan_NET.Persistence.Context;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
-
 #nullable disable
 
 namespace Juan_NET.Persistence.Migrations

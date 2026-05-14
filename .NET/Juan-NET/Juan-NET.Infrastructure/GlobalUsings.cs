@@ -1,0 +1,17 @@
+global using Juan_NET.Application.Authorization;
+global using Juan_NET.Domain.Entities;
+global using Juan_NET.Infrastructure.BackgroundServices;
+global using Juan_NET.Infrastructure.Services;
+global using Juan_NET.Persistence.Context;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Logging;
+global using SixLabors.ImageSharp;
+global using SixLabors.ImageSharp.Formats.Webp;
+global using System.Globalization;
+global using System.Net;
+global using System.Net.Mail;
+global using System.Security.Claims;

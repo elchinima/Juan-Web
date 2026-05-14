@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Juan_NET.Web.Services;
 
 namespace Juan_NET.Web.ViewModels
 {

@@ -5,12 +5,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<ImageStorageService>();
-builder.Services.AddScoped<EmailService>();
-builder.Services.AddScoped<AdminAccessService>();
-builder.Services.AddScoped<SupportWorkTimeService>();
-builder.Services.AddHostedService<SupportReportCleanupService>();
-builder.Services.AddHostedService<FavoriteCategoryDigestService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -26,21 +20,15 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions
 });
 
 builder.Services.AddOpenApi();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await AdminAccessService.EnsureRoleInfrastructureAsync(context);
-    await FavoriteCategoryInfrastructureService.EnsureInfrastructureAsync(context);
-    await ShopListInfrastructureService.EnsureInfrastructureAsync(context);
-    await SiteSettingsInfrastructureService.EnsureInfrastructureAsync(context);
-    await OrderInfrastructureService.EnsureInfrastructureAsync(context);
-    await SupportInfrastructureService.EnsureInfrastructureAsync(context);
-    await ProductReviewInfrastructureService.EnsureInfrastructureAsync(context);
+    await DatabaseInfrastructureInitializer.EnsureInfrastructureAsync(context);
 }
 
 if (app.Environment.IsDevelopment())

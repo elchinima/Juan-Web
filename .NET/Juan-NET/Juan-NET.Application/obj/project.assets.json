@@ -1,11 +1,30 @@
 {
   "version": 4,
   "targets": {
-    "net10.0": {}
+    "net10.0": {
+      "Juan-NET.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Juan-NET.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Juan-NET.Domain.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Juan-NET.Domain/1.0.0": {
+      "type": "project",
+      "path": "../Juan-NET.Domain/Juan-NET.Domain.csproj",
+      "msbuildProject": "../Juan-NET.Domain/Juan-NET.Domain.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net10.0": []
+    "net10.0": [
+      "Juan-NET.Domain >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\dmatc\\.nuget\\packages\\": {},
@@ -39,7 +58,11 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Domain\\Juan-NET.Domain.csproj": {
+              "projectPath": "D:\\Project-Work\\Code Academy\\Mini Projects\\Juan - Online Store\\.NET\\Juan-NET\\Juan-NET.Domain\\Juan-NET.Domain.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

@@ -120,3 +120,11 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\art
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-scroll-verify-build\Juan-NET.Persistence.runtimeconfig.json
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-scroll-verify-build\Juan-NET.Persistence.dll
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\slider-scroll-verify-build\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Persistence.runtimeconfig.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Persistence.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Persistence.runtimeconfig.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Persistence.pdb

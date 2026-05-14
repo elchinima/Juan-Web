@@ -7,4 +7,18 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Juan-NET.Application\Juan-NET.Application.csproj" />
+    <ProjectReference Include="..\Juan-NET.Domain\Juan-NET.Domain.csproj" />
+    <ProjectReference Include="..\Juan-NET.Persistence\Juan-NET.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

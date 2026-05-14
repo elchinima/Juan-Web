@@ -1,7 +1,3 @@
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text.Json;
-using Juan_NET.Domain.Entities;
 
 namespace Juan_NET.Web.Controllers
 {

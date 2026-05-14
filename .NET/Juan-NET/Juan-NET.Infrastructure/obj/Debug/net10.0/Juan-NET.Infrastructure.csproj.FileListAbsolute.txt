@@ -10,3 +10,17 @@ D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Jua
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\obj\Debug\net10.0\refint\Juan-NET.Infrastructure.dll
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\obj\Debug\net10.0\Juan-NET.Infrastructure.pdb
 D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\obj\Debug\net10.0\ref\Juan-NET.Infrastructure.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Infrastructure.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Infrastructure.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\architecture-verify-build\Juan-NET.Infrastructure.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\obj\Debug\net10.0\Juan-NET.Infrastructure.csproj.AssemblyReference.cache
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\obj\Debug\net10.0\Juan-NET.748F4AF7.Up2Date
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\bin\Debug\net10.0\Juan-NET.Application.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\bin\Debug\net10.0\Juan-NET.Domain.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\bin\Debug\net10.0\Juan-NET.Persistence.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\bin\Debug\net10.0\Juan-NET.Application.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\bin\Debug\net10.0\Juan-NET.Domain.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\Juan-NET.Infrastructure\bin\Debug\net10.0\Juan-NET.Persistence.pdb
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Infrastructure.deps.json
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Infrastructure.dll
+D:\Project-Work\Code Academy\Mini Projects\Juan - Online Store\.NET\Juan-NET\artifacts\global-usings-verify-build\Juan-NET.Infrastructure.pdb
