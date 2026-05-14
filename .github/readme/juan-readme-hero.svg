@@ -1,0 +1,110 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Juan Online Store animated README banner</title>
+  <desc id="desc">Animated ecommerce hero banner in the Juan store visual style.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="0.56" stop-color="#f8f8f8"/>
+      <stop offset="1" stop-color="#fcedda"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e3a51e"/>
+      <stop offset="1" stop-color="#b98521"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#141414" flood-opacity="0.15"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title { font: 800 64px Montserrat, Arial, sans-serif; fill: #333333; letter-spacing: 0; }
+    .subtitle { font: 700 19px Montserrat, Arial, sans-serif; fill: #e3a51e; letter-spacing: 4px; }
+    .copy { font: 400 19px 'Open Sans', Arial, sans-serif; fill: #666666; }
+    .label { font: 700 16px Montserrat, Arial, sans-serif; fill: #333333; }
+    .small { font: 600 13px Montserrat, Arial, sans-serif; fill: #666666; }
+    .price { font: 800 18px Montserrat, Arial, sans-serif; fill: #e3a51e; }
+    .float-a { animation: floatA 5.6s ease-in-out infinite; transform-origin: center; }
+    .float-b { animation: floatB 6.2s ease-in-out infinite; transform-origin: center; }
+    .float-c { animation: floatC 4.9s ease-in-out infinite; transform-origin: center; }
+    .pulse { animation: pulse 2.2s ease-in-out infinite; transform-origin: center; }
+    .slide { animation: slide 8s ease-in-out infinite; }
+    .spark { animation: sparkle 2.8s ease-in-out infinite; transform-origin: center; }
+    .dash { stroke-dasharray: 18 14; animation: dash 18s linear infinite; }
+    @keyframes floatA { 0%,100%{ transform: translateY(0) rotate(-1.2deg);} 50%{ transform: translateY(-12px) rotate(1deg);} }
+    @keyframes floatB { 0%,100%{ transform: translateY(0) rotate(1.5deg);} 50%{ transform: translateY(11px) rotate(-1deg);} }
+    @keyframes floatC { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-9px);} }
+    @keyframes pulse { 0%,100%{ transform: scale(1); opacity: .9;} 50%{ transform: scale(1.06); opacity: 1;} }
+    @keyframes slide { 0%,100%{ transform: translateX(0);} 50%{ transform: translateX(16px);} }
+    @keyframes sparkle { 0%,100%{ opacity: .32; transform: scale(.82);} 50%{ opacity: 1; transform: scale(1.12);} }
+    @keyframes dash { to { stroke-dashoffset: -320; } }
+    @media (prefers-reduced-motion: reduce) {
+      .float-a, .float-b, .float-c, .pulse, .slide, .spark, .dash { animation: none; }
+    }
+  </style>
+
+  <rect x="0.5" y="0.5" width="1199" height="359" rx="18" fill="url(#bg)" stroke="#eeeeee"/>
+  <circle cx="914" cy="66" r="98" fill="#f2fbcb" filter="url(#soft)" opacity="0.85"/>
+  <circle cx="1080" cy="288" r="118" fill="#f7d8f9" filter="url(#soft)" opacity="0.62"/>
+  <path class="dash" d="M676 284 C801 196 890 226 1015 142 C1080 98 1122 75 1180 86" stroke="#e3a51e" stroke-width="3" stroke-linecap="round" opacity="0.34"/>
+
+  <g transform="translate(70 74)">
+    <text class="subtitle" x="0" y="0">JUAN ONLINE STORE</text>
+    <text class="title" x="0" y="80">README</text>
+    <text class="copy" x="4" y="124">ASP.NET Core ecommerce with admin, support chat, Stripe,</text>
+    <text class="copy" x="4" y="154">wishlist, reviews, animated transitions and Onion layers.</text>
+    <g transform="translate(4 194)">
+      <g class="pulse">
+        <rect width="188" height="48" rx="6" fill="url(#gold)"/>
+        <text x="26" y="31" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="800" fill="#ffffff">SHOP EXPERIENCE</text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(674 83)" filter="url(#shadow)">
+    <g class="float-a">
+      <rect width="190" height="224" rx="10" fill="#ffffff"/>
+      <rect x="16" y="16" width="158" height="116" rx="8" fill="#f7f7f7"/>
+      <path d="M51 112 C66 70 88 51 114 69 C138 86 131 116 151 122" stroke="#333333" stroke-width="10" stroke-linecap="round"/>
+      <path d="M54 114 C89 126 120 126 153 122" stroke="#e3a51e" stroke-width="8" stroke-linecap="round"/>
+      <text class="label" x="18" y="164">Premium Shoes</text>
+      <text class="small" x="18" y="188">wishlist | cart | view</text>
+      <text class="price" x="18" y="214">$70.00</text>
+    </g>
+  </g>
+
+  <g transform="translate(920 58)" filter="url(#shadow)">
+    <g class="float-b">
+      <rect width="204" height="242" rx="10" fill="#ffffff"/>
+      <rect x="18" y="18" width="168" height="128" rx="8" fill="#fcedda"/>
+      <circle cx="78" cy="84" r="34" fill="#e3a51e" opacity="0.22"/>
+      <path d="M55 100 L84 61 L142 109" stroke="#333333" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M61 108 C93 124 126 125 153 112" stroke="#e3a51e" stroke-width="9" stroke-linecap="round"/>
+      <text class="label" x="20" y="178">Support Chat</text>
+      <text class="small" x="20" y="202">tickets | ratings | reports</text>
+      <rect x="20" y="219" width="84" height="8" rx="4" fill="#e3a51e"/>
+      <rect x="112" y="219" width="54" height="8" rx="4" fill="#eeeeee"/>
+    </g>
+  </g>
+
+  <g transform="translate(340 236)" filter="url(#shadow)">
+    <g class="float-c">
+      <rect width="210" height="68" rx="10" fill="#333333"/>
+      <circle cx="38" cy="34" r="19" fill="#e3a51e"/>
+      <path d="M30 33 L37 40 L49 26" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="70" y="29" font-family="Montserrat, Arial, sans-serif" font-size="15" font-weight="800" fill="#ffffff">Stripe Ready</text>
+      <text x="70" y="51" font-family="Open Sans, Arial, sans-serif" font-size="12" font-weight="600" fill="#cccccc">checkout success flow</text>
+    </g>
+  </g>
+
+  <g transform="translate(1018 316)">
+    <g class="slide">
+      <rect width="105" height="22" rx="11" fill="#ffffff" opacity="0.9"/>
+      <circle class="spark" cx="19" cy="11" r="4" fill="#e3a51e"/>
+      <circle class="spark" cx="53" cy="11" r="4" fill="#e3a51e" style="animation-delay:.35s"/>
+      <circle class="spark" cx="87" cy="11" r="4" fill="#e3a51e" style="animation-delay:.7s"/>
+    </g>
+  </g>
+</svg>
