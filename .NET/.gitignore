@@ -88,6 +88,7 @@ $RECYCLE.BIN/
 
 appsettings.local.json
 appsettings.json
+appsettings.*.json
 secrets.json
 connectionstrings.json
 

@@ -14,7 +14,7 @@ namespace Juan_NET.Web.Controllers
 
         public async Task<IActionResult> Index(string? query, int? categoryId, decimal? minPrice, decimal? maxPrice, decimal? minRating, int page = 1)
         {
-            const int pageSize = 10;
+            const int pageSize = 5;
             page = Math.Max(1, page);
 
             IQueryable<Product> productsQuery = _context.Products
